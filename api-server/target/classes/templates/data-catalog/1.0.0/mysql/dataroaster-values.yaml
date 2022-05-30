@@ -1,5 +1,0 @@
-namespace: {{ namespace }}
-storage:
-  storageClass: {{ storageClass }}
-  size: {{ storageSize }}Gi
-rootPassword: icarus0337

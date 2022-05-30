@@ -1,4 +1,0 @@
-namespace: {{ redashNamespace }}
-storage:
-  storageClass: {{ storageClass }}
-  size: {{ redashStorageSize }}

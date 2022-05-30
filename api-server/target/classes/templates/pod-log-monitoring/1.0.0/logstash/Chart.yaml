@@ -1,7 +1,0 @@
-apiVersion: v2
-name: dataroaster-logstash
-version: 1.0.0
-appVersion: 7.12.1
-description: dataroaster Logstash.
-
-

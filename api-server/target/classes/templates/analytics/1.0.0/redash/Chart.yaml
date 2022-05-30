@@ -1,7 +1,0 @@
-apiVersion: v2
-name: dataroaster-analytics-redash
-version: 1.0.0
-appVersion: 8.0.0.b32245
-description: dataroaster analytics redash.
-
-

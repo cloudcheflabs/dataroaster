@@ -1,7 +1,0 @@
-apiVersion: v2
-name: dataroaster-trino
-version: 1.0.0
-appVersion: 360
-description: dataroaster query engine trino.
-
-

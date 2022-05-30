@@ -1,9 +1,0 @@
-namespace: {{ namespace }}
-s3:
-  bucket: {{ s3Bucket }}
-  accessKey: {{ s3AccessKey }}
-  secretKey: {{ s3SecretKey }}
-  endpoint: {{ s3Endpoint }}
-jdbc:
-  user: root
-  password: icarus0337
