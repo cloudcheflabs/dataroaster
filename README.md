@@ -232,11 +232,6 @@ ansible-playbook -i inventory/dataroaster.ini restart-all.yml \
 --extra-vars "exec_user=<sudo-user> target_hosts=all";
 ```
 
-## Install DataRoaster with Source
-
-* See [Install DataRoaster with Source](https://github.com/cloudcheflabs/dataroaster/wiki/Install-DataRoaster-with-Source)
-
-
 
 ## Storage Requirement
 
