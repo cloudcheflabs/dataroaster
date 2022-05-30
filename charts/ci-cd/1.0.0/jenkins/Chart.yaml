@@ -1,0 +1,7 @@
+apiVersion: v2
+name: dataroaster-jenkins
+version: 1.0.0
+appVersion: 2.289.1
+description: dataroaster Jenkins
+
+

@@ -1,0 +1,10 @@
+replicaCount: 3
+persistence:
+  enabled: true
+  size: 8Gi
+  storageClass: ceph-rbd-sc
+zookeeper:
+  replicaCount: 3
+  persistence:
+    enabled: true
+    storageClass: ceph-rbd-sc

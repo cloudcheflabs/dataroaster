@@ -1,0 +1,8 @@
+- name: start authorizer
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ authorizer_home_dir }}"
+  with_items:
+    - "./start-authorizer.sh"
+  become_user: "{{ dataroaster_exec_user }}"

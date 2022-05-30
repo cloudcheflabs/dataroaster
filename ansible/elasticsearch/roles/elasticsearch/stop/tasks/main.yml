@@ -1,0 +1,21 @@
+- name: Stopping kibana
+  shell: "kill $(cat pid)"
+  args:
+    chdir: "{{ item }}"
+    executable: /bin/bash
+  become_user: kibana
+  with_items:
+    - "{{ kibana_home }}"
+  when: inventory_hostname in groups['kibana']
+  ignore_errors: true
+
+
+- name: Stopping elasticsearch
+  shell: "kill $(cat pid)"
+  args:
+    chdir: "{{ item }}"
+    executable: /bin/bash
+  become_user: elasticsearch
+  with_items:
+    - "{{ es_home }}"
+  ignore_errors: true

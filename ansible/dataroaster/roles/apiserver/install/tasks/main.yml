@@ -1,0 +1,85 @@
+- name: create dataroaster user
+  user:
+    name: "{{ dataroaster_exec_user }}"
+    state: present
+    createhome: yes
+    home: "{{ dataroaster_home_dir }}"
+  become: true
+
+
+- name: create dataroaster directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ dataroaster_exec_user }}"
+    group: "{{ dataroaster_exec_user }}"
+    mode: 0755
+  with_items:
+    - "{{ dataroaster_home_dir }}"
+    - "{{ apiserver_home_dir }}"
+    - "{{ dataroaster_log_dir }}"
+  become: true
+
+- name: download apiserver distribution
+  get_url:
+    url: "https://github.com/cloudcheflabs/dataroaster/releases/download/{{ dataroaster_version }}/api-server-{{ dataroaster_version }}-dist.tgz"
+    dest: "{{ apiserver_home_dir }}"
+    mode: '0755'
+  become: true
+
+
+- name: extract apiserver distribution
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ apiserver_home_dir }}"
+  with_items:
+    - "tar zxvf api-server-*-dist.tgz"
+    - "cp -R apiserver/* ."
+    - "rm -rf api-server-*-dist.tgz"
+    - "rm -rf apiserver/"
+  become: true
+
+- name: prompt for vault initial root token
+  pause:
+    prompt: "Enter vault initial root token "
+    echo: yes
+  register: vault_init_root_token
+- set_fact:
+    vault_init_root_token_input: "{{ vault_init_root_token.user_input }}"
+- debug:
+    var: "{{ vault_init_root_token_input }}"
+  ignore_errors: true
+
+- name: copy apiserver configuration
+  template:
+    src: "templates/{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ dataroaster_exec_user }}"
+    group: "{{ dataroaster_exec_user }}"
+    mode: 0755
+  with_items:
+    - { src: 'application-prod.yml', dest: '{{ apiserver_home_dir }}/conf/application-prod.yml' }
+    - { src: 'logback.xml', dest: '{{ apiserver_home_dir }}/logback.xml' }
+    - { src: 'persistence-mysql.properties', dest: '{{ apiserver_home_dir }}/persistence-mysql.properties' }
+  become: true
+
+- name: chown apiserver home dir.
+  file:
+    path: "{{ item }}"
+    recurse: true
+    owner: "{{ dataroaster_exec_user }}"
+    group: "{{ dataroaster_exec_user }}"
+    mode: 0755
+  with_items:
+    - "{{ apiserver_home_dir }}"
+  become: true
+
+- name: start apiserver
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ apiserver_home_dir }}"
+  with_items:
+    - "./start-apiserver.sh"
+  become_user: "{{ dataroaster_exec_user }}"

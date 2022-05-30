@@ -1,0 +1,55 @@
+- name: download mysql rpm
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+  with_items:
+    - "wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm && rpm -ivh mysql-community-release-el7-5.noarch.rpm"
+  become: true
+  ignore_errors: true
+
+- name: install mysql server
+  yum:
+    name: mysql-server
+    state: present
+
+- name: start mysql server
+  service:
+    name: mysql
+    state: started
+  become: true
+
+- name: create temp directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ mysql_temp_dir }}"
+
+- name: copy sql files
+  template:
+    src: "templates/{{ item }}"
+    dest: "{{ mysql_temp_dir }}/{{ item }}"
+    mode: 0755
+  with_items:
+    - "create-db-user.sql"
+    - "creat-auth.sql"
+    - "create-tables.sql"
+
+- name: create db, user and tables
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ mysql_temp_dir }}"
+  with_items:
+    - "mysql -u root < create-db-user.sql"
+    - "mysql -u root dataroaster < creat-auth.sql"
+    - "mysql -u root dataroaster < create-tables.sql"
+  become: true
+  ignore_errors: true
+
+- name: remove temp dir
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ mysql_temp_dir }}"

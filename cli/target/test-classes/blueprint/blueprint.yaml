@@ -1,0 +1,154 @@
+project:
+  name: my-blueprint-project
+  description: "My blueprint project description..."
+
+cluster:
+  name: my-blueprint-cluster
+  description: "My blueprint cluster description..."
+  kubeconfig: "/home/opc/.kube/config"
+
+services:
+  - name: ingresscontroller
+
+  - name: datacatalog
+    params:
+      properties:
+        - s3
+      storage-size: 1
+    extra-params:
+      storage-class: 
+        property-ref: storage-classes
+        key: storage-class-rwo
+        
+  - name: queryengine
+    params:
+      properties:
+        - s3
+      spark-thrift-server-executors: 1
+      spark-thrift-server-executor-memory: 1
+      spark-thrift-server-executor-cores: 1
+      spark-thrift-server-driver-memory: 1
+      trino-workers: 3
+      trino-server-max-memory: 16
+      trino-cores: 1
+      trino-temp-data-storage: 1
+      trino-data-storage: 1
+    extra-params:
+      spark-thrift-server-storage-class:
+        property-ref: storage-classes
+        key: storage-class-rwx
+      trino-storage-class:
+        property-ref: storage-classes
+        key: storage-class-rwo
+    depends: datacatalog
+
+  - name: analytics
+    params:
+      jupyterhub-github-client-id: any-github-client-id
+      jupyterhub-github-client-secret: any-github-client-secret
+      jupyterhub-ingress-host: jupyterhub-test.cloudchef-labs.com
+      jupyterhub-storage-size: 1
+      redash-storage-size: 1
+    extra-params:
+      storage-class:
+        property-ref: storage-classes
+        key: storage-class-rwo
+    depends: ingresscontroller
+
+  - name: streaming
+    params:
+      kafka-replica-count: 3
+      kafka-storage-size: 4
+      zk-replica-count: 3
+    extra-params:
+      storage-class:
+        property-ref: storage-classes
+        key: storage-class-rwo
+
+  - name: workflow
+    params:
+      properties:
+        - argo-workflow-s3
+      storage-size: 1
+    extra-params:
+      storage-class:
+        property-ref: storage-classes
+        key: storage-class-rwo
+
+  - name: podlogmonitoring
+    params:
+      elasticsearch-hosts: 192.168.10.10:9200,192.168.10.134:9200,192.168.10.145:9200
+  - name: metricsmonitoring
+    params:
+      storage-size: 1
+    extra-params:
+      storage-class:
+        property-ref: storage-classes
+        key: storage-class-rwo
+
+  - name: distributedtracing
+    params:
+      ingress-host: ingress-nginx-jaeger-test.cloudchef-labs.com
+      elasticsearch-host-port: 192.168.10.10:9200
+    extra-params:
+      storage-class:
+        property-ref: storage-classes
+        key: storage-class-rwo
+    depends: ingresscontroller
+
+  - name: privateregistry
+    params:
+      core-host: harbor-core-test.cloudchef-labs.com
+      notary-host: harbor-notary-test.cloudchef-labs.com
+      registry-storage-size: 5
+      chartmuseum-storage-size: 5
+      jobservice-storage-size: 1
+      database-storage-size: 1
+      redis-storage-size: 1
+      trivy-storage-size: 1
+      properties:
+        - s3
+    extra-params:
+      storage-class:
+        property-ref: storage-classes
+        key: storage-class-rwo
+    depends: ingresscontroller
+
+  - name: cicd
+    params:
+      argocd-ingress-host: argocd-test.cloudchef-labs.com
+      jenkins-ingress-host: jenkins-test.cloudchef-labs.com
+    extra-params:
+      storage-class:
+        property-ref: storage-classes
+        key: storage-class-rwo
+    depends: ingresscontroller
+
+  - name: backup
+    params:
+      properties:
+        - velero-s3
+
+properties:
+  - name: s3
+    kv:
+      s3-bucket: mykidong
+      s3-access-key: any-access-key
+      s3-secret-key: any-secret-key
+      s3-endpoint: https://s3-endpoint
+  - name: argo-workflow-s3
+    kv:
+      s3-bucket: mykidong
+      s3-access-key: any-access-key
+      s3-secret-key: any-secret-key
+      s3-endpoint: s3-endpoint
+  - name: velero-s3
+    kv:
+      s3-bucket: velero-backups
+      s3-access-key: any-access-key
+      s3-secret-key: any-secret-key
+      s3-endpoint: https://s3-endpoint
+  - name: storage-classes
+    kv:
+      storage-class-rwo: oci
+      storage-class-rwx: nfs

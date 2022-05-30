@@ -1,0 +1,9 @@
+vault_temp_dir: /tmp/vault
+vault_conf_dir: /etc/vault.d
+vault_env:
+  VAULT_ADDR: https://localhost:8200
+  VAULT_SKIP_VERIFY: true
+
+mysql_vault_user: dataroaster
+mysql_vault_password: dataroaster123
+

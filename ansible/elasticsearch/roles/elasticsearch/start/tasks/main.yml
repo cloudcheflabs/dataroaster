@@ -1,0 +1,10 @@
+- name: Starting elasticsearch
+  shell: sudo su - elasticsearch -c "source /etc/profile && bin/elasticsearch -d -p pid"
+  args:
+    chdir: "{{ es_home }}"
+
+- name: Starting kibana
+  shell: sudo su - kibana -c "nohup bin/kibana > /dev/null 2>&1 & echo \$! > pid"
+  args:
+    chdir: "{{ kibana_home }}"
+  when: inventory_hostname in groups['kibana']

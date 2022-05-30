@@ -1,0 +1,10 @@
+replicaCount: {{ kafkaReplicaCount }}
+persistence:
+  enabled: true
+  size: {{ kafkaStorageSize }}Gi
+  storageClass: {{ storageClass }}
+zookeeper:
+  replicaCount: {{ zkReplicaCount }}
+  persistence:
+    enabled: true
+    storageClass: {{ storageClass }}

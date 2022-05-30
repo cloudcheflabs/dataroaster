@@ -1,0 +1,21 @@
+- name: stop mysql server
+  service:
+    name: mysql
+    state: stopped
+  become: true
+
+- name: remove mysql server
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+  with_items:
+    - "yum remove mysql-community\\* -y"
+  become: true
+
+- name: remove mysql data dir
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "/var/lib/mysql"
+  become: true

@@ -1,0 +1,12 @@
+com/cloudcheflabs/dataroaster/authorizer/controller/AuthorizationController.class
+com/cloudcheflabs/dataroaster/authorizer/component/FavreBcryptPasswordEncoder.class
+com/cloudcheflabs/dataroaster/authorizer/dao/mysql/MySqlUserDetailsDao.class
+com/cloudcheflabs/dataroaster/authorizer/api/service/RoleService.class
+com/cloudcheflabs/dataroaster/authorizer/service/RoleServiceImpl.class
+com/cloudcheflabs/dataroaster/authorizer/config/AuthorizationSeverConfig.class
+com/cloudcheflabs/dataroaster/authorizer/config/ResourceServerConfig.class
+com/cloudcheflabs/dataroaster/authorizer/service/UserDetailsServiceImpl.class
+com/cloudcheflabs/dataroaster/authorizer/domain/UserInfo.class
+com/cloudcheflabs/dataroaster/authorizer/config/SecurityConfig.class
+com/cloudcheflabs/dataroaster/authorizer/api/dao/UserDetailsDao.class
+com/cloudcheflabs/dataroaster/authorizer/AuthorizerApplication.class

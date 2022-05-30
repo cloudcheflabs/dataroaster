@@ -1,0 +1,17 @@
+namespace: spark-operator
+serviceAccount: spark-operator
+image: cloudcheflabs/spark-operator:v3.0.3
+imagePullPolicy: Always
+resources: 
+  requests:
+    cpu: 200m
+    memory: 1Gi
+  limits:
+    cpu: 300m
+    memory: 1500Mi
+priorityClassName: ""
+annotations: null
+affinity: null
+tolerations: null
+nodeSelector: null
+hostNetwork: false

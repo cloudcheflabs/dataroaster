@@ -1,0 +1,15 @@
+namespace: {{ trinoNamespace }}
+workers: {{ trinoWorkers }}
+serverMaxMemory: {{ trinoServerMaxMemory }}
+cpu: {{ trinoCores }}
+tempDataStorage: {{ trinoTempDataStorage }}
+dataStorage: {{ trinoDataStorage }}
+storageClass: {{ trinoStorageClass }}
+tempStorageClass: {{ sparkThriftServerStorageClass }}
+s3:
+  accessKey: {{ s3AccessKey }}
+  secretKey: {{ s3SecretKey }}
+  endpoint: {{ s3Endpoint }}
+hive:
+  metastore:
+    endpoint: metastore.{{ hivemetastoreNamespace }}.svc:9083

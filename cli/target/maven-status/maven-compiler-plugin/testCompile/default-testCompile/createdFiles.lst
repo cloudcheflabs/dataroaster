@@ -1,0 +1,6 @@
+com/cloudcheflabs/dataroaster/cli/ClusterDaoTestRunner.class
+com/cloudcheflabs/dataroaster/cli/ProjectDaoTestRunner.class
+com/cloudcheflabs/dataroaster/cli/KubeconfigDaoTestRunner.class
+com/cloudcheflabs/dataroaster/cli/BlueprintTestRunner.class
+com/cloudcheflabs/dataroaster/cli/PodLogMonitoringDaoTestRunner.class
+com/cloudcheflabs/dataroaster/cli/LoginDaoTestRunner.class

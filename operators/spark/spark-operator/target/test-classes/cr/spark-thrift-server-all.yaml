@@ -1,0 +1,100 @@
+apiVersion: "spark-operator.cloudchef-labs.com/v1alpha1"
+kind: SparkApplication
+metadata:
+  name: spark-thrift-server
+  namespace: spark-operator
+spec:
+  core:
+    applicationType: EndlessRun
+    deployMode: Cluster
+    container:
+      image: "cloudcheflabs/spark:v3.0.3"
+      imagePullPolicy: Always
+    class: com.cloudcheflabs.dataroaster.hive.SparkThriftServerRunner
+    args:
+      - "arg1"
+      - "arg2"
+    applicationFileUrl: "s3a://my-bucket/spark-apps/spark-thrift-server-3.0.3-spark-job.jar"
+    namespace: spark
+    s3:
+      bucket: my-bucket
+      accessKey:
+        valueFrom:
+          secretKeyRef:
+            name: s3-secret
+            key: accessKey
+      secretKey:
+        valueFrom:
+          secretKeyRef:
+            name: s3-secret
+            key: secretKey
+      endpoint: "https://any-s3-endpoint"
+    hive:
+      metastoreUris:
+        - "thrift://metastore.hive-metastore.svc:9083"
+  driver:
+    serviceAccountName: spark
+    label:
+      application-name: spark-thrift-server-driver
+    annotation:
+      some-key: some-value
+    resources:
+      cores: "1"
+      limitCores: "1500m"
+      memory: "512m"
+    volumeMounts:
+      - name: host-path-volume
+        mountPath: "/opt/driver-volume"
+      - name: empty-dir-volume
+        mountPath: "/tmp"
+      - name: pvc-volume-driver
+        mountPath: "/local-dir"
+    podTemplate:
+      hostNetwork: false
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+  executor:
+    instances: 3
+    label:
+      application-name: spark-thrift-server-executor
+    annotation:
+      some-key: some-value
+    resources:
+      cores: "2"
+      limitCores: "2500m"
+      memory: "2g"
+    volumeMounts:
+      - name: pvc-volume-executor
+        mountPath: "/local-dir"
+    podTemplate:
+      hostNetwork: false
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+  confs:
+    spark.kubernetes.appKillPodDeletionGracePeriod: "30"
+    spark.driver.extraJavaOptions: "-Divy.cache.dir=/tmp -Divy.home=/tmp"
+    spark.hadoop.hive.metastore.client.connect.retry.delay: "5"
+    spark.hadoop.fs.s3a.fast.upload: "true"
+    spark.hadoop.fs.s3a.path.style.access: "true"
+  volumes:
+    - name: host-path-volume
+      type: Any
+      hostPath:
+        path: "/any-host-path"
+        type: Directory
+    - name: empty-dir-volume
+      type: Any
+      emptyDir: { }
+    - name: pvc-volume-driver
+      type: SparkLocalDir
+      persistentVolumeClaim:
+        claimName: nfs-pvc-driver
+    - name: pvc-volume-executor
+      type: SparkLocalDir
+      persistentVolumeClaim:
+        claimName: nfs-pvc-executor
+

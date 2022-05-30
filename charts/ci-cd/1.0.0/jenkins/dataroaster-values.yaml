@@ -1,0 +1,4 @@
+namespace: dataroaster-jenkins
+ingress:
+  host: jenkins-test.cloudchef-labs.com
+storageClass: ceph-rbd-sc

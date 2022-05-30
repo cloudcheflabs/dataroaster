@@ -1,0 +1,294 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: trino-s3-keys
+  namespace: {{ .Values.namespace }}
+type: Opaque
+data:
+  access-key: {{ .Values.s3.accessKey }}
+  secret-key: {{ .Values.s3.secretKey }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trino-cfg-coordinator
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: trino-coordinator
+data:
+  config.properties: |
+    coordinator=true
+    node-scheduler.include-coordinator=false
+    http-server.http.port=8080
+    query.max-memory=50GB
+    query.max-memory-per-node=8GB
+    query.max-total-memory-per-node=10GB
+    query.max-stage-count=200
+    task.writer-count=4
+    discovery-server.enabled=true
+    discovery.uri=http://trino-coordinator.{{ .Values.namespace }}.svc:8080
+
+  node.properties: |
+    node.environment=production
+    node.data-dir=/opt/trino-server/data
+    spiller-spill-path=/tmp
+    max-spill-per-node=4TB
+    query-max-spill-per-node=1TB
+
+  jvm.config: |
+    -server
+    -Xmx{{ .Values.serverMaxMemory }}G
+    -XX:-UseBiasedLocking
+    -XX:+UseG1GC
+    -XX:G1HeapRegionSize=32M
+    -XX:+ExplicitGCInvokesConcurrent
+    -XX:+ExitOnOutOfMemoryError
+    -XX:+HeapDumpOnOutOfMemoryError
+    -XX:ReservedCodeCacheSize=512M
+    -XX:PerMethodRecompilationCutoff=10000
+    -XX:PerBytecodeRecompilationCutoff=10000
+    -Djdk.attach.allowAttachSelf=true
+    -Djdk.nio.maxCachedBufferSize=2000000
+
+  hive.properties: |
+    connector.name=hive-hadoop2
+    hive.metastore.uri=thrift://{{ .Values.hive.metastore.endpoint }}
+    hive.allow-drop-table=true
+    hive.max-partitions-per-scan=1000000
+    hive.compression-codec=NONE
+    hive.s3.path-style-access=true
+    hive.s3.ssl.enabled=true
+    hive.s3.max-connections=100
+    hive.s3.endpoint={{ .Values.s3.endpoint }}
+    hive.s3.aws-access-key={{ .Values.s3.accessKey }}
+    hive.s3.aws-secret-key={{ .Values.s3.secretKey }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trino-cfg-worker
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: trino-worker
+data:
+  config.properties: |
+    coordinator=false
+    http-server.http.port=8080
+    query.max-memory=50GB
+    query.max-memory-per-node=10GB
+    query.max-total-memory-per-node=10GB
+    query.max-stage-count=200
+    task.writer-count=4
+    discovery.uri=http://trino-coordinator.{{ .Values.namespace }}.svc:8080
+
+  node.properties: |
+    node.environment=production
+    node.data-dir=/opt/trino-server/data
+    spiller-spill-path=/tmp
+    max-spill-per-node=4TB
+    query-max-spill-per-node=1TB
+
+  jvm.config: |
+    -server
+    -Xmx{{ .Values.serverMaxMemory }}G
+    -XX:-UseBiasedLocking
+    -XX:+UseG1GC
+    -XX:G1HeapRegionSize=32M
+    -XX:+ExplicitGCInvokesConcurrent
+    -XX:+ExitOnOutOfMemoryError
+    -XX:+HeapDumpOnOutOfMemoryError
+    -XX:ReservedCodeCacheSize=512M
+    -XX:PerMethodRecompilationCutoff=10000
+    -XX:PerBytecodeRecompilationCutoff=10000
+    -Djdk.attach.allowAttachSelf=true
+    -Djdk.nio.maxCachedBufferSize=2000000
+
+  hive.properties: |
+    connector.name=hive-hadoop2
+    hive.metastore.uri=thrift://{{ .Values.hive.metastore.endpoint }}
+    hive.allow-drop-table=true
+    hive.max-partitions-per-scan=1000000
+    hive.compression-codec=NONE
+    hive.s3.path-style-access=true
+    hive.s3.ssl.enabled=true
+    hive.s3.max-connections=100
+    hive.s3.endpoint={{ .Values.s3.endpoint }}
+    hive.s3.aws-access-key={{ .Values.s3.accessKey }}
+    hive.s3.aws-secret-key={{ .Values.s3.secretKey }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino
+  namespace: {{ .Values.namespace }}
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+  selector:
+    app: trino-coordinator
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino-coordinator
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 8080
+  selector:
+    app: trino-coordinator
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trino-coordinator
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: trino-coordinator
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: trino-coordinator
+    spec:
+      containers:
+      - name: metastore
+        image: cloudcheflabs/trino:360
+        ports:
+        - containerPort: 8080
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: trino-s3-keys
+              key: access-key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: trino-s3-keys
+              key: secret-key
+        volumeMounts:
+        - name: trino-cfg-coordinator-vol
+          mountPath: /opt/trino-server/etc/jvm.config
+          subPath: jvm.config
+        - name: trino-cfg-coordinator-vol
+          mountPath: /opt/trino-server/etc/config.properties
+          subPath: config.properties
+        - name: trino-cfg-coordinator-vol
+          mountPath: /opt/trino-server/etc/node.properties
+          subPath: node.properties
+        - name: trino-cfg-coordinator-vol
+          mountPath: /opt/trino-server/etc/catalog/hive.properties
+          subPath: hive.properties
+        command: ["bin/launcher"]
+        args: ["run"]
+        resources:
+          requests:
+            memory: "{{ .Values.serverMaxMemory }}Gi"
+            cpu: {{ .Values.cpu }}
+        imagePullPolicy: Always
+      volumes:
+        - name: trino-cfg-coordinator-vol
+          configMap:
+            name: trino-cfg-coordinator
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: trino-worker
+  namespace: {{ .Values.namespace }}
+spec:
+  serviceName: trino-worker 
+  replicas: {{ .Values.workers }}
+  selector:
+    matchLabels:
+      app: trino-worker
+  template:
+    metadata:
+      labels:
+        app: trino-worker
+    spec:
+      containers:
+      - name: metastore
+        image: cloudcheflabs/trino:360
+        ports:
+        - containerPort: 8080
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: trino-s3-keys
+              key: access-key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: trino-s3-keys
+              key: secret-key
+        volumeMounts:
+        - name: trino-cfg-worker-vol
+          mountPath: /opt/trino-server/etc/jvm.config
+          subPath: jvm.config
+        - name: trino-cfg-worker-vol
+          mountPath: opt/trino-server/etc/config.properties
+          subPath: config.properties
+        - name: trino-cfg-worker-vol
+          mountPath: /opt/trino-server/etc/node.properties
+          subPath: node.properties
+        - name: trino-cfg-worker-vol
+          mountPath: /opt/trino-server/etc/catalog/hive.properties
+          subPath: hive.properties
+        - name: trino-tmp-data
+          mountPath: /tmp
+        - name: trino-data-dir
+          mountPath: /opt/trino-server/data
+        command: [ "bin/launcher" ]
+        args: [ "run" ]
+        resources:
+          requests:
+            memory: "{{ .Values.serverMaxMemory }}Gi"
+            cpu: {{ .Values.cpu }}
+        imagePullPolicy: Always
+      volumes:
+        - name: trino-cfg-worker-vol
+          configMap:
+            name: trino-cfg-worker
+  volumeClaimTemplates:
+  - metadata:
+      name: trino-tmp-data
+    spec:
+      accessModes:
+      - ReadWriteMany
+      resources:
+        requests:
+          storage: {{ .Values.tempDataStorage }}Gi
+      storageClassName: nfs
+  - metadata:
+      name: trino-data-dir
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.dataStorage }}Gi
+      storageClassName: {{ .Values.storageClass }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: trino-cli
+  namespace: {{ .Values.namespace }}
+spec:
+  containers:
+  - name: trino-cli
+    image: cloudcheflabs/trino-cli:360
+    command: ["tail", "-f", "/dev/null"]
+    imagePullPolicy: Always
+  restartPolicy: Always

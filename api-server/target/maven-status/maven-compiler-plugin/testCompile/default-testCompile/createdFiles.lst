@@ -1,0 +1,3 @@
+com/cloudcheflabs/dataroaster/apiserver/kubernetes/client/RunKubernetesClient.class
+com/cloudcheflabs/dataroaster/apiserver/jinja/RenderYaml.class
+com/cloudcheflabs/dataroaster/apiserver/test/SpringTestBase.class

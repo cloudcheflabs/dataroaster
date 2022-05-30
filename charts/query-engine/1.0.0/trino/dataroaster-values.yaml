@@ -1,0 +1,14 @@
+namespace: dataroaster-trino
+workers: 3
+serverMaxMemory: 16
+cpu: 1
+tempDataStorage: 1
+dataStorage: 1
+storageClass: ceph-rbd-sc
+s3:
+  accessKey: TOW32G9ULH63MTUI6NNW
+  secretKey: jXqViVmSqIDTEKKKzdgSssHVykBrX4RrlnSeVgMi
+  endpoint: https://ceph-rgw-test.cloudchef-labs.com
+hive:
+  metastore:
+    endpoint: metastore.dataroaster-hivemetastore.svc:9083

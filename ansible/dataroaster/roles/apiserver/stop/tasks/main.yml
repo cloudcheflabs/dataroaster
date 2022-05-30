@@ -1,0 +1,8 @@
+- name: stop apiserver
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ apiserver_home_dir }}"
+  with_items:
+    - "./stop-apiserver.sh"
+  become_user: "{{ dataroaster_exec_user }}"

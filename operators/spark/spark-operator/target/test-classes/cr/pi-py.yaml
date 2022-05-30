@@ -1,0 +1,44 @@
+apiVersion: "spark-operator.cloudchef-labs.com/v1alpha1"
+kind: SparkApplication
+metadata:
+  name: pi-py
+  namespace: spark-operator
+spec:
+  core:
+    applicationType: Batch
+    deployMode: Client
+    container:
+      image: "cloudcheflabs/spark-py:v3.0.3"
+      imagePullPolicy: Always
+    applicationFileUrl: "s3a://mykidong/spark-app/pi.py"
+    namespace: spark
+    s3:
+      bucket: mykidong
+      accessKey:
+        valueFrom:
+          secretKeyRef:
+            name: s3-secret
+            key: accessKey
+      secretKey:
+        valueFrom:
+          secretKeyRef:
+            name: s3-secret
+            key: secretKey
+      endpoint: "https://any-s3-endpoint"
+  driver:
+    serviceAccountName: spark
+    label:
+      application-name: pi-py
+    resources:
+      cores: "1"
+      limitCores: "1200m"
+      memory: "512m"
+  executor:
+    instances: 1
+    label:
+      application-name: pi-py
+    resources:
+      cores: "1"
+      limitCores: "1200m"
+      memory: "1g"
+

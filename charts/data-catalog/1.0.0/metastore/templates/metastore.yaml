@@ -1,0 +1,151 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-s3-keys
+  namespace: {{ .Values.namespace }}
+type: Opaque
+data:
+  access-key: {{ .Values.s3.accessKey }}
+  secret-key: {{ .Values.s3.secretKey }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metastore-cfg
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: metastore
+data:
+  core-site.xml: |-
+    <configuration>
+        <property>
+            <name>fs.s3a.connection.ssl.enabled</name>
+    	    <value>false</value>
+        </property>
+        <property>
+            <name>fs.defaultFS</name>
+            <value>s3a://{{ .Values.s3.bucket }}</value>
+        </property>
+        <property>
+            <name>fs.s3a.path.style.access</name>
+            <value>true</value>
+        </property>
+        <property>
+            <name>fs.s3a.access.key</name>
+            <value>{{ .Values.s3.accessKey }}</value>
+        </property>
+        <property>
+            <name>fs.s3a.secret.key</name>
+            <value>{{ .Values.s3.secretKey }}</value>
+        </property>
+        <property>
+            <name>fs.s3a.impl</name>
+            <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
+        </property>
+        <property>
+            <name>fs.s3a.endpoint</name>
+            <value>{{ .Values.s3.endpoint }}</value>
+        </property>
+        <property>
+            <name>fs.s3a.fast.upload</name>
+            <value>true</value>
+        </property>
+    </configuration>
+  metastore-site.xml: |-
+    <configuration>
+    	<property>
+    		<name>metastore.task.threads.always</name>
+    		<value>org.apache.hadoop.hive.metastore.events.EventCleanerTask</value>
+    	</property>
+    	<property>
+    		<name>metastore.expression.proxy</name>
+    		<value>org.apache.hadoop.hive.metastore.DefaultPartitionExpressionProxy</value>
+    	</property>
+    	<property>
+    		<name>javax.jdo.option.ConnectionDriverName</name>
+    		<value>com.mysql.jdbc.Driver</value>
+    	</property>
+    	<property>
+    		<name>javax.jdo.option.ConnectionURL</name>
+    		<value>jdbc:mysql://mysql-service.{{ .Values.namespace }}.svc:3306/metastore_db?useSSL=false</value>
+    	</property>
+    	<property>
+    		<name>javax.jdo.option.ConnectionUserName</name>
+    		<value>{{ .Values.jdbc.user }}</value>
+    	</property>
+    	<property>
+    		<name>javax.jdo.option.ConnectionPassword</name>
+    		<value>{{ .Values.jdbc.password }}</value>
+    	</property>
+    	<property>
+    		<name>metastore.warehouse.dir</name>
+    		<value>s3a://{{ .Values.s3.bucket }}/warehouse/</value>
+    	</property>
+    	<property>
+    		<name>metastore.thrift.port</name>
+    		<value>9083</value>
+    	</property>
+    </configuration>
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metastore
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - port: 9083
+  selector:
+    app: metastore
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metastore
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: metastore
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: metastore
+    spec:
+      containers:
+      - name: metastore
+        image: cloudcheflabs/hivemetastore:v3.0.0
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: my-s3-keys
+              key: access-key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: my-s3-keys
+              key: secret-key
+        ports:
+        - containerPort: 9083
+        volumeMounts:
+        - name: metastore-cfg-vol
+          mountPath: /opt/hive-metastore/conf/metastore-site.xml
+          subPath: metastore-site.xml
+        - name: metastore-cfg-vol
+          mountPath: /opt/hadoop/etc/hadoop/core-site.xml
+          subPath: core-site.xml
+        command: ["/opt/hive-metastore/bin/start-metastore"]
+        args: ["-p", "9083"]
+        resources:
+          requests:
+            memory: "2G"
+            cpu: 1
+        imagePullPolicy: Always
+      volumes:
+        - name: metastore-cfg-vol
+          configMap:
+            name: metastore-cfg

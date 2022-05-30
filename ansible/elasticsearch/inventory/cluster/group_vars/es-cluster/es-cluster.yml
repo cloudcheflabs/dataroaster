@@ -1,0 +1,32 @@
+#es_home: /opt/elasticsearch
+#es_cluster_name: es-cluster
+#es_http_publish_port: 9200
+#es_transport_publish_port: 9300
+es_init_hosts:
+  - 192.168.10.10
+  - 192.168.10.134
+  - 192.168.10.145
+#es_seed_hosts:
+#  - "{{ es_init_hosts[0] }}:{{ es_transport_publish_port }}"
+#  - "{{ es_init_hosts[1] }}:{{ es_transport_publish_port }}"
+#  - "{{ es_init_hosts[2] }}:{{ es_transport_publish_port }}"
+#es_initial_master_nodes: "{{ es_seed_hosts }}"
+es_data_dir:
+  - /data01/es/data
+es_log_dir: /data01/es/log
+#es_tmp_dir: "{{ es_home }}/temp"
+es_memory: 4g
+#es_pack_name: elasticsearch-7.12.1
+#es_file_name: "{{ es_pack_name }}-linux-x86_64.tar.gz"
+#es_install_temp_dir: /tmp/es
+
+#kibana_home: /opt/kibana
+#kibana_port: 5601
+#kibana_es_hosts:
+#  - "http://{{ es_init_hosts[0] }}:{{ es_http_publish_port }}"
+#  - "http://{{ es_init_hosts[1] }}:{{ es_http_publish_port }}"
+#  - "http://{{ es_init_hosts[2] }}:{{ es_http_publish_port }}"
+kibana_data_dir: /data01/kibana
+#kibana_pack_name: kibana-7.12.1-linux-x86_64
+#kibana_file_name: "{{ kibana_pack_name }}.tar.gz"
+#kibana_install_temp_dir: /tmp/kibana

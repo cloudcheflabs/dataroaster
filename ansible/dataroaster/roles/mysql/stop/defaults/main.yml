@@ -1,0 +1,5 @@
+- name: stop mysql server
+  service:
+    name: mysql
+    state: stopped
+  become: true

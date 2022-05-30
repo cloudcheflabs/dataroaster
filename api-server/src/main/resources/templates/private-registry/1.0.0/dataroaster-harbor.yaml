@@ -1,0 +1,57 @@
+expose:
+  tls:
+    enabled: true
+    certSource: secret
+    secret:
+      secretName: "{{ coreHost }}-tls"
+      notarySecretName: "{{ notaryHost }}-tls"
+  ingress:
+    hosts:
+      core: {{ coreHost }}
+      notary: {{ notaryHost }}
+    annotations:
+      ingress.kubernetes.io/ssl-redirect: "true"
+      ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      kubernetes.io/ingress.class: "nginx"
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+externalURL: https://{{ coreHost }}
+persistence:
+  enabled: true
+  resourcePolicy: "keep"
+  persistentVolumeClaim:
+    registry:
+      storageClass: "{{ storageClass }}"
+      accessMode: ReadWriteOnce
+      size: {{ registryStorageSize }}Gi
+    chartmuseum:
+      storageClass: "{{ storageClass }}"
+      accessMode: ReadWriteOnce
+      size: {{ chartmuseumStorageSize }}Gi
+    jobservice:
+      storageClass: "{{ storageClass }}"
+      accessMode: ReadWriteOnce
+      size: {{ jobserviceStorageSize }}Gi
+    database:
+      storageClass: "{{ storageClass }}"
+      accessMode: ReadWriteOnce
+      size: {{ databaseStorageSize }}Gi
+    redis:
+      storageClass: "{{ storageClass }}"
+      accessMode: ReadWriteOnce
+      size: {{ redisStorageSize }}Gi
+    trivy:
+      storageClass: "{{ storageClass }}"
+      accessMode: ReadWriteOnce
+      size: {{ trivyStorageSize }}Gi
+  imageChartStorage:
+    disableredirect: true
+    type: s3
+    s3:
+      region: us-west-1
+      bucket: {{ s3Bucket }}
+      accesskey: {{ s3AccessKey }}
+      secretkey: {{ s3SecretKey }}
+      regionendpoint: {{ s3Endpoint }}
+

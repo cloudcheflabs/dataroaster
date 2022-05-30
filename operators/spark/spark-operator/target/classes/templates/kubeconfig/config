@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: spark-operator-cluster
+  cluster:
+    certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    server: https://kubernetes.default.svc
+contexts:
+- name: spark-operator-context
+  context:
+    cluster: spark-operator-cluster
+    namespace: default
+    user: spark-operator-user
+current-context: spark-operator-context
+users:
+- name: spark-operator-user
+  user:
+    token: {{ token }}

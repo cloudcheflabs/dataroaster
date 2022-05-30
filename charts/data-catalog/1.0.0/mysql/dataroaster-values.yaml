@@ -1,0 +1,5 @@
+namespace: dataroaster-hivemetastore
+storage:
+  storageClass: ceph-rbd-sc
+  size: 10Gi
+rootPassword: icarus0337

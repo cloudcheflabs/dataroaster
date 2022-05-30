@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hive-initschema
+  namespace: {{ .Values.namespace }}
+spec:
+  template:
+    spec:
+      containers:
+        - name: hivemeta
+          image: cloudcheflabs/hivemetastore:v3.0.0
+          command: ["/opt/hive-metastore/bin/schematool"]
+          args: ["--verbose" ,"-initSchema" , "-dbType", "mysql" , "-userName", "root",
+                 "-passWord", "{{ .Values.rootPassword }}" , "-url", "jdbc:mysql://mysql-service.{{ .Values.namespace }}.svc:3306/metastore_db?createDatabaseIfNotExist=true"]
+      restartPolicy: Never
+  backoffLimit: 4

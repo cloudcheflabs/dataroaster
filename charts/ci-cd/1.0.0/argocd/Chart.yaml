@@ -1,0 +1,7 @@
+apiVersion: v2
+name: dataroaster-argocd
+version: 1.0.0
+appVersion: 2.0.3
+description: dataroaster ArgoCD
+
+

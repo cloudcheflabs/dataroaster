@@ -1,0 +1,2 @@
+namespace: {{ namespace }}
+rootPassword: icarus0337

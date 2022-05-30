@@ -1,0 +1,45 @@
+provisionDataStore:
+  cassandra: false
+  elasticsearch: false
+  kafka: true
+storage:
+  type: elasticsearch
+  elasticsearch:
+    scheme: http
+    host: {{ elasticsearchHost }}
+    port: {{ elasticsearchPort }}
+    usePassword: false
+  kafka:
+    brokers:
+      - jaeger-kafka.{{ namespace }}.svc:9092
+    topic: jaeger_v1_prod
+kafka:
+  replicaCount: 3
+  persistence:
+    enabled: true
+    storageClass: {{ storageClass }}
+  zookeeper:
+    replicaCount: 3
+    persistence:
+      enabled: true
+      storageClass: {{ storageClass }}
+ingester:
+  enabled: true
+  replicaCount: 3
+collector:
+  enabled: true
+  replicaCount: 3
+query:
+  enabled: true
+  replicaCount: 2
+  service:
+    type: ClusterIP
+    port: 8080
+    targetPort: 16686
+  ingress:
+    enabled: true
+    hosts:
+      - {{ ingressHost }}
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"

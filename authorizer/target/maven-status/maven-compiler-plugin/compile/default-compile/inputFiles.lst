@@ -1,0 +1,12 @@
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/api/dao/UserDetailsDao.java
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/dao/mysql/MySqlUserDetailsDao.java
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/service/RoleServiceImpl.java
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/domain/UserInfo.java
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/config/SecurityConfig.java
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/AuthorizerApplication.java
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/component/FavreBcryptPasswordEncoder.java
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/service/UserDetailsServiceImpl.java
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/config/AuthorizationSeverConfig.java
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/api/service/RoleService.java
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/config/ResourceServerConfig.java
+/Users/mykidong/project/dataroaster/authorizer/src/main/java/com/cloudcheflabs/dataroaster/authorizer/controller/AuthorizationController.java

@@ -1,0 +1,9 @@
+namespace: {{ namespace }}
+storage:
+  storageClass: {{ storageClass }}
+  size: {{ storageSize }}
+s3:
+  bucket: {{ s3Bucket }}
+  accessKey: {{ s3AccessKey }}
+  secretKey: {{ s3SecretKey }}
+  endpoint: {{ s3Endpoint }}

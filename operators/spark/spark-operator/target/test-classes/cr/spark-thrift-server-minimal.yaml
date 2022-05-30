@@ -1,0 +1,63 @@
+apiVersion: "spark-operator.cloudchef-labs.com/v1alpha1"
+kind: SparkApplication
+metadata:
+  name: spark-thrift-server-minimal
+  namespace: spark-operator
+spec:
+  core:
+    applicationType: EndlessRun
+    deployMode: Cluster
+    container:
+      image: "cloudcheflabs/spark:v3.0.3"
+      imagePullPolicy: Always
+    class: com.cloudcheflabs.dataroaster.hive.SparkThriftServerRunner
+    applicationFileUrl: "s3a://mykidong/spark-app/spark-thrift-server-3.0.3-spark-job.jar"
+    namespace: spark
+    s3:
+      bucket: mykidong
+      accessKey:
+        valueFrom:
+          secretKeyRef:
+            name: s3-secret
+            key: accessKey
+      secretKey:
+        valueFrom:
+          secretKeyRef:
+            name: s3-secret
+            key: secretKey
+      endpoint: "https://any-s3-endpoint"
+    hive:
+      metastoreUris:
+        - "thrift://metastore.dataroaster-hivemetastore.svc:9083"
+  driver:
+    serviceAccountName: spark
+    label:
+      application-name: spark-thrift-server-driver
+    resources:
+      cores: "1"
+      limitCores: "1200m"
+      memory: "512m"
+    volumeMounts:
+      - name: driver-local-dir
+        mountPath: "/tmp/local-dir"
+  executor:
+    instances: 1
+    label:
+      application-name: spark-thrift-server-executor
+    resources:
+      cores: "1"
+      limitCores: "1200m"
+      memory: "1g"
+    volumeMounts:
+      - name: executor-local-dir
+        mountPath: "/tmp/local-dir"
+  volumes:
+    - name: driver-local-dir
+      type: SparkLocalDir
+      persistentVolumeClaim:
+        claimName: nfs-pvc-driver
+    - name: executor-local-dir
+      type: SparkLocalDir
+      persistentVolumeClaim:
+        claimName: nfs-pvc-executor
+

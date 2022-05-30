@@ -1,0 +1,73 @@
+- name: create dataroaster user
+  user:
+    name: "{{ dataroaster_exec_user }}"
+    state: present
+    createhome: yes
+    home: "{{ dataroaster_home_dir }}"
+  become: true
+
+
+- name: create dataroaster directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ dataroaster_exec_user }}"
+    group: "{{ dataroaster_exec_user }}"
+    mode: 0755
+  with_items:
+    - "{{ dataroaster_home_dir }}"
+    - "{{ authorizer_home_dir }}"
+    - "{{ dataroaster_log_dir }}"
+  become: true
+
+- name: download authorizer distribution
+  get_url:
+    url: "https://github.com/cloudcheflabs/dataroaster/releases/download/{{ dataroaster_version }}/authorizer-{{ dataroaster_version }}-dist.tgz"
+    dest: "{{ authorizer_home_dir }}"
+    mode: '0755'
+  become: true
+
+
+- name: extract authorizer distribution
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ authorizer_home_dir }}"
+  with_items:
+    - "tar zxvf authorizer-*-dist.tgz"
+    - "cp -R authorizer/* ."
+    - "rm -rf authorizer-*-dist.tgz"
+    - "rm -rf authorizer/"
+  become: true
+
+- name: copy authorizer configuration
+  template:
+    src: "templates/{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ dataroaster_exec_user }}"
+    group: "{{ dataroaster_exec_user }}"
+    mode: 0755
+  with_items:
+    - { src: 'application-prod.yml', dest: '{{ authorizer_home_dir }}/conf/application-prod.yml' }
+    - { src: 'logback.xml', dest: '{{ authorizer_home_dir }}/logback.xml' }
+  become: true
+
+- name: chown authorizer home dir.
+  file:
+    path: "{{ item }}"
+    recurse: true
+    owner: "{{ dataroaster_exec_user }}"
+    group: "{{ dataroaster_exec_user }}"
+    mode: 0755
+  with_items:
+    - "{{ authorizer_home_dir }}"
+  become: true
+
+- name: start authorizer
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ authorizer_home_dir }}"
+  with_items:
+    - "./start-authorizer.sh"
+  become_user: "{{ dataroaster_exec_user }}"

@@ -1,0 +1,13 @@
+- hosts: "{{ target_hosts }}"
+  remote_user: "{{ exec_user }}"
+  become: true
+
+  vars:
+  - ansible_ssh_user: "{{ exec_user }}"
+
+  roles:
+    - role: "mysql/start"
+    - role: "vault/start"
+    - role: "authorizer/start"
+    - role: "apiserver/start"
+

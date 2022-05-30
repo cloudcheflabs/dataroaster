@@ -1,0 +1,14 @@
+<assembly>
+	<id>dist</id>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<formats>
+		<format>tgz</format>
+	</formats>
+	<files>
+		<file>
+			<source>./target/cli-${project.version}-executable.jar</source>
+			<outputDirectory>cli</outputDirectory>
+			<destName>dataroaster</destName>
+		</file>
+	</files>
+</assembly>

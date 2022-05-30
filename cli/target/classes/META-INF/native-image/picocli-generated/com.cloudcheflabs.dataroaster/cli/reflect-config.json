@@ -1,0 +1,543 @@
+[
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.Console",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.analytics.Analytics",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.analytics.CreateAnalytics",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "jupyterhubGithubClientId" },
+      { "name" : "jupyterhubGithubClientSecret" },
+      { "name" : "jupyterhubIngressHost" },
+      { "name" : "jupyterhubStorageSize" },
+      { "name" : "parent" },
+      { "name" : "redashStorageSize" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.analytics.DeleteAnalytics",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.backup.Backup",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.backup.CreateBackup",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" },
+      { "name" : "s3AccessKey" },
+      { "name" : "s3Bucket" },
+      { "name" : "s3Endpoint" },
+      { "name" : "s3SecretKey" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.backup.DeleteBackup",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.blueprint.Blueprint",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.blueprint.CreateBlueprint",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "blueprintFile" },
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.blueprint.DeleteBlueprint",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "blueprintFile" },
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.cicd.CiCd",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.cicd.CreateCiCd",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "argocdIngressHost" },
+      { "name" : "jenkinsIngressHost" },
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.cicd.DeleteCiCd",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.cluster.Cluster",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.cluster.CreateCluster",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "description" },
+      { "name" : "name" },
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.cluster.DeleteCluster",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.cluster.UpdateCluster",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.datacatalog.CreateDataCatalog",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" },
+      { "name" : "s3AccessKey" },
+      { "name" : "s3Bucket" },
+      { "name" : "s3Endpoint" },
+      { "name" : "s3SecretKey" },
+      { "name" : "storageSize" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.datacatalog.DataCatalog",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.datacatalog.DeleteDataCatalog",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.distributedtracing.CreateDistributedTracing",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "elasticsearchHostPort" },
+      { "name" : "ingressHost" },
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.distributedtracing.DeleteDistributedTracing",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.distributedtracing.DistributedTracing",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.ingresscontroller.CreateIngressController",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.ingresscontroller.DeleteIngressController",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.ingresscontroller.IngressController",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.kubeconfig.CreateKubeconfig",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "kubeconfigFile" },
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.kubeconfig.Kubeconfig",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.kubeconfig.UpdateKubeconfig",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "kubeconfigFile" },
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.login.Login",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" },
+      { "name" : "server" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.metricsmonitoring.CreateMetricsMonitoring",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.metricsmonitoring.DeleteMetricsMonitoring",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.metricsmonitoring.MetricsMonitoring",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.podlogmonitoring.CreatePodLogMonitoring",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "elasticsearchHosts" },
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.podlogmonitoring.DeletePodLogMonitoring",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.podlogmonitoring.PodLogMonitoring",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.privateregistry.CreatePrivateRegistry",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "chartmuseumStorageSize" },
+      { "name" : "coreHost" },
+      { "name" : "databaseStorageSize" },
+      { "name" : "jobserviceStorageSize" },
+      { "name" : "notaryHost" },
+      { "name" : "parent" },
+      { "name" : "redisStorageSize" },
+      { "name" : "registryStorageSize" },
+      { "name" : "s3AccessKey" },
+      { "name" : "s3Bucket" },
+      { "name" : "s3Endpoint" },
+      { "name" : "s3SecretKey" },
+      { "name" : "trivyStorageSize" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.privateregistry.DeletePrivateRegistry",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.privateregistry.PrivateRegistry",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.project.CreateProject",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "description" },
+      { "name" : "name" },
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.project.DeleteProject",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.project.Project",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.project.UpdateProject",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.queryengine.CreateQueryEngine",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" },
+      { "name" : "s3AccessKey" },
+      { "name" : "s3Bucket" },
+      { "name" : "s3Endpoint" },
+      { "name" : "s3SecretKey" },
+      { "name" : "sparkThriftServerDriverMemory" },
+      { "name" : "sparkThriftServerExecutorCores" },
+      { "name" : "sparkThriftServerExecutorMemory" },
+      { "name" : "sparkThriftServerExecutors" },
+      { "name" : "trinoCores" },
+      { "name" : "trinoDataStorage" },
+      { "name" : "trinoServerMaxMemory" },
+      { "name" : "trinoTempDataStorage" },
+      { "name" : "trinoWorkers" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.queryengine.DeleteQueryEngine",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.queryengine.QueryEngine",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.streaming.CreateStreaming",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "kafkaReplicaCount" },
+      { "name" : "kafkaStorageSize" },
+      { "name" : "parent" },
+      { "name" : "zkReplicaCount" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.streaming.DeleteStreaming",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.streaming.Streaming",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.workflow.CreateWorkflow",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" },
+      { "name" : "s3AccessKey" },
+      { "name" : "s3Bucket" },
+      { "name" : "s3Endpoint" },
+      { "name" : "s3SecretKey" },
+      { "name" : "storageSize" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.workflow.DeleteWorkflow",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "parent" }
+    ]
+  },
+  {
+    "name" : "com.cloudcheflabs.dataroaster.cli.command.workflow.Workflow",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  },
+  {
+    "name" : "picocli.CommandLine$HelpCommand",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "commands" },
+      { "name" : "helpRequested" }
+    ]
+  }
+]

@@ -1,0 +1,4 @@
+namespace: {{ logstashNamespace }}
+elasticsearch:
+  hosts: {% for item in elasticsearchHosts %}
+    - {{ item }}{% endfor %}

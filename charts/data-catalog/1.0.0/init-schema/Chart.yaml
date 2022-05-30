@@ -1,0 +1,7 @@
+apiVersion: v2
+name: dataroaster-hivemetastore-init-schema
+version: 1.0.0
+appVersion: 3.0.0
+description: dataroaster hivemetastore init schema.
+
+

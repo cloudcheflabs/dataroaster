@@ -1,0 +1,5 @@
+dataroaster_version: 3.0.0
+dataroaster_home_dir: /opt/dataroaster
+
+cli_temp_dir: "{{ dataroaster_home_dir }}/cli"
+cli_binary: /usr/local/bin/dataroaster

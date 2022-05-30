@@ -1,0 +1,4 @@
+namespace: dataroaster-redash
+storage:
+  storageClass: ceph-rbd-sc
+  size: 2

@@ -1,0 +1,33 @@
+- name: uninstall jdk
+  yum:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - "java-11-openjdk"
+    - "java-11-openjdk-devel"
+  become: true
+
+- name: uninstall maven
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ prerequisite_maven_home_dir }}"
+    - "{{ prerequisite_maven_profile }}"
+  become: true
+  ignore_errors: true
+
+- name: uninstall kubectl
+  yum:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - "kubectl"
+  become: true
+
+- name: uninstall helm
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "/usr/local/bin/helm"

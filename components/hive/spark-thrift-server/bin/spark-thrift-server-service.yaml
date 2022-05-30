@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-thrift-server-service
+  namespace: spark
+spec:
+  type: LoadBalancer
+  selector:
+    spark-role: driver
+  ports:
+    - name: jdbc-port
+      port: 10016
+      protocol: TCP
+      targetPort: 10016

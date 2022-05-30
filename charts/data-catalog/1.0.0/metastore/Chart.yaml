@@ -1,0 +1,7 @@
+apiVersion: v2
+name: dataroaster-hivemetastore-metastore
+version: 1.0.0
+appVersion: 3.0.0
+description: dataroaster hivemetastore mysql.
+
+

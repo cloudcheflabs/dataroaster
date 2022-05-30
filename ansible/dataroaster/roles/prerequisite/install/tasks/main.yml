@@ -1,0 +1,104 @@
+- name: install jdk
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "java-11-openjdk"
+    - "java-11-openjdk-devel"
+  become: true
+
+- name: create dataroaster user
+  user:
+    name: "{{ dataroaster_exec_user }}"
+    state: present
+    createhome: yes
+    home: "{{ dataroaster_home_dir }}"
+  become: true
+
+- name: create maven home directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ prerequisite_maven_home_dir }}"
+  become: true
+
+- name: install maven
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ prerequisite_maven_home_dir }}"
+  with_items:
+    - "curl -L -O https://dlcdn.apache.org/maven/maven-3/{{ prerequisite_maven_version }}/binaries/apache-maven-{{ prerequisite_maven_version }}-bin.tar.gz"
+    - "tar zxvf apache-maven-{{ prerequisite_maven_version }}-bin.tar.gz"
+    - "cp -R apache-maven-{{ prerequisite_maven_version }}/* ."
+    - "rm -rf apache-maven-{{ prerequisite_maven_version }} apache-maven-{{ prerequisite_maven_version }}-bin.tar.gz"
+    - "touch {{ prerequisite_maven_profile }}"
+    - "echo 'export MAVEN_HOME={{ prerequisite_maven_home_dir }}' >> {{ prerequisite_maven_profile }}"
+    - "echo 'export PATH=\"$PATH:$MAVEN_HOME/bin\"' >> {{ prerequisite_maven_profile }}"
+    - "source /etc/profile"
+  become: true
+  
+- name: copy pom.xml file
+  template:
+    src: "templates/{{ item }}"
+    dest: "{{ dataroaster_home_dir }}/{{ item }}"
+    mode: 0755
+  with_items:
+    - "pom.xml"
+
+- name: run maven to download spark thrift server deps jars
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ dataroaster_home_dir }}"
+  with_items:
+    - "{{ prerequisite_maven_home_dir }}/bin/mvn -e clean install"
+  become_user: "{{ dataroaster_exec_user }}"
+  register: maven_out
+
+- debug:
+    msg: "{{ maven_out }}"
+
+
+- name: copy repo file
+  template:
+    src: "templates/{{ item }}"
+    dest: "/etc/yum.repos.d/{{ item }}"
+    mode: 0755
+  with_items:
+    - "kubernetes.repo"
+
+- name: install kubectl
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "kubectl"
+  become: true
+
+- name: create temp directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ prerequisite_helm_temp_dir }}"
+
+- name: install helm
+  shell: "{{ item }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ prerequisite_helm_temp_dir }}"
+  with_items:
+    - "wget https://get.helm.sh/helm-v{{ prerequisite_helm_version }}-linux-amd64.tar.gz"
+    - "tar zxvf helm-v{{ prerequisite_helm_version }}-linux-amd64.tar.gz"
+    - "cp linux-amd64/helm /usr/local/bin/helm"
+  become: true
+
+- name: remove temp dir
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ prerequisite_helm_temp_dir }}"

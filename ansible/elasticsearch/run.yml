@@ -1,0 +1,17 @@
+- hosts: "{{ target_hosts }}"
+  remote_user: "{{ exec_user }}"
+  become: true
+  vars:
+  - ansible_ssh_user: "{{ exec_user }}"
+  roles:
+  - role: "{{ role_prefix }}/start"
+    when: ("{{ run_option }}" == "start")
+    
+  - role: "{{ role_prefix }}/stop"
+    when: ("{{ run_option }}" == "stop")
+
+  - role: "{{ role_prefix }}/stop"
+    when: ("{{ run_option }}" == "restart")
+
+  - role: "{{ role_prefix }}/start"
+    when: ("{{ run_option }}" == "restart")
