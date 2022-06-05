@@ -16,6 +16,9 @@
 		<!-- fabric8 kubernetes client -->
 		<fabric8.k8s.client.version>5.12.2</fabric8.k8s.client.version>
 
+		<!-- mock web server -->
+		<mockwebserver.version>0.2.2</mockwebserver.version>
+
 		<!-- logback -->
 		<logback.version>1.2.6</logback.version>
 
@@ -31,11 +34,43 @@
 			<groupId>com.cloudcheflabs.dataroaster</groupId>
 			<artifactId>common</artifactId>
 			<version>3.1.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-annotations</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.fabric8</groupId>
 			<artifactId>kubernetes-client</artifactId>
 			<version>${fabric8.k8s.client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.fabric8</groupId>
+			<artifactId>crd-generator-apt</artifactId>
+			<version>${fabric8.k8s.client.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.fabric8</groupId>
+			<artifactId>kubernetes-server-mock</artifactId>
+			<version>${fabric8.k8s.client.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.fabric8</groupId>
+			<artifactId>mockwebserver</artifactId>
+			<version>${mockwebserver.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
