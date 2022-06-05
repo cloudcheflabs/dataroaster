@@ -1,1 +1,6 @@
 
+apiVersion: v2
+name: dataroaster-trino-operator
+version: v1.0.0
+appVersion: 384
+description: dataroaster trino operator

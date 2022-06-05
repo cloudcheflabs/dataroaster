@@ -8,8 +8,8 @@ spec:
   serviceAccountName: trino
   image:
     repository: trinodb/trino
-    tag: 384
-    pullPolicy: IfNotPresent
+    tag: "384"
+    imagePullPolicy: IfNotPresent
     imagePullSecrets: null
   securityContext:
     runAsUser: 1000
@@ -73,8 +73,8 @@ spec:
   worker:
     replicas: 3
     autoscaler:
-      maxReplicas: 5
       minReplicas: 3
+      maxReplicas: 5
       targetCPUUtilizationPercentage: 50
     resources: null
     nodeSelector: null

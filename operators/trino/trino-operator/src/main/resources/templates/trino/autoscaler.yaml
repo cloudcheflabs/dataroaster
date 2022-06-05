@@ -1,6 +1,13 @@
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ name }}
-spec: {{ spec }}
-
+  name: trino-worker
+  namespace: {{ namespace }}
+spec:
+  maxReplicas: {{ maxReplicas }}
+  minReplicas: {{ minReplicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: trino-worker
+  targetCPUUtilizationPercentage: {{ targetCPUUtilizationPercentage }}
