@@ -19,6 +19,9 @@
 		<!-- mock web server -->
 		<mockwebserver.version>0.2.2</mockwebserver.version>
 
+		<!-- assertj -->
+		<assertj.core.version>3.23.1</assertj.core.version>
+
 		<!-- logback -->
 		<logback.version>1.2.6</logback.version>
 
@@ -59,7 +62,6 @@
 			<artifactId>crd-generator-apt</artifactId>
 			<version>${fabric8.k8s.client.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.fabric8</groupId>
 			<artifactId>kubernetes-server-mock</artifactId>
@@ -70,6 +72,12 @@
 			<groupId>io.fabric8</groupId>
 			<artifactId>mockwebserver</artifactId>
 			<version>${mockwebserver.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${assertj.core.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
