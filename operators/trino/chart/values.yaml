@@ -1,6 +1,6 @@
 namespace: trino-operator
 serviceAccount: trino-operator
-image: cloudcheflabs/trino-operator:v1.0.0
+image: cloudcheflabs/trino-operator:384
 imagePullPolicy: Always
 resources:
   requests:

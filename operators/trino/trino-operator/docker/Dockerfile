@@ -27,7 +27,7 @@ ADD ${TRINO_OPERATOR_JAR} ${TRINO_OPERATOR_HOME}
 ADD run-trino-operator.sh ${TRINO_OPERATOR_HOME}
 
 # add permissions.
-RUN chmod +x ${TRINO_OPERATOR_HOME}/run-TRINO-operator.sh
+RUN chmod +x ${TRINO_OPERATOR_HOME}/*.sh
 RUN chown ${TRINO_OPERATOR_USER}: -R ${TRINO_OPERATOR_HOME}
 
 # change work directory.
