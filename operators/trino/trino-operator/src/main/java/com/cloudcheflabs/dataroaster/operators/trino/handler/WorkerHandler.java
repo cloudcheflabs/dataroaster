@@ -39,14 +39,14 @@ public class WorkerHandler {
 
         // create namespace.
         Namespace ns = new NamespaceBuilder().withNewMetadata().withName(namespace).endMetadata().build();
-        client.namespaces().create(ns);
+        client.namespaces().createOrReplace(ns);
 
         // create service account.
         ServiceAccount sa = new ServiceAccountBuilder()
                 .withNewMetadata()
                 .withName(serviceAccountName).withNamespace(namespace)
                 .endMetadata().build();
-        client.serviceAccounts().inNamespace(namespace).create(sa);
+        client.serviceAccounts().inNamespace(namespace).createOrReplace(sa);
 
         // construct worker configmap.
         ConfigMapBuilder workerConfigMapBuilder = new ConfigMapBuilder()
@@ -80,7 +80,7 @@ public class WorkerHandler {
 
         // create worker configmap.
         workerConfigMapBuilder.withData(workerConfigMapKV);
-        ConfigMap retConfigMap = client.configMaps().inNamespace(namespace).create(workerConfigMapBuilder.build());
+        ConfigMap retConfigMap = client.configMaps().inNamespace(namespace).createOrReplace(workerConfigMapBuilder.build());
         LOG.info("worker configmap: \n {}", YamlUtils.objectToYaml(retConfigMap));
 
         // worker volumes.
@@ -178,7 +178,7 @@ public class WorkerHandler {
                 .endSpec();
 
         // create worker deployment.
-        Deployment retDeployment = client.apps().deployments().inNamespace(namespace).create(workerDeploymentBuilder.build());
+        Deployment retDeployment = client.apps().deployments().inNamespace(namespace).createOrReplace(workerDeploymentBuilder.build());
         LOG.info("worker deployment: \n{}", YamlUtils.objectToYaml(retDeployment));
 
         // create horizontal pod autoscaler.
@@ -199,7 +199,7 @@ public class WorkerHandler {
                             .withApiVersion("apps/v1")
                         .endScaleTargetRef()
                     .endSpec().build();
-            HorizontalPodAutoscaler retHpa = client.autoscaling().v1().horizontalPodAutoscalers().inNamespace(namespace).create(workerHpa);
+            HorizontalPodAutoscaler retHpa = client.autoscaling().v1().horizontalPodAutoscalers().inNamespace(namespace).createOrReplace(workerHpa);
             LOG.info("worker hpa: \n{}", YamlUtils.objectToYaml(retHpa));
         }
 

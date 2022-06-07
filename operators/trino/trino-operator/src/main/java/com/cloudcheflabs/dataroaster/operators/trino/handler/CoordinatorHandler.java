@@ -37,14 +37,14 @@ public class CoordinatorHandler {
 
         // create namespace.
         Namespace ns = new NamespaceBuilder().withNewMetadata().withName(namespace).endMetadata().build();
-        client.namespaces().create(ns);
+        client.namespaces().createOrReplace(ns);
 
         // create service account.
         ServiceAccount sa = new ServiceAccountBuilder()
                 .withNewMetadata()
                 .withName(serviceAccountName).withNamespace(namespace)
                 .endMetadata().build();
-        client.serviceAccounts().inNamespace(namespace).create(sa);
+        client.serviceAccounts().inNamespace(namespace).createOrReplace(sa);
 
         // construct coordinator configmap.
         ConfigMapBuilder coordinatorConfigMapBuilder = new ConfigMapBuilder()
@@ -78,7 +78,7 @@ public class CoordinatorHandler {
 
         // create coordinator configmap.
         coordinatorConfigMapBuilder.withData(coordinatorConfigMapKV);
-        ConfigMap retConfigMap = client.configMaps().inNamespace(namespace).create(coordinatorConfigMapBuilder.build());
+        ConfigMap retConfigMap = client.configMaps().inNamespace(namespace).createOrReplace(coordinatorConfigMapBuilder.build());
         LOG.info("coordinator configmap: \n {}", YamlUtils.objectToYaml(retConfigMap));
 
         // coordinator volumes.
@@ -175,7 +175,7 @@ public class CoordinatorHandler {
                 .endSpec();
 
         // create coordinator deployment.
-        Deployment retDeployment = client.apps().deployments().inNamespace(namespace).create(coordinatorDeploymentBuilder.build());
+        Deployment retDeployment = client.apps().deployments().inNamespace(namespace).createOrReplace(coordinatorDeploymentBuilder.build());
         LOG.info("coordinator deployment: \n{}", YamlUtils.objectToYaml(retDeployment));
 
         // construct coordinator service.
@@ -202,7 +202,7 @@ public class CoordinatorHandler {
                 .endSpec().build();
 
         // create coordinator service.
-        Service retService = client.services().inNamespace(namespace).create(coordinatorService);
+        Service retService = client.services().inNamespace(namespace).createOrReplace(coordinatorService);
         LOG.info("coordinator service: \n{}", YamlUtils.objectToYaml(retService));
     }
 
