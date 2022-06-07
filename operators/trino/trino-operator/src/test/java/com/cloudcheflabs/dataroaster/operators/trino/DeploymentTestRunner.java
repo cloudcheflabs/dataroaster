@@ -1,44 +1,20 @@
 package com.cloudcheflabs.dataroaster.operators.trino;
 
+import com.cloudcheflabs.dataroaster.common.util.FileUtils;
 import com.cloudcheflabs.dataroaster.common.util.TemplateUtils;
+import com.cloudcheflabs.dataroaster.operators.trino.util.YamlUtils;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentList;
 import io.fabric8.kubernetes.api.model.apps.DeploymentStatus;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.server.mock.EnableKubernetesMockClient;
-
-import com.cloudcheflabs.dataroaster.common.util.FileUtils;
-import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
-import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoClusterStatus;
-import com.cloudcheflabs.dataroaster.operators.trino.util.YamlUtils;
-import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
-import io.fabric8.kubernetes.api.model.KubernetesResourceList;
-import io.fabric8.kubernetes.api.model.StatusBuilder;
-import io.fabric8.kubernetes.api.model.StatusDetails;
-import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.MixedOperation;
-import io.fabric8.kubernetes.client.dsl.Resource;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
-import io.fabric8.kubernetes.client.server.mock.EnableKubernetesMockClient;
-import io.fabric8.kubernetes.client.server.mock.KubernetesMockServer;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
-import net.bytebuddy.implementation.bytecode.assign.primitive.VoidAwareAssigner;
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.util.*;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.HashMap;
+import java.util.Map;
 
 @EnableKubernetesMockClient(crud = true)
 public class DeploymentTestRunner {

@@ -1,12 +1,14 @@
 package com.cloudcheflabs.dataroaster.operators.trino.crd;
 
+import io.fabric8.kubernetes.api.model.LocalObjectReference;
+
 import java.util.List;
 
 public class Image {
     private String repository;
     private String tag;
     private String imagePullPolicy;
-    private List<String> imagePullSecrets;
+    private List<LocalObjectReference> imagePullSecrets;
 
     public String getRepository() {
         return repository;
@@ -32,11 +34,11 @@ public class Image {
         this.imagePullPolicy = imagePullPolicy;
     }
 
-    public List<String> getImagePullSecrets() {
+    public List<LocalObjectReference> getImagePullSecrets() {
         return imagePullSecrets;
     }
 
-    public void setImagePullSecrets(List<String> imagePullSecrets) {
+    public void setImagePullSecrets(List<LocalObjectReference> imagePullSecrets) {
         this.imagePullSecrets = imagePullSecrets;
     }
 }

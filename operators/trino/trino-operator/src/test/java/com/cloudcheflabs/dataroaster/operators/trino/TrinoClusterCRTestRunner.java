@@ -148,7 +148,7 @@ public class TrinoClusterCRTestRunner {
     @Test
     public void createCustomResourceWithObject() throws Exception {
         // create custom resource of trino cluster.
-        trinoClusterClient.inNamespace("\"trino-operator\"").create(trinoCluster);
+        trinoClusterClient.inNamespace("trino-operator").create(trinoCluster);
 
         KubernetesResourceList<TrinoCluster> trinoClusterList = trinoClusterClient.inNamespace("trino-operator").list();
         Assert.assertNotNull(trinoClusterList);

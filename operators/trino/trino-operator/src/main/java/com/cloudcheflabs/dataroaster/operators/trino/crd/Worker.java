@@ -1,5 +1,8 @@
 package com.cloudcheflabs.dataroaster.operators.trino.crd;
 
+import io.fabric8.kubernetes.api.model.Affinity;
+import io.fabric8.kubernetes.api.model.Toleration;
+
 import java.util.List;
 import java.util.Map;
 

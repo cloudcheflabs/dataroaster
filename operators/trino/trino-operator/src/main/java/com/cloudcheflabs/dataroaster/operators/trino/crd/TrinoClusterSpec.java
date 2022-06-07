@@ -3,6 +3,7 @@ package com.cloudcheflabs.dataroaster.operators.trino.crd;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
+import io.fabric8.kubernetes.api.model.PodSecurityContext;
 
 @JsonDeserialize(
         using = JsonDeserializer.None.class
@@ -12,7 +13,7 @@ public class TrinoClusterSpec implements KubernetesResource {
     private String namespace;
     private String serviceAccountName;
     private Image image;
-    private SecurityContext securityContext;
+    private PodSecurityContext securityContext;
     private Coordinator coordinator;
     private Worker worker;
 
@@ -40,11 +41,11 @@ public class TrinoClusterSpec implements KubernetesResource {
         this.image = image;
     }
 
-    public SecurityContext getSecurityContext() {
+    public PodSecurityContext getSecurityContext() {
         return securityContext;
     }
 
-    public void setSecurityContext(SecurityContext securityContext) {
+    public void setSecurityContext(PodSecurityContext securityContext) {
         this.securityContext = securityContext;
     }
 

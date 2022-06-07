@@ -23,6 +23,22 @@ public class Resources {
     public static class Requests {
         private String cpu;
         private String memory;
+
+        public String getCpu() {
+            return cpu;
+        }
+
+        public void setCpu(String cpu) {
+            this.cpu = cpu;
+        }
+
+        public String getMemory() {
+            return memory;
+        }
+
+        public void setMemory(String memory) {
+            this.memory = memory;
+        }
     }
 
     public static class Limits extends Requests {
