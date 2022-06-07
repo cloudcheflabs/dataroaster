@@ -50,6 +50,7 @@ rules:
   - apiGroups:
       - ""
     resources:
+      - namespaces
       - configmaps
       - events
       - persistentvolumes
