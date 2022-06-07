@@ -71,9 +71,9 @@ spec:
           connector.name=tpcds
           tpcds.splits-per-node=4
   worker:
-    replicas: 3
+    replicas: 2
     autoscaler:
-      minReplicas: 3
+      minReplicas: 2
       maxReplicas: 5
       targetCPUUtilizationPercentage: 50
     resources: null
