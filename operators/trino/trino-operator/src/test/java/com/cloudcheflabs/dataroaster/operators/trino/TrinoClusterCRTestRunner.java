@@ -44,9 +44,6 @@ public class TrinoClusterCRTestRunner {
 
     @BeforeEach
     public void setup() throws Exception {
-        // register custom kind.
-        KubernetesDeserializer.registerCustomKind("trino-operator.cloudchef-labs.com/v1alpha1", "TrinoCluster", TrinoCluster.class);
-
         // load custom resource definition for trino cluster.
         InputStream is = FileUtils.readFile(crdPath);
         customResourceDefinition = client.apiextensions().v1().customResourceDefinitions()
@@ -81,21 +78,21 @@ public class TrinoClusterCRTestRunner {
 
         // Then
         assertThat(server.getLastRequest())
-                .hasFieldOrPropertyWithValue("path", "/apis/trino-operator.cloudchef-labs.com/v1alpha1/namespaces/trino-operator/trinoclusters");
+                .hasFieldOrPropertyWithValue("path", "/apis/trino-operator.cloudchef-labs.com/v1beta1/namespaces/trino-operator/trinoclusters");
     }
 
     @Test
     public void create() throws Exception {
 
-        server.expect().post().withPath("/apis/trino-operator.cloudchef-labs.com/v1alpha1/namespaces/trino")
+        server.expect().post().withPath("/apis/trino-operator.cloudchef-labs.com/v1beta1/namespaces/trino")
                 .andReturn(HttpURLConnection.HTTP_INTERNAL_ERROR, new StatusBuilder().build()).once();
-        server.expect().post().withPath("/apis/trino-operator.cloudchef-labs.com/v1alpha1/namespaces/trino")
+        server.expect().post().withPath("/apis/trino-operator.cloudchef-labs.com/v1beta1/namespaces/trino")
                 .andReturn(HttpURLConnection.HTTP_CREATED, customResource).once();
-        server.expect().post().withPath("/apis/trino-operator.cloudchef-labs.com/v1alpha1/namespaces/trino")
+        server.expect().post().withPath("/apis/trino-operator.cloudchef-labs.com/v1beta1/namespaces/trino")
                 .andReturn(HttpURLConnection.HTTP_CONFLICT, customResource).once();
-        server.expect().put().withPath("/apis/trino-operator.cloudchef-labs.com/v1alpha1/namespaces/trino-operator")
+        server.expect().put().withPath("/apis/trino-operator.cloudchef-labs.com/v1beta1/namespaces/trino-operator")
                 .andReturn(HttpURLConnection.HTTP_OK, customResource).once();
-        server.expect().get().withPath("/apis/trino-operator.cloudchef-labs.com/v1alpha1/namespaces/trino-operator")
+        server.expect().get().withPath("/apis/trino-operator.cloudchef-labs.com/v1beta1/namespaces/trino-operator")
                 .andReturn(HttpURLConnection.HTTP_OK, customResource).once();
 
         GenericKubernetesResource resource = client.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(customResourceDefinition)).inNamespace("trino-operator")
@@ -109,7 +106,7 @@ public class TrinoClusterCRTestRunner {
 
     @Test
     public void get() throws Exception {
-        server.expect().get().withPath("/apis/trino-operator.cloudchef-labs.com/v1alpha1/namespaces/trino-operator/trinoclusters/trino-cluster-etl")
+        server.expect().get().withPath("/apis/trino-operator.cloudchef-labs.com/v1beta1/namespaces/trino-operator/trinoclusters/trino-cluster-etl")
                 .andReturn(HttpURLConnection.HTTP_OK, customResource).once();
 
         GenericKubernetesResource customResource = client.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(customResourceDefinition))
@@ -121,7 +118,7 @@ public class TrinoClusterCRTestRunner {
     @Test
     public void delete() throws Exception {
         // Given
-        server.expect().delete().withPath("/apis/trino-operator.cloudchef-labs.com/v1alpha1/namespaces/trino-operator/trinoclusters/trino-cluster-etl").andReturn(
+        server.expect().delete().withPath("/apis/trino-operator.cloudchef-labs.com/v1beta1/namespaces/trino-operator/trinoclusters/trino-cluster-etl").andReturn(
                         HttpURLConnection.HTTP_OK,
                         customResource)
                 .once();
@@ -134,7 +131,7 @@ public class TrinoClusterCRTestRunner {
         assertTrue(result);
 
 
-        server.expect().delete().withPath("/apis/trino-operator.cloudchef-labs.com/v1alpha1/namespaces/trino-operator/trinoclusters/trino-cluster-etl")
+        server.expect().delete().withPath("/apis/trino-operator.cloudchef-labs.com/v1beta1/namespaces/trino-operator/trinoclusters/trino-cluster-etl")
                 .andReturn(HttpURLConnection.HTTP_NOT_FOUND, customResource).once();
 
         // When
