@@ -427,6 +427,10 @@ spec:
                           type: int64
                         targetCPUUtilizationPercentage:
                           type: int64
+                      required:
+                        - minReplicas
+                        - maxReplicas
+                        - targetCPUUtilizationPercentage
                     resources:
                       type: object
                       properties:

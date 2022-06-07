@@ -207,7 +207,9 @@ public class CoordinatorHandler {
     }
 
     public void delete(TrinoCluster trinoCluster) {
-        String namespace = trinoCluster.getSpec().getNamespace();
+        TrinoClusterSpec spec = trinoCluster.getSpec();
+        String namespace = spec.getNamespace();
+        String serviceAccountName = spec.getServiceAccountName();
 
         // delete coordinator deployment.
         boolean deploymentDeleted = client.apps().deployments().inNamespace(namespace).withName(DEFAULT_COORDINATOR_DEPLOYMENT).delete();
@@ -220,5 +222,9 @@ public class CoordinatorHandler {
         // delete coordinator config map.
         boolean configmapDeleted = client.configMaps().inNamespace(namespace).withName(DEFAULT_COORDINATOR_CONFIGMAP).delete();
         LOG.info("coordinator configmap [{}] deleted  in namespace [{}]: {}", DEFAULT_COORDINATOR_CONFIGMAP, namespace, configmapDeleted);
+
+        // delete service account.
+        boolean saDeleted = client.serviceAccounts().inNamespace(namespace).withName(serviceAccountName).delete();
+        LOG.info("sa [{}] deleted  in namespace [{}]: {}", serviceAccountName, namespace, saDeleted);
     }
 }

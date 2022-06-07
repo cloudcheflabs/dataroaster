@@ -17,4 +17,6 @@ public class TrinoConfiguration {
      */
     public static final String DEFAULT_WORKER_CONFIGMAP = "trino-worker";
     public static final String DEFAULT_WORKER_DEPLOYMENT = DEFAULT_WORKER_CONFIGMAP;
+
+    public static final String DEFAULT_WORKER_HPA = DEFAULT_WORKER_CONFIGMAP;
 }

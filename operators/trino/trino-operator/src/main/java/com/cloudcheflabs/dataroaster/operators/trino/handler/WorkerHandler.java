@@ -6,6 +6,8 @@ import com.cloudcheflabs.dataroaster.operators.trino.util.YamlUtils;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import io.fabric8.kubernetes.api.model.autoscaling.v1.HorizontalPodAutoscaler;
+import io.fabric8.kubernetes.api.model.autoscaling.v1.HorizontalPodAutoscalerBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
 
-import static com.cloudcheflabs.dataroaster.operators.trino.config.TrinoConfiguration.DEFAULT_WORKER_CONFIGMAP;
-import static com.cloudcheflabs.dataroaster.operators.trino.config.TrinoConfiguration.DEFAULT_WORKER_DEPLOYMENT;
+import static com.cloudcheflabs.dataroaster.operators.trino.config.TrinoConfiguration.*;
 
 public class WorkerHandler {
 
@@ -179,6 +180,29 @@ public class WorkerHandler {
         // create worker deployment.
         Deployment retDeployment = client.apps().deployments().inNamespace(namespace).create(workerDeploymentBuilder.build());
         LOG.info("worker deployment: \n{}", YamlUtils.objectToYaml(retDeployment));
+
+        // create horizontal pod autoscaler.
+        Autoscaler autoscaler = worker.getAutoscaler();
+        if(autoscaler != null) {
+            HorizontalPodAutoscaler workerHpa = new HorizontalPodAutoscalerBuilder()
+                    .withNewMetadata()
+                        .withName(DEFAULT_WORKER_HPA)
+                        .withNamespace(namespace)
+                    .endMetadata()
+                    .withNewSpec()
+                        .withMinReplicas(autoscaler.getMinReplicas())
+                        .withMaxReplicas(autoscaler.getMaxReplicas())
+                        .withTargetCPUUtilizationPercentage(autoscaler.getTargetCPUUtilizationPercentage())
+                        .withNewScaleTargetRef()
+                            .withName(DEFAULT_WORKER_DEPLOYMENT)
+                            .withKind("Deployment")
+                            .withApiVersion("apps/v1")
+                        .endScaleTargetRef()
+                    .endSpec().build();
+            HorizontalPodAutoscaler retHpa = client.autoscaling().v1().horizontalPodAutoscalers().inNamespace(namespace).create(workerHpa);
+            LOG.info("worker hpa: \n{}", YamlUtils.objectToYaml(retHpa));
+        }
+
     }
 
     public void delete(TrinoCluster trinoCluster) {
@@ -191,5 +215,11 @@ public class WorkerHandler {
         // delete worker config map.
         boolean configmapDeleted = client.configMaps().inNamespace(namespace).withName(DEFAULT_WORKER_CONFIGMAP).delete();
         LOG.info("worker configmap [{}] deleted  in namespace [{}]: {}", DEFAULT_WORKER_CONFIGMAP, namespace, configmapDeleted);
+
+        // delete worker hpa.
+        if(trinoCluster.getSpec().getWorker().getAutoscaler() != null) {
+            boolean hpaDeleted = client.autoscaling().v1().horizontalPodAutoscalers().inNamespace(namespace).withName(DEFAULT_WORKER_HPA).delete();
+            LOG.info("worker hpa [{}] deleted  in namespace [{}]: {}", DEFAULT_WORKER_HPA, namespace, hpaDeleted);
+        }
     }
 }
