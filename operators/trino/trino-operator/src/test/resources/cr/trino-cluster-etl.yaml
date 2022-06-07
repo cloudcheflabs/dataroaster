@@ -1,4 +1,4 @@
-apiVersion: "trino-operator.cloudchef-labs.com/v1beta1"
+apiVersion: "trino-operator.cloudchef-labs.com/v1alpha1"
 kind: TrinoCluster
 metadata:
   name: trino-cluster-etl
