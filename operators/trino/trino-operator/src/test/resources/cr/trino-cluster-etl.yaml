@@ -95,7 +95,7 @@ spec:
           query.max-memory=4GB
           query.max-memory-per-node=1GB
           memory.heap-headroom-per-node=1GB
-          discovery.uri=http://trino-cluster-etl.svc:8080
+          discovery.uri=http://trino-coordinator-service.trino-cluster-etl.svc:8080
       - name: jvm.config
         path: /etc/trino
         value: |

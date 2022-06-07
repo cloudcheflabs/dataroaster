@@ -31,7 +31,7 @@ public class TrinoClusterQueueConsumer implements Runnable{
                     if(action.name().equals("ADDED")) {
                         LOG.info("add trino cluster: \n{}", YamlUtils.objectToYaml(trinoCluster));
                         actionHandler.create(trinoCluster);
-                        LOG.info("[{}] submitted...", trinoCluster.getMetadata().getName());
+                        LOG.info("[{}] created...", trinoCluster.getMetadata().getName());
                     } else if(action.name().equals("DELETED")) {
                         LOG.info("delete trino cluster: \n{}", YamlUtils.objectToYaml(trinoCluster));
                         actionHandler.destroy(trinoCluster);
