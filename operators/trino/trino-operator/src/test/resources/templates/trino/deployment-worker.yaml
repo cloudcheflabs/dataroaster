@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trino-worker
+  namespace: {{ namespace }}
+  labels:
+    app: {{ trinoName }}
+    component: worker
+spec:
+  replicas: {{ replicas }}
+  selector:
+    matchLabels:
+      app: {{ trinoName }}
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: {{ trinoName }}
+        component: worker
+    spec:
+      serviceAccountName: {{ serviceAccountName }}
+      volumes: {{ volumes }}
+      imagePullSecrets: {{ imagePullSecrets }}
+      containers:
+        - name: trino-worker
+          image: {{ image }}
+          imagePullPolicy: {{ imagePullPolicy }}
+          volumeMounts: {{ volumeMounts }}
+          ports:
+            - name: http
+              containerPort: {{ servicePort }}
+              protocol: TCP
+          resources: {{ resources }}
+      nodeSelector: {{ nodeSelector }}
+      affinity: {{ affinity }}
+      tolerations: {{ tolerations }}

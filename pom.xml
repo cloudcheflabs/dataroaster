@@ -15,6 +15,7 @@
         <module>cli</module>
         <module>components/hive/spark-thrift-server</module>
         <module>operators/spark/spark-operator</module>
+        <module>operators/trino/trino-operator</module>
     </modules>
     <build>
         <pluginManagement>
