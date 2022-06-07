@@ -11,8 +11,6 @@ spec:
     shortNames:
       - trinocluster
   scope: Namespaced
-  subresources:
-    status: {}
   versions:
     - name: v1beta1
       served: true

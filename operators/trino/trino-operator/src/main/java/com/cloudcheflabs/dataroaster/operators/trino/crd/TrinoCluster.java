@@ -7,7 +7,7 @@ import io.fabric8.kubernetes.model.annotation.Version;
 
 @Version(TrinoCluster.VERSION)
 @Group(TrinoCluster.GROUP)
-public class TrinoCluster extends CustomResource<TrinoClusterSpec, TrinoClusterStatus> implements Namespaced {
+public class TrinoCluster extends CustomResource<TrinoClusterSpec, Void> implements Namespaced {
 
     public static final String GROUP = "trino-operator.cloudchef-labs.com";
     public static final String VERSION = "v1beta1";

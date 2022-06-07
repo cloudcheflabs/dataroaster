@@ -2,8 +2,6 @@ package com.cloudcheflabs.dataroaster.operators.trino;
 
 import com.cloudcheflabs.dataroaster.common.util.FileUtils;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
-import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoClusterStatus;
-import com.cloudcheflabs.dataroaster.operators.trino.util.YamlUtils;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
@@ -14,17 +12,12 @@ import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import io.fabric8.kubernetes.client.server.mock.EnableKubernetesMockClient;
 import io.fabric8.kubernetes.client.server.mock.KubernetesMockServer;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -182,51 +175,5 @@ public class TrinoClusterCRTestRunner {
                 Assert.assertEquals("trino-cluster-etl", ns);
             }
         });
-    }
-
-    @Test
-    public void statusSubresourceHandling() throws Exception {
-        TrinoClusterStatus trinoClusterStatus = new TrinoClusterStatus();
-        trinoClusterStatus.setReplicas(1);
-        trinoCluster.setStatus(trinoClusterStatus);
-
-        // set status.
-        TrinoCluster retTrinoCluster = trinoClusterClient.inNamespace("trino-operator").create(trinoCluster);
-        System.out.printf("trino cluster after setting status: \n%s", YamlUtils.objectToYaml(retTrinoCluster));
-        Assert.assertNotNull(retTrinoCluster.getStatus());
-
-        String originalUid = retTrinoCluster.getMetadata().getUid();
-
-        Map<String, String> labels = new HashMap<>();
-        labels.put("app", "trino-cluster");
-
-        trinoCluster.getMetadata().setLabels(labels);
-        trinoCluster.getMetadata().setResourceVersion("1");
-
-        // add labels and set resource version.
-        retTrinoCluster = trinoClusterClient.inNamespace("trino-operator").replace(trinoCluster);
-        System.out.printf("trino cluster after adding labels: \n%s", YamlUtils.objectToYaml(retTrinoCluster));
-        Assert.assertNotNull(retTrinoCluster.getMetadata().getLabels());
-
-        // set status to null.
-        trinoCluster.setStatus(null);
-        retTrinoCluster = trinoClusterClient.inNamespace("trino-operator").replace(trinoCluster);
-        System.out.printf("trino cluster after setting null status: \n%s", YamlUtils.objectToYaml(retTrinoCluster));
-        Assert.assertNull(retTrinoCluster.getStatus());
-
-        // add label to the existing labels.
-        labels.put("another", "value");
-        retTrinoCluster = trinoClusterClient.inNamespace("trino-operator").withName("trino-cluster-etl").patch(trinoCluster);
-        assertEquals(new HashSet<String>(Arrays.asList("app", "another")), retTrinoCluster.getMetadata().getLabels().keySet());
-
-        assertEquals(originalUid, retTrinoCluster.getMetadata().getUid());
-
-        trinoClusterStatus = new TrinoClusterStatus();
-        trinoClusterStatus.setReplicas(2);
-        trinoCluster.setStatus(trinoClusterStatus);
-        retTrinoCluster = trinoClusterClient.inNamespace("trino-operator").withName("trino-cluster-etl").patch(trinoCluster);
-        assertNotNull(retTrinoCluster.getStatus());
-        Assert.assertEquals(2, retTrinoCluster.getStatus().getReplicas());
-        System.out.printf("trino cluster after setting new status: \n%s", YamlUtils.objectToYaml(retTrinoCluster));
     }
 }
