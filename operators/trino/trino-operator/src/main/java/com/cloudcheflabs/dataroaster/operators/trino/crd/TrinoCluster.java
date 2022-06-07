@@ -10,7 +10,7 @@ import io.fabric8.kubernetes.model.annotation.Version;
 public class TrinoCluster extends CustomResource<TrinoClusterSpec, Void> implements Namespaced {
 
     public static final String GROUP = "trino-operator.cloudchef-labs.com";
-    public static final String VERSION = "v1alpha1";
+    public static final String VERSION = "v1beta1";
 
 
 
