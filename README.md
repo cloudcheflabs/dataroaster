@@ -1111,6 +1111,11 @@ DataRoaster Spark Operator is used to submit and delete spark applications on ku
 See [DataRoaster Spark Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/spark) for more details.
 
 
+## DataRoaster Trino Operator
+DataRoaster Trino Operator is used to create/delete trino clusters easily.
+
+See [DataRoaster Trino Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/trino) for more details.
+
 ## Community
 
 * DataRoaster Community Mailing Lists: https://groups.google.com/g/dataroaster
