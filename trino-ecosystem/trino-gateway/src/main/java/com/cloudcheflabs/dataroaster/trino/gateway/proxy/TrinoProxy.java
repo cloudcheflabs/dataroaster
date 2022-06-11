@@ -56,9 +56,9 @@ public class TrinoProxy {
                             new HttpConnectionFactory(httpsConfig));
         } else {
             connector = new ServerConnector(server);
+            connector.setPort(httpPort);
         }
         connector.setHost("0.0.0.0");
-        connector.setPort(httpPort);
         connector.setName("Trino Proxy");
         connector.setAccepting(true);
         server.addConnector(connector);
