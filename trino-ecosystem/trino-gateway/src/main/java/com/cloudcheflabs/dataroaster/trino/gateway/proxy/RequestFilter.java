@@ -30,12 +30,13 @@ public class RequestFilter implements jakarta.servlet.Filter {
     HttpServletRequest req = (HttpServletRequest) request;
     String user = req.getHeader("X-Trino-User");
     String passwordEncoded = req.getHeader("Authorization");
+    LOG.info("user: [{}], password: [{}]", user, passwordEncoded);
 
     // TODO: do basic authentication.
     if(user != null && passwordEncoded != null) {
-      byte[] decodedBytes = Base64.getDecoder().decode(passwordEncoded);
-      String password = new String(decodedBytes);
-      LOG.info("user: [{}], password: [{}]", user, password);
+//      byte[] decodedBytes = Base64.getDecoder().decode(passwordEncoded);
+//      String password = new String(decodedBytes);
+//      LOG.info("user: [{}], password: [{}]", user, password);
     }
 
     RequestWrapper requestWrapper = new RequestWrapper(req);
