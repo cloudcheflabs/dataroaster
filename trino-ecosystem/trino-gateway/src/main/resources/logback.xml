@@ -15,7 +15,7 @@
     <springProfile name="dev">
         <appender name="RollingFile"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>/tmp/logs/apiserver/apiserver.log</file>
+            <file>/tmp/logs/trino-gateway/trino-gateway.log</file>
             <encoder
                     class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
                 <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
@@ -23,7 +23,7 @@
 
             <rollingPolicy
                     class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>/tmp/logs/apiserver/archived/apiserver-%d{yyyy-MM-dd}.%i.log
+                <fileNamePattern>/tmp/logs/trino-gateway/archived/trino-gateway-%d{yyyy-MM-dd}.%i.log
                 </fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy
                         class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -39,7 +39,7 @@
     <springProfile name="prod">
         <appender name="RollingFile"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>/data/dataroaster/logs/apiserver/apiserver.log</file>
+            <file>/data/dataroaster/logs/trino-gateway/trino-gateway.log</file>
             <encoder
                     class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
                 <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
@@ -47,7 +47,7 @@
 
             <rollingPolicy
                     class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>/data/dataroaster/logs/apiserver/archived/apiserver-%d{yyyy-MM-dd}.%i.log
+                <fileNamePattern>/data/dataroaster/logs/trino-gateway/archived/trino-gateway-%d{yyyy-MM-dd}.%i.log
                 </fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy
                         class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
