@@ -20,7 +20,8 @@ public class TrinoProxy {
         server.setStopAtShutdown(true);
         ServerConnector connector = new ServerConnector(server);
         connector.setHost("0.0.0.0");
-        connector.setPort(8088);
+        // TODO: port configurable.
+        connector.setPort(18080);
         connector.setName("Trino Proxy");
         connector.setAccepting(true);
         server.addConnector(connector);
