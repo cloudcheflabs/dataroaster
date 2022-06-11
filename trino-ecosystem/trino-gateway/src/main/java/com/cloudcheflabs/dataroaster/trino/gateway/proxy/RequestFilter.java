@@ -1,17 +1,17 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
 import java.util.Enumeration;
 
-public class RequestFilter implements Filter {
+public class RequestFilter implements jakarta.servlet.Filter {
 
   private static Logger LOG = LoggerFactory.getLogger(RequestFilter.class);
   private FilterConfig filterConfig = null;
@@ -20,12 +20,8 @@ public class RequestFilter implements Filter {
     this.filterConfig = filterConfig;
   }
 
-  public void destroy() {
-    this.filterConfig = null;
-  }
-
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-      throws IOException, ServletException {
+  @Override
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     RequestWrapper requestWrapper = new RequestWrapper((HttpServletRequest) request);
     Enumeration<String> headers = requestWrapper.getHeaderNames();
     while(headers.hasMoreElements()) {
@@ -39,5 +35,10 @@ public class RequestFilter implements Filter {
 
     HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper((HttpServletResponse) response);
     chain.doFilter(requestWrapper, responseWrapper);
+  }
+
+
+  public void destroy() {
+    this.filterConfig = null;
   }
 }

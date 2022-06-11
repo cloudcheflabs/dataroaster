@@ -1,7 +1,6 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 import jakarta.servlet.DispatcherType;
-import jakarta.servlet.Filter;
 import org.eclipse.jetty.proxy.ConnectHandler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -41,7 +40,7 @@ public class TrinoProxy {
         ServletContextHandler context =
                 new ServletContextHandler(proxyConnectHandler, "/", ServletContextHandler.SESSIONS);
         context.addServlet(servletHolder, "/*");
-        context.addFilter((Class<? extends Filter>) RequestFilter.class, "/*", EnumSet.allOf(DispatcherType.class));
+        context.addFilter(RequestFilter.class, "/*", EnumSet.allOf(DispatcherType.class));
 
         try {
             server.start();

@@ -1,9 +1,9 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+
 import java.io.*;
 import java.util.*;
 
@@ -81,7 +81,9 @@ public class RequestWrapper extends HttpServletRequestWrapper {
       }
 
       @Override
-      public void setReadListener(ReadListener readListener) {}
+      public void setReadListener(jakarta.servlet.ReadListener readListener) {
+
+      }
 
       public int read() throws IOException {
         return byteArrayInputStream.read();
