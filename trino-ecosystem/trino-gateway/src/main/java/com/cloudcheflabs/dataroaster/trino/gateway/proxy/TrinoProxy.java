@@ -11,11 +11,13 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
+@Component
 public class TrinoProxy {
 
     private static Logger LOG = LoggerFactory.getLogger(TrinoProxy.class);
@@ -39,6 +41,10 @@ public class TrinoProxy {
     private String trustStorePass;
 
     public TrinoProxy() {
+        run();
+    }
+
+    private void run() {
         Server server = new Server();
         server.setStopAtShutdown(true);
         ServerConnector connector = null;
@@ -105,7 +111,7 @@ public class TrinoProxy {
         }
     }
 
-    public static class TlsContextFactory extends SslContextFactory.Server {
+    private static class TlsContextFactory extends SslContextFactory.Server {
         public TlsContextFactory() {
             super();
         }
