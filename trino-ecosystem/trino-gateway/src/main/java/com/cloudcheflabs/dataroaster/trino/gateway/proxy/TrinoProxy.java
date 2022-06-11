@@ -29,6 +29,7 @@ public class TrinoProxy {
         String keystorePath = "/home/vagrant/cert-tool/work/keystore.jks";
         String keystorePass = "changeit";
         int httpsPort = 28080;
+        int proxyServerPort = (tlsEnabled) ? httpsPort : httpPort;
         if (tlsEnabled) {
             File keystoreFile = new File(keystorePath);
 
@@ -42,7 +43,6 @@ public class TrinoProxy {
 
             HttpConfiguration httpsConfig = new HttpConfiguration();
             httpsConfig.setSecureScheme(HttpScheme.HTTPS.asString());
-            httpsConfig.setSecurePort(httpsPort);
             httpsConfig.setOutputBufferSize(32768);
 
             SecureRequestCustomizer src = new SecureRequestCustomizer();
@@ -56,9 +56,9 @@ public class TrinoProxy {
                             new HttpConnectionFactory(httpsConfig));
         } else {
             connector = new ServerConnector(server);
-            connector.setPort(httpPort);
         }
         connector.setHost("0.0.0.0");
+        connector.setPort(proxyServerPort);
         connector.setName("Trino Proxy");
         connector.setAccepting(true);
         server.addConnector(connector);
