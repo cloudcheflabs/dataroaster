@@ -33,6 +33,7 @@ public class TrinoProxy {
 
         ServletHolder servletHolder = new ServletHolder("Trino Proxy Servlet", trinoProxyServlet);
 
+        servletHolder.setInitParameter("proxyTo", "http://localhost:54321");
         servletHolder.setInitParameter("prefix", "/");
         servletHolder.setInitParameter("trustAll", "true");
         servletHolder.setInitParameter("preserveHost", "localhost");

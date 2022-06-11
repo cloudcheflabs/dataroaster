@@ -48,4 +48,13 @@ public class JsonUtils {
             throw new RuntimeException(e);
         }
     }
+
+    public static String toJson(Object obj)
+    {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

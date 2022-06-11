@@ -1,6 +1,8 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 
+import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,15 +25,17 @@ public class RequestFilter implements jakarta.servlet.Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     RequestWrapper requestWrapper = new RequestWrapper((HttpServletRequest) request);
-    Enumeration<String> headers = requestWrapper.getHeaderNames();
-    while(headers.hasMoreElements()) {
-      String header = headers.nextElement();
-      String headerValue = requestWrapper.getHeader(header);
-      Enumeration<String> headerValues = requestWrapper.getHeaders(header);
-      LOG.info("header: [{}], value: [{}], values: [{}]", header, headerValue, headerValues.toString());
+    if(LOG.isDebugEnabled()) {
+      Enumeration<String> headers = requestWrapper.getHeaderNames();
+      while (headers.hasMoreElements()) {
+        String header = headers.nextElement();
+        String headerValue = requestWrapper.getHeader(header);
+        Enumeration<String> headerValues = requestWrapper.getHeaders(header);
+        LOG.debug("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), headerValues));
+      }
+      String body = requestWrapper.getBody();
+      LOG.debug("body: [{}]", body);
     }
-    String body = requestWrapper.getBody();
-    LOG.info("body: [{}]", body);
 
     HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper((HttpServletResponse) response);
     chain.doFilter(requestWrapper, responseWrapper);
