@@ -10,6 +10,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.util.EnumSet;
@@ -19,20 +20,29 @@ public class TrinoProxy {
 
     private static Logger LOG = LoggerFactory.getLogger(TrinoProxy.class);
 
+    @Value("${trino.proxy.port}")
+    private int port;
+
+    @Value("${trino.proxy.tls.enabled}")
+    private boolean tlsEnabled;
+
+    @Value("${trino.proxy.tls.keystorePath}")
+    private String keystorePath;
+
+    @Value("${trino.proxy.tls.keystorePass}")
+    private String keystorePass;
+
+    @Value("${trino.proxy.tls.trustStorePath}")
+    private String trustStorePath;
+
+    @Value("${trino.proxy.tls.trustStorePass}")
+    private String trustStorePass;
+
     public TrinoProxy() {
         Server server = new Server();
         server.setStopAtShutdown(true);
         ServerConnector connector = null;
 
-        int httpPort = 18080;
-        boolean tlsEnabled = true;
-
-        String keystorePath = "/home/vagrant/key-tool/keystore.jks";
-        String keystorePass = "changeit";
-        String trustStorePath = "/home/vagrant/.keystore";
-        String trustStorePass = "changeit";
-        int httpsPort = 28080;
-        int proxyServerPort = (tlsEnabled) ? httpsPort : httpPort;
         if (tlsEnabled) {
             File keystoreFile = new File(keystorePath);
             File trustStoreFile = new File(trustStorePath);
@@ -64,7 +74,7 @@ public class TrinoProxy {
             connector = new ServerConnector(server);
         }
         connector.setHost("0.0.0.0");
-        connector.setPort(proxyServerPort);
+        connector.setPort(port);
         connector.setName("Trino Proxy");
         connector.setAccepting(true);
         server.addConnector(connector);

@@ -2,3 +2,12 @@ server:
   port: 8099
   servlet:
     context-path: /
+trino:
+  proxy:
+    port: 18080
+    tls:
+      enabled: true
+      keystorePath: /home/vagrant/key-tool/keystore.jks
+      keystorePass: changeit
+      trustStorePath: /home/vagrant/.keystore
+      trustStorePass: changeit

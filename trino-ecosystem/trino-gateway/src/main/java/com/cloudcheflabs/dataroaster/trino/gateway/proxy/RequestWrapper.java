@@ -43,7 +43,8 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 
 
   /**
-   * reconstruct headers without headers like 'Authorization'.
+   * reconstruct headers removing headers like 'Authorization'
+   * to forward queries to downstream trino which will not do authentication.
    *
    * @return
    */
@@ -58,7 +59,9 @@ public class RequestWrapper extends HttpServletRequestWrapper {
       if(!name.equals("Authorization")) {
         filteredHeaderNames.add(name);
       } else {
-        LOG.info("header [{}}] not allowed!", name);
+        if(LOG.isDebugEnabled()) {
+          LOG.debug("header [{}}] removed to forward queries to downstream trino which will not do authentication", name);
+        }
       }
     }
 
