@@ -36,11 +36,9 @@ public class RequestFilter implements jakarta.servlet.Filter {
 
     // TODO: do basic authentication.
     if(user != null && authValue != null) {
-      Enumeration<String> authValues = req.getHeaders("Authorization");
-      List<String> authValueList = Collections.list(authValues);
-      authValueList.removeIf(Predicate.isEqual("Basic"));
+      String[] tokens = authValue.split(" ");
 
-      byte[] decodedBytes = Base64.getDecoder().decode(authValueList.get(0));
+      byte[] decodedBytes = Base64.getDecoder().decode(tokens[1]);
       String password = new String(decodedBytes);
       LOG.info("user: [{}], password: [{}]", user, password);
     }
