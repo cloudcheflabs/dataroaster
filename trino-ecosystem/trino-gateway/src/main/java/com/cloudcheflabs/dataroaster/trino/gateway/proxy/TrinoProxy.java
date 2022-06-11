@@ -27,9 +27,9 @@ public class TrinoProxy {
         int httpPort = 18080;
         boolean tlsEnabled = true;
 
-        String keystorePath = "/home/vagrant/cert-tool/work/keystore.jks";
+        String keystorePath = "/home/vagrant/key-tool/keystore.jks";
         String keystorePass = "changeit";
-        String trustStorePath = "/home/vagrant/cert-tool/work/ca/private/amaster.example.com.decrypted.key.pem";
+        String trustStorePath = "/home/vagrant/.keystore";
         String trustStorePass = "changeit";
         int httpsPort = 28080;
         int proxyServerPort = (tlsEnabled) ? httpsPort : httpPort;
