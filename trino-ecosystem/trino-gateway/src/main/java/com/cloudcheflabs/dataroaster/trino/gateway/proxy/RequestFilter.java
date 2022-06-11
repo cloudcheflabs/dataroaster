@@ -26,17 +26,16 @@ public class RequestFilter implements jakarta.servlet.Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     RequestWrapper requestWrapper = new RequestWrapper((HttpServletRequest) request);
-    if(LOG.isDebugEnabled()) {
-      Enumeration<String> headers = requestWrapper.getHeaderNames();
-      while (headers.hasMoreElements()) {
-        String header = headers.nextElement();
-        String headerValue = requestWrapper.getHeader(header);
-        Enumeration<String> headerValues = requestWrapper.getHeaders(header);
-        LOG.debug("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), Collections.list(headerValues)));
-      }
-      String body = requestWrapper.getBody();
-      LOG.debug("body: [{}]", body);
+
+    Enumeration<String> headers = requestWrapper.getHeaderNames();
+    while (headers.hasMoreElements()) {
+      String header = headers.nextElement();
+      String headerValue = requestWrapper.getHeader(header);
+      Enumeration<String> headerValues = requestWrapper.getHeaders(header);
+      LOG.info("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), Collections.list(headerValues)));
     }
+    String body = requestWrapper.getBody();
+    LOG.info("body: [{}]", body);
 
     HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper((HttpServletResponse) response);
     chain.doFilter(requestWrapper, responseWrapper);
