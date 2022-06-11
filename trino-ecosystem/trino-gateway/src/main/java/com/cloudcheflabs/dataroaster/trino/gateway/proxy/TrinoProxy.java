@@ -26,12 +26,16 @@ public class TrinoProxy {
 
         int httpPort = 18080;
         boolean tlsEnabled = true;
+
         String keystorePath = "/home/vagrant/cert-tool/work/keystore.jks";
         String keystorePass = "changeit";
+        String trustStorePath = "/home/vagrant/cert-tool/work/ca/certs/ca.cert.pem";
+        String trustStorePass = "changeit";
         int httpsPort = 28080;
         int proxyServerPort = (tlsEnabled) ? httpsPort : httpPort;
         if (tlsEnabled) {
             File keystoreFile = new File(keystorePath);
+            File trustStoreFile = new File(trustStorePath);
 
             TlsContextFactory tlsContextFactory = new TlsContextFactory();
             tlsContextFactory.setTrustAll(true);
@@ -40,6 +44,8 @@ public class TrinoProxy {
             tlsContextFactory.setKeyStorePath(keystoreFile.getAbsolutePath());
             tlsContextFactory.setKeyStorePassword(keystorePass);
             tlsContextFactory.setKeyManagerPassword(keystorePass);
+            tlsContextFactory.setTrustStorePath(trustStoreFile.getAbsolutePath());
+            tlsContextFactory.setTrustStorePassword(trustStorePass);
 
             HttpConfiguration httpsConfig = new HttpConfiguration();
             httpsConfig.setSecureScheme(HttpScheme.HTTPS.asString());
