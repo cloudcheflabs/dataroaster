@@ -30,17 +30,18 @@ public class RequestFilter implements jakarta.servlet.Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     HttpServletRequest req = (HttpServletRequest) request;
-    String user = req.getHeader("X-Trino-User");
     String authValue = req.getHeader("Authorization");
-    LOG.info("user: [{}], authValue: [{}]", user, authValue);
+    LOG.info("authValue: [{}]", authValue);
 
     // TODO: do basic authentication.
-    if(user != null && authValue != null) {
+    if(authValue != null) {
       String[] tokens = authValue.split(" ");
 
       byte[] decodedBytes = Base64.getDecoder().decode(tokens[1]);
-      String password = new String(decodedBytes);
-      LOG.info("user: [{}], password: [{}]", user, password);
+      String userPassword = new String(decodedBytes);
+      // split the form of <user>:<password> into array.
+      String[] userPassTokens = userPassword.split(":");
+      LOG.info("user: [{}], password: [{}]", userPassTokens[0], userPassTokens[1]);
     }
 
     RequestWrapper requestWrapper = new RequestWrapper(req);
