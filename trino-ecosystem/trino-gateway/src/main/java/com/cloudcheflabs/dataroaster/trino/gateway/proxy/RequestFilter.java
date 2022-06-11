@@ -35,7 +35,7 @@ public class RequestFilter implements jakarta.servlet.Filter {
       Enumeration<String> headerValues = requestWrapper.getHeaders(header);
       LOG.info("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), Collections.list(headerValues)));
     }
-    
+
     String body = requestWrapper.getBody();
     LOG.info("body: [{}]", body);
 
