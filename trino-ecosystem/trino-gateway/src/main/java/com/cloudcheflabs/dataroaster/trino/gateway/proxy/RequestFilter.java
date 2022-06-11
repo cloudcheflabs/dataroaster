@@ -5,6 +5,7 @@ import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class RequestFilter implements jakarta.servlet.Filter {
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-    RequestWrapper requestWrapper = new RequestWrapper((HttpServletRequest) request);
+    HttpServletRequestWrapper requestWrapper = new HttpServletRequestWrapper((HttpServletRequest) request);
 
     Enumeration<String> headers = requestWrapper.getHeaderNames();
     while (headers.hasMoreElements()) {
@@ -34,8 +35,6 @@ public class RequestFilter implements jakarta.servlet.Filter {
       Enumeration<String> headerValues = requestWrapper.getHeaders(header);
       LOG.info("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), Collections.list(headerValues)));
     }
-    String body = requestWrapper.getBody();
-    LOG.info("body: [{}]", body);
 
     HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper((HttpServletResponse) response);
     chain.doFilter(requestWrapper, responseWrapper);
