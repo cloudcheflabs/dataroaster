@@ -20,7 +20,7 @@
             memoryStoreEvictionPolicy="LRU"
             />
 
-	<cache name="privileges"
+	<cache name="queries"
 		   maxElementsInMemory="10000"
 		   eternal="false"
 		   timeToIdleSeconds="600"

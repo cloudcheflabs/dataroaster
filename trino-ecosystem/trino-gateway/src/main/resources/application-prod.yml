@@ -1,16 +1,4 @@
 server:
-  port: 8082
+  port: 8088
   servlet:
-    context-path: /api
-
-authorizer:
-  url: http://localhost:8081
-
-client:
-  secret: YXBpOmhlbGxvQXV0aEFQSQ==
-
-vault:
-  host: localhost
-  port: 8200
-  trustStore: /etc/vault.d/keystore.jks
-  token: s.zOeVranQ2UMXNwAGlPKP6Waw
+    context-path: /
