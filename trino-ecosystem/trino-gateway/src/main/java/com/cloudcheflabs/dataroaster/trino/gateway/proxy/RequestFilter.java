@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 
 public class RequestFilter implements jakarta.servlet.Filter {
 
@@ -29,14 +30,17 @@ public class RequestFilter implements jakarta.servlet.Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     HttpServletRequest req = (HttpServletRequest) request;
     String user = req.getHeader("X-Trino-User");
-    String passwordEncoded = req.getHeader("Authorization");
-    LOG.info("user: [{}], password: [{}]", user, passwordEncoded);
+    Enumeration<String> authValues = req.getHeaders("Authorization");
+    LOG.info("user: [{}], authValues: [{}]", user, (authValues != null) ? JsonUtils.toJson(Collections.list(authValues)) : null);
 
     // TODO: do basic authentication.
-    if(user != null && passwordEncoded != null) {
-//      byte[] decodedBytes = Base64.getDecoder().decode(passwordEncoded);
-//      String password = new String(decodedBytes);
-//      LOG.info("user: [{}], password: [{}]", user, password);
+    if(user != null && authValues != null) {
+      List<String> authValueList = Collections.list(authValues);
+      authValueList.remove("Basic");
+
+      byte[] decodedBytes = Base64.getDecoder().decode(authValueList.get(0));
+      String password = new String(decodedBytes);
+      LOG.info("user: [{}], password: [{}]", user, password);
     }
 
     RequestWrapper requestWrapper = new RequestWrapper(req);
