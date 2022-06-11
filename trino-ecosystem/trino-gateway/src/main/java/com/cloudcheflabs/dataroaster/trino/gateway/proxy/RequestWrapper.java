@@ -5,14 +5,17 @@ import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
 
 public class RequestWrapper extends HttpServletRequestWrapper {
 
+  private static Logger LOG = LoggerFactory.getLogger(RequestWrapper.class);
+
   private byte[] content;
-  private final Map<String, String> headerMap = new HashMap<>();
 
   public static void copy(InputStream in, OutputStream out) throws IOException {
 
@@ -34,41 +37,35 @@ public class RequestWrapper extends HttpServletRequestWrapper {
   }
 
 
-  public void addHeader(String name, String value) {
-    headerMap.put(name, value);
-  }
-
-  @Override
-  public String getHeader(String name) {
-    String headerValue = super.getHeader(name);
-    if (headerMap.containsKey(name)) {
-      headerValue = headerMap.get(name);
-    }
-    return headerValue;
-  }
-
   public String getBody() {
     return new String(content);
   }
 
 
+  /**
+   * reconstruct headers without headers like 'Authorization'.
+   *
+   * @return
+   */
   @Override
   public Enumeration<String> getHeaderNames() {
     List<String> names = Collections.list(super.getHeaderNames());
-    for (String name : headerMap.keySet()) {
-      names.add(name);
+
+    List<String> filteredHeaderNames = new ArrayList<>();
+
+    // remove Authorization header.
+    for(String name : names) {
+      if(!name.equals("Authorization")) {
+        filteredHeaderNames.add(name);
+      } else {
+        LOG.info("header [{}}] not allowed!", name);
+      }
     }
-    return Collections.enumeration(names);
+
+    return Collections.enumeration(filteredHeaderNames);
   }
 
-  @Override
-  public Enumeration<String> getHeaders(String name) {
-    List<String> values = Collections.list(super.getHeaders(name));
-    if (headerMap.containsKey(name)) {
-      values.add(headerMap.get(name));
-    }
-    return Collections.enumeration(values);
-  }
+
 
   @Override
   public ServletInputStream getInputStream() throws IOException {

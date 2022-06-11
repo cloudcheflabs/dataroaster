@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Enumeration;
 
@@ -26,8 +27,20 @@ public class RequestFilter implements jakarta.servlet.Filter {
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-    RequestWrapper requestWrapper = new RequestWrapper((HttpServletRequest) request);
+    HttpServletRequest req = (HttpServletRequest) request;
+    String user = req.getHeader("X-Trino-User");
+    String passwordEncoded = req.getHeader("Authorization");
 
+    // TODO: do basic authentication.
+    if(user != null && passwordEncoded != null) {
+      byte[] decodedBytes = Base64.getDecoder().decode(passwordEncoded);
+      String password = new String(decodedBytes);
+      LOG.info("user: [{}], password: [{}]", user, password);
+    }
+
+    RequestWrapper requestWrapper = new RequestWrapper(req);
+
+    // print all headers without Authorization header.
     Enumeration<String> headers = requestWrapper.getHeaderNames();
     while (headers.hasMoreElements()) {
       String header = headers.nextElement();
@@ -35,6 +48,8 @@ public class RequestFilter implements jakarta.servlet.Filter {
       Enumeration<String> headerValues = requestWrapper.getHeaders(header);
       LOG.info("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), Collections.list(headerValues)));
     }
+
+    // remove
 
     String body = requestWrapper.getBody();
     LOG.info("body: [{}]", body);
