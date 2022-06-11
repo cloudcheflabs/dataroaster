@@ -1,15 +1,19 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 import jakarta.servlet.DispatcherType;
+import org.eclipse.jetty.http.HttpScheme;
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.proxy.ConnectHandler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 
 public class TrinoProxy {
 
@@ -18,10 +22,43 @@ public class TrinoProxy {
     public TrinoProxy() {
         Server server = new Server();
         server.setStopAtShutdown(true);
-        ServerConnector connector = new ServerConnector(server);
+        ServerConnector connector = null;
+
+        int httpPort = 18080;
+        boolean tlsEnabled = true;
+        String keystorePath = "/home/vagrant/cert-tool/work/keystore.jks";
+        String keystorePass = "changeit";
+        int httpsPort = 28080;
+        if (tlsEnabled) {
+            File keystoreFile = new File(keystorePath);
+
+            SslContextFactory sslContextFactory = new TlsContextFactory();
+            sslContextFactory.setTrustAll(true);
+            sslContextFactory.setSslSessionTimeout(15);
+
+            sslContextFactory.setKeyStorePath(keystoreFile.getAbsolutePath());
+            sslContextFactory.setKeyStorePassword(keystorePass);
+            sslContextFactory.setKeyManagerPassword(keystorePass);
+
+            HttpConfiguration httpsConfig = new HttpConfiguration();
+            httpsConfig.setSecureScheme(HttpScheme.HTTPS.asString());
+            httpsConfig.setSecurePort(httpsPort);
+            httpsConfig.setOutputBufferSize(32768);
+
+            SecureRequestCustomizer src = new SecureRequestCustomizer();
+            src.setStsMaxAge(TimeUnit.SECONDS.toSeconds(2000));
+            src.setStsIncludeSubDomains(true);
+            httpsConfig.addCustomizer(src);
+            connector =
+                    new ServerConnector(
+                            server,
+                            new SslConnectionFactory((SslContextFactory.Server)sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                            new HttpConnectionFactory(httpsConfig));
+        } else {
+            connector = new ServerConnector(server);
+        }
         connector.setHost("0.0.0.0");
-        // TODO: port configurable.
-        connector.setPort(18080);
+        connector.setPort(httpPort);
         connector.setName("Trino Proxy");
         connector.setAccepting(true);
         server.addConnector(connector);
@@ -49,6 +86,12 @@ public class TrinoProxy {
             server.join();
         } catch (Exception e) {
             LOG.error("exception", e);
+        }
+    }
+
+    public static class TlsContextFactory extends SslContextFactory {
+        public TlsContextFactory() {
+            super();
         }
     }
 }
