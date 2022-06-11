@@ -31,7 +31,7 @@ public class RequestFilter implements jakarta.servlet.Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     HttpServletRequest req = (HttpServletRequest) request;
     String authValue = req.getHeader("Authorization");
-    LOG.info("authValue: [{}]", authValue);
+    //LOG.info("authValue: [{}]", authValue);
 
     // TODO: do basic authentication.
     if(authValue != null) {
@@ -41,24 +41,26 @@ public class RequestFilter implements jakarta.servlet.Filter {
       String userPassword = new String(decodedBytes);
       // split the form of <user>:<password> into array.
       String[] userPassTokens = userPassword.split(":");
-      LOG.info("user: [{}], password: [{}]", userPassTokens[0], userPassTokens[1]);
+      String user = userPassTokens[0];
+      String password = userPassTokens[1];
+      //LOG.info("user: [{}], password: [{}]", user, password);
     }
 
     RequestWrapper requestWrapper = new RequestWrapper(req);
 
-    // print all headers without Authorization header.
-    Enumeration<String> headers = requestWrapper.getHeaderNames();
-    while (headers.hasMoreElements()) {
-      String header = headers.nextElement();
-      String headerValue = requestWrapper.getHeader(header);
-      Enumeration<String> headerValues = requestWrapper.getHeaders(header);
-      LOG.info("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), Collections.list(headerValues)));
+    if(LOG.isDebugEnabled()) {
+      // print all headers without Authorization header.
+      Enumeration<String> headers = requestWrapper.getHeaderNames();
+      while (headers.hasMoreElements()) {
+        String header = headers.nextElement();
+        String headerValue = requestWrapper.getHeader(header);
+        Enumeration<String> headerValues = requestWrapper.getHeaders(header);
+        LOG.debug("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), Collections.list(headerValues)));
+      }
+
+      String body = requestWrapper.getBody();
+      LOG.debug("body: [{}]", body);
     }
-
-    // remove
-
-    String body = requestWrapper.getBody();
-    LOG.info("body: [{}]", body);
 
     HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper((HttpServletResponse) response);
     chain.doFilter(requestWrapper, responseWrapper);
