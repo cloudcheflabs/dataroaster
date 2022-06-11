@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Enumeration;
 
 public class RequestFilter implements jakarta.servlet.Filter {
@@ -31,7 +32,7 @@ public class RequestFilter implements jakarta.servlet.Filter {
         String header = headers.nextElement();
         String headerValue = requestWrapper.getHeader(header);
         Enumeration<String> headerValues = requestWrapper.getHeaders(header);
-        LOG.debug("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), headerValues));
+        LOG.debug("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), Collections.list(headerValues)));
       }
       String body = requestWrapper.getBody();
       LOG.debug("body: [{}]", body);
