@@ -32,13 +32,13 @@ public class TrinoProxy {
         if (tlsEnabled) {
             File keystoreFile = new File(keystorePath);
 
-            SslContextFactory sslContextFactory = new TlsContextFactory();
-            sslContextFactory.setTrustAll(true);
-            sslContextFactory.setSslSessionTimeout(15);
+            TlsContextFactory tlsContextFactory = new TlsContextFactory();
+            tlsContextFactory.setTrustAll(true);
+            tlsContextFactory.setSslSessionTimeout(15);
 
-            sslContextFactory.setKeyStorePath(keystoreFile.getAbsolutePath());
-            sslContextFactory.setKeyStorePassword(keystorePass);
-            sslContextFactory.setKeyManagerPassword(keystorePass);
+            tlsContextFactory.setKeyStorePath(keystoreFile.getAbsolutePath());
+            tlsContextFactory.setKeyStorePassword(keystorePass);
+            tlsContextFactory.setKeyManagerPassword(keystorePass);
 
             HttpConfiguration httpsConfig = new HttpConfiguration();
             httpsConfig.setSecureScheme(HttpScheme.HTTPS.asString());
@@ -52,7 +52,7 @@ public class TrinoProxy {
             connector =
                     new ServerConnector(
                             server,
-                            new SslConnectionFactory((SslContextFactory.Server)sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                            new SslConnectionFactory(tlsContextFactory, HttpVersion.HTTP_1_1.asString()),
                             new HttpConnectionFactory(httpsConfig));
         } else {
             connector = new ServerConnector(server);
@@ -89,7 +89,7 @@ public class TrinoProxy {
         }
     }
 
-    public static class TlsContextFactory extends SslContextFactory {
+    public static class TlsContextFactory extends SslContextFactory.Server {
         public TlsContextFactory() {
             super();
         }
