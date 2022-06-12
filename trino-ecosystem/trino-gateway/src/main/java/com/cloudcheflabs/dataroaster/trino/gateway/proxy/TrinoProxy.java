@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @Component
-public class TrinoProxy extends Thread implements InitializingBean {
+public class TrinoProxy implements InitializingBean {
 
     private static Logger LOG = LoggerFactory.getLogger(TrinoProxy.class);
 
@@ -54,10 +55,18 @@ public class TrinoProxy extends Thread implements InitializingBean {
         keystorePass = env.getProperty("trino.proxy.tls.keystorePass");
         trustStorePath = env.getProperty("trino.proxy.tls.trustStorePath");
         trustStorePass = env.getProperty("trino.proxy.tls.trustStorePass");
+
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(1);
+        executor.setThreadNamePrefix("TrinoProxy");
+        executor.initialize();
+
+        executor.execute(() -> run());
     }
 
-    @Override
-    public void run() {
+
+    private void run() {
         Server server = new Server();
         server.setStopAtShutdown(true);
         ServerConnector connector = null;
