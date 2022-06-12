@@ -5,7 +5,6 @@ import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.slf4j.Logger;
@@ -15,8 +14,6 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.function.Predicate;
 
 public class RequestFilter implements jakarta.servlet.Filter {
 

@@ -2,13 +2,10 @@ package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.proxy.ProxyServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Enumeration;
 
 
 public class TrinoProxyServlet extends ProxyServlet.Transparent {

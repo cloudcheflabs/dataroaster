@@ -10,37 +10,48 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
+
 @Component
-public class TrinoProxy {
+public class TrinoProxy implements InitializingBean {
 
     private static Logger LOG = LoggerFactory.getLogger(TrinoProxy.class);
 
-    @Value("${trino.proxy.port}")
+    @Autowired
+    private Environment env;
+
     private int port;
 
-    @Value("${trino.proxy.tls.enabled}")
     private boolean tlsEnabled;
 
-    @Value("${trino.proxy.tls.keystorePath}")
     private String keystorePath;
 
-    @Value("${trino.proxy.tls.keystorePass}")
     private String keystorePass;
 
-    @Value("${trino.proxy.tls.trustStorePath}")
     private String trustStorePath;
 
-    @Value("${trino.proxy.tls.trustStorePass}")
     private String trustStorePass;
 
     public TrinoProxy() {
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        port = Integer.valueOf(env.getProperty("trino.proxy.port"));
+        tlsEnabled = Boolean.valueOf(env.getProperty("trino.proxy.tls.enabled"));
+        keystorePath = env.getProperty("trino.proxy.tls.keystorePath");
+        keystorePass = env.getProperty("trino.proxy.tls.keystorePass");
+        trustStorePath = env.getProperty("trino.proxy.tls.trustStorePath");
+        trustStorePass = env.getProperty("trino.proxy.tls.trustStorePass");
+
         run();
     }
 
@@ -110,6 +121,8 @@ public class TrinoProxy {
             LOG.error("exception", e);
         }
     }
+
+
 
     private static class TlsContextFactory extends SslContextFactory.Server {
         public TlsContextFactory() {
