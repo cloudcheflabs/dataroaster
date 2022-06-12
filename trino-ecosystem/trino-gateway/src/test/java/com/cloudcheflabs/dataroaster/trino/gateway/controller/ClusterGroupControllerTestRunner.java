@@ -1,6 +1,7 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.controller;
 
 import com.cloudcheflabs.dataroaster.common.util.FileUtils;
+import com.cloudcheflabs.dataroaster.trino.gateway.TrinoGatewayApplication;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.ClusterGroupDao;
 import com.cloudcheflabs.dataroaster.trino.gateway.component.SimpleHttpClient;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
@@ -23,9 +24,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = {
-        "spring.config.location=classpath:application-test.properties"
-})
+@SpringBootTest(classes = TrinoGatewayApplication.class)
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class ClusterGroupControllerTestRunner {
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterGroupControllerTestRunner.class);
@@ -51,6 +51,7 @@ public class ClusterGroupControllerTestRunner {
         prop.load(is);
         String port = prop.getProperty("server.port");
         serverUrl = "http://localhost:" + port;
+        LOG.info("serverUrl: [{}]", serverUrl);
     }
 
     @Test
