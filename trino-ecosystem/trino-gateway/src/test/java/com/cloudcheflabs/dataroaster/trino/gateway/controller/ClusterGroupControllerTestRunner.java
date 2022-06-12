@@ -19,10 +19,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
+@TestPropertySource(locations = "classpath:application-test.properties")
 @SpringBootTest(properties = {
         "spring.config.location=classpath:application-test.properties"
 })
-@TestPropertySource("/application-test.properties")
 public class ClusterGroupControllerTestRunner {
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterGroupControllerTestRunner.class);
