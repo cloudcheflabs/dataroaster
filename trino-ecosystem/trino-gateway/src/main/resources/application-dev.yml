@@ -5,6 +5,7 @@ server:
 trino:
   proxy:
     port: 18080
+    authentication: true
     tls:
       enabled: true
       keystorePath: /home/vagrant/key-tool/keystore.jks

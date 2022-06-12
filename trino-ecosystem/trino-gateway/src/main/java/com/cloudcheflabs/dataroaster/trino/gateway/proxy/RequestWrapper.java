@@ -14,6 +14,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
+import static com.cloudcheflabs.dataroaster.trino.gateway.proxy.TrinoProxyServlet.HEADER_HTTP_AUTHORIZATION;
+
 public class RequestWrapper extends HttpServletRequestWrapper {
 
   private static Logger LOG = LoggerFactory.getLogger(RequestWrapper.class);
@@ -59,7 +61,7 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 
     // remove Authorization header.
     for(String name : names) {
-      if(!name.equals("Authorization")) {
+      if(!name.equals(HEADER_HTTP_AUTHORIZATION)) {
         filteredHeaderNames.add(name);
       } else {
         if(LOG.isDebugEnabled()) {
