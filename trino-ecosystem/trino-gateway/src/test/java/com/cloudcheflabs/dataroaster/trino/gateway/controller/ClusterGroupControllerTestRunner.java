@@ -8,7 +8,7 @@ import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import okhttp3.*;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
