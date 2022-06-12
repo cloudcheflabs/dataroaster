@@ -1,10 +1,7 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.domain.model;
 
-import com.google.common.collect.Sets;
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Set;
 
 @Entity
 @Table(name = "cluster")

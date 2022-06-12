@@ -1,7 +1,14 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 
+import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
+import com.cloudcheflabs.dataroaster.trino.gateway.api.service.UsersService;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.BasicAuthentication;
+import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
+import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
+import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Users;
+import com.cloudcheflabs.dataroaster.trino.gateway.util.BCryptUtils;
+import com.cloudcheflabs.dataroaster.trino.gateway.util.RandomUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.proxy.ProxyServlet;
@@ -9,8 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class TrinoProxyServlet extends ProxyServlet.Transparent implements InitializingBean {
@@ -24,6 +36,14 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
   @Autowired
   private Environment env;
+
+  @Autowired
+  @Qualifier("usersServiceImpl")
+  private UsersService usersService;
+
+  @Autowired
+  @Qualifier("clusterGroupServiceImpl")
+  private ClusterGroupService clusterGroupService;
 
   private boolean authenticationNecessary;
 
@@ -57,11 +77,25 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
       // get any trino clusters registered if authentication is not necessary, otherwise return exception.
       if(authenticationNecessary) {
         LOG.error("User [{}] must have password to be authenticated!", user);
-        return null;
-      } else
-      {
-        // TODO: get any trino clusters registered if authentication is not necessary.
-        String backendTrinoAddress = "http://localhost:8080";
+        throw new IllegalStateException("Password missing...");
+      } else {
+        // get any trino clusters registered if authentication is not necessary.
+        List<Cluster> clusterList = new ArrayList<>();
+        List<ClusterGroup> clusterGroupList = clusterGroupService.findAll();
+        for(ClusterGroup clusterGroup : clusterGroupList) {
+          for(Cluster cluster : clusterGroup.getClusterSet()) {
+            if(cluster.isActivated()) {
+              clusterList.add(cluster);
+            }
+          }
+        }
+
+        if(clusterList.size() == 0) {
+          throw new IllegalStateException("There is no cluster for routing");
+        }
+        // choose one of the clusters through cluster randomization.
+        Cluster chosedCluster = RandomUtils.randomize(clusterList);
+        String backendTrinoAddress = chosedCluster.getUrl();
         String target =
                 backendTrinoAddress
                         + request.getRequestURI()
@@ -73,21 +107,42 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
       BasicAuthentication basicAuthentication = (BasicAuthentication) basicAuthObj;
       String user = basicAuthentication.getUser();
       String password = basicAuthentication.getPassword();
-     // LOG.info("user: [{}], password: [{}] from attribute", user, password);
-      // TODO: authenticate user, and get target trino address.
 
-      String backendTrinoAddress = "http://localhost:8080";
+      // authenticate user, and get target trino address.
+      Users users = usersService.findOne(user);
+      String bcryptEncodedPassword = users.getPassword();
+      boolean isMatched = BCryptUtils.isMatched(password, bcryptEncodedPassword);
+      if(isMatched) {
+        ClusterGroup clusterGroup = users.getClusterGroup();
+        Set<Cluster> clusterSet = clusterGroup.getClusterSet();
+        if(clusterSet.size() == 0) {
+          throw new IllegalStateException("There is no cluster in the group [" + clusterGroup.getGroupName() + "]");
+        }
 
-      // TODO: get backend trino address.
+        List<Cluster> clusterList = new ArrayList<>();
+        for(Cluster cluster : clusterSet) {
+          if(cluster.isActivated()) {
+            clusterList.add(cluster);
+          }
+        }
+        if(clusterList.size() == 0) {
+          throw new IllegalStateException("There is no cluster for routing");
+        }
 
-      String target =
-              backendTrinoAddress
-                      + request.getRequestURI()
-                      + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
+        // choose one of the clusters through cluster randomization.
+        Cluster chosedCluster = RandomUtils.randomize(clusterList);
+        String backendTrinoAddress = chosedCluster.getUrl();
+        String target =
+                backendTrinoAddress
+                        + request.getRequestURI()
+                        + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
 
-      LOG.info("source: [{}], target: [{}]", source, target);
+        LOG.info("source: [{}], target: [{}]", source, target);
 
-      return target;
+        return target;
+      } else {
+        throw new IllegalStateException("User Authentication Failed...");
+      }
     }
   }
 }
