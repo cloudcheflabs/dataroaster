@@ -55,7 +55,9 @@ public class TrinoProxy implements InitializingBean {
         trustStorePath = env.getProperty("trino.proxy.tls.trustStorePath");
         trustStorePass = env.getProperty("trino.proxy.tls.trustStorePass");
 
-        run();
+        Runnable runnable = () -> {run();};
+        Thread t = new Thread(runnable);
+        t.start();
     }
 
     private void run() {
