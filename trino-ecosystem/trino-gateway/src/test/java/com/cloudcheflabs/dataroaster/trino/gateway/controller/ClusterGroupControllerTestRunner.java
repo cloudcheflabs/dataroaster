@@ -37,14 +37,14 @@ public class ClusterGroupControllerTestRunner {
     @Autowired
     private ClusterGroupDao dao;
 
-    private OkHttpClient client;
-    private MediaType mediaType;
+    private static OkHttpClient client;
+    private static MediaType mediaType;
 
-    private String serverUrl;
+    private static String serverUrl;
 
 
     @BeforeClass
-    public void setup() throws Exception {
+    public static void setup() throws Exception {
         SpringApplication.run(TrinoGatewayApplication.class, Arrays.asList("").toArray(new String[0]));
 
         client = new SimpleHttpClient().getClient();
