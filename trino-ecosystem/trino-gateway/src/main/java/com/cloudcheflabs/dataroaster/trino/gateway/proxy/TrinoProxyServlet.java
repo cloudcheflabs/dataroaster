@@ -73,7 +73,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
       BasicAuthentication basicAuthentication = (BasicAuthentication) basicAuthObj;
       String user = basicAuthentication.getUser();
       String password = basicAuthentication.getPassword();
-      LOG.info("user: [{}], password: [{}] from attribute", user, password);
+     // LOG.info("user: [{}], password: [{}] from attribute", user, password);
       // TODO: authenticate user, and get target trino address.
 
       String backendTrinoAddress = "http://localhost:8080";

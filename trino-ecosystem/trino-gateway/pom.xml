@@ -73,6 +73,9 @@
 
 		<!-- trino -->
 		<trino.version>385</trino.version>
+
+		<!-- favre bcrypt -->
+		<favre-bcrypt.version>0.8.0</favre-bcrypt.version>
 	</properties>
 
 	<dependencies>
@@ -100,6 +103,11 @@
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlet</artifactId>
 			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>at.favre.lib</groupId>
+			<artifactId>bcrypt</artifactId>
+			<version>${favre-bcrypt.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
