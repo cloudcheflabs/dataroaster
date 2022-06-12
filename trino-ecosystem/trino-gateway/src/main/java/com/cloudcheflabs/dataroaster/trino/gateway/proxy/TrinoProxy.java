@@ -21,7 +21,6 @@ import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
 
-@Component
 public class TrinoProxy implements InitializingBean, DisposableBean {
 
     private static Logger LOG = LoggerFactory.getLogger(TrinoProxy.class);
