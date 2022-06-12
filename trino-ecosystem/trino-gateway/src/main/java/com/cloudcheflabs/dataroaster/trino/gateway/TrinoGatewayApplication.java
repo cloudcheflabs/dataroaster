@@ -24,12 +24,12 @@ public class TrinoGatewayApplication {
 	@Bean
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
 		return args -> {
-			LOG.info("beans loaded by the spring boot application: ");
+			LOG.debug("beans loaded by the spring boot application: ");
 
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			Arrays.sort(beanNames);
 			for (String beanName : beanNames) {
-				LOG.info("- bean name: {}", beanName);
+				LOG.debug("- bean name: {}", beanName);
 			}
 		};
 	}

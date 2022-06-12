@@ -18,7 +18,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
-        "spring.config.location=classpath:application-test.properties"
+        "spring.config.location=classpath:application-test.properties",
+        "mysql.config.location=classpath:persistence-mysql.properties"
 })
 public class ClusterGroupControllerTestRunner {
 
