@@ -8,6 +8,7 @@ import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import okhttp3.*;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class ClusterGroupControllerTestRunner {
     private String serverUrl;
 
 
-    @Before
+    @BeforeClass
     public void setup() throws Exception {
         SpringApplication.run(TrinoGatewayApplication.class, Arrays.asList("").toArray(new String[0]));
 
