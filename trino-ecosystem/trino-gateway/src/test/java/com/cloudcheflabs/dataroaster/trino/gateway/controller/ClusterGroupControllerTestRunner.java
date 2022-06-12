@@ -7,15 +7,17 @@ import com.cloudcheflabs.dataroaster.trino.gateway.component.SimpleHttpClient;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import okhttp3.*;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -23,10 +25,14 @@ import java.util.Properties;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TrinoGatewayApplication.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
+@AutoConfigureMockMvc
 public class ClusterGroupControllerTestRunner {
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterGroupControllerTestRunner.class);
 
+
+    @Autowired
+    private MockMvc mvc;
 
     @Autowired
     private ClusterGroupDao dao;
@@ -37,8 +43,7 @@ public class ClusterGroupControllerTestRunner {
     private String serverUrl;
 
 
-
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         client = new SimpleHttpClient().getClient();
         mediaType = MediaType.parse("application/x-www-form-urlencoded");
