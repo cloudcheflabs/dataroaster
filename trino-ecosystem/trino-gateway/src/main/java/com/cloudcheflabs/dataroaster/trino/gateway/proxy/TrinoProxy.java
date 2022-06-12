@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @Component
-public class TrinoProxy implements InitializingBean {
+public class TrinoProxy extends Thread implements InitializingBean {
 
     private static Logger LOG = LoggerFactory.getLogger(TrinoProxy.class);
 
@@ -54,13 +54,10 @@ public class TrinoProxy implements InitializingBean {
         keystorePass = env.getProperty("trino.proxy.tls.keystorePass");
         trustStorePath = env.getProperty("trino.proxy.tls.trustStorePath");
         trustStorePass = env.getProperty("trino.proxy.tls.trustStorePass");
-
-        Runnable runnable = () -> {run();};
-        Thread t = new Thread(runnable);
-        t.start();
     }
 
-    private void run() {
+    @Override
+    public void run() {
         Server server = new Server();
         server.setStopAtShutdown(true);
         ServerConnector connector = null;
@@ -119,6 +116,7 @@ public class TrinoProxy implements InitializingBean {
 
         try {
             server.start();
+            LOG.info("Trino Proxy is running on {}...", port);
         } catch (Exception e) {
             LOG.error("exception", e);
         }
