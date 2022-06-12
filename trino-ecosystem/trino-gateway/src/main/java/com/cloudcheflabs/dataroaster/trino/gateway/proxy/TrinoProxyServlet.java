@@ -6,8 +6,9 @@ import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.proxy.ProxyServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class TrinoProxyServlet extends ProxyServlet.Transparent {
 
   private static Logger LOG = LoggerFactory.getLogger(TrinoProxyServlet.class);

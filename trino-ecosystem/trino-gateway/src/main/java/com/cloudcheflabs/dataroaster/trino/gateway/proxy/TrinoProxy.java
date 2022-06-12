@@ -40,6 +40,9 @@ public class TrinoProxy implements InitializingBean {
 
     private String trustStorePass;
 
+    @Autowired
+    private TrinoProxyServlet trinoProxyServlet;
+
     public TrinoProxy() {
     }
 
@@ -98,8 +101,6 @@ public class TrinoProxy implements InitializingBean {
 
         ConnectHandler proxyConnectHandler = new ConnectHandler();
         server.setHandler(proxyConnectHandler);
-
-        TrinoProxyServlet trinoProxyServlet = new TrinoProxyServlet();
 
         ServletHolder servletHolder = new ServletHolder("Trino Proxy Servlet", trinoProxyServlet);
 
