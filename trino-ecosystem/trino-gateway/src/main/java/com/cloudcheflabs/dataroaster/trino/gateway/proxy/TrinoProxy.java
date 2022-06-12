@@ -10,10 +10,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @Component
-public class TrinoProxy implements InitializingBean {
+public class TrinoProxy implements InitializingBean, DisposableBean {
 
     private static Logger LOG = LoggerFactory.getLogger(TrinoProxy.class);
 
@@ -44,6 +44,8 @@ public class TrinoProxy implements InitializingBean {
     @Autowired
     private TrinoProxyServlet trinoProxyServlet;
 
+    private Server server;
+
     public TrinoProxy() {
     }
 
@@ -56,18 +58,13 @@ public class TrinoProxy implements InitializingBean {
         trustStorePath = env.getProperty("trino.proxy.tls.trustStorePath");
         trustStorePass = env.getProperty("trino.proxy.tls.trustStorePass");
 
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(1);
-        executor.setThreadNamePrefix("TrinoProxy");
-        executor.initialize();
-
-        executor.execute(() -> run());
+        setup();
+        startServer();
     }
 
 
-    private void run() {
-        Server server = new Server();
+    private void setup() {
+        server = new Server();
         server.setStopAtShutdown(true);
         ServerConnector connector = null;
 
@@ -122,13 +119,16 @@ public class TrinoProxy implements InitializingBean {
                 new ServletContextHandler(proxyConnectHandler, "/", ServletContextHandler.SESSIONS);
         context.addServlet(servletHolder, "/*");
         context.addFilter(RequestFilter.class, "/*", EnumSet.allOf(DispatcherType.class));
+    }
 
-        try {
-            server.start();
-            LOG.info("Trino Proxy is running on {}...", port);
-        } catch (Exception e) {
-            LOG.error("exception", e);
-        }
+    private void startServer() throws Exception {
+        server.start();
+        LOG.info("Trino Proxy is running on {}...", port);
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        server.stop();
     }
 
 
