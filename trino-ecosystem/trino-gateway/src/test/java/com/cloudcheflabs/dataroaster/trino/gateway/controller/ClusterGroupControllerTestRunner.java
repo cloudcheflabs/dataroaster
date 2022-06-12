@@ -7,19 +7,12 @@ import com.cloudcheflabs.dataroaster.trino.gateway.component.SimpleHttpClient;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import okhttp3.*;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -30,12 +23,7 @@ public class ClusterGroupControllerTestRunner {
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterGroupControllerTestRunner.class);
 
-
-    @Autowired
-    private MockMvc mvc;
-
-    @Autowired
-    private ClusterGroupDao dao;
+    private static ClusterGroupDao dao;
 
     private static OkHttpClient client;
     private static MediaType mediaType;
@@ -45,7 +33,10 @@ public class ClusterGroupControllerTestRunner {
 
     @BeforeClass
     public static void setup() throws Exception {
-        SpringApplication.run(TrinoGatewayApplication.class, Arrays.asList("").toArray(new String[0]));
+        // run spring boot application.
+        ConfigurableApplicationContext applicationContext =
+                SpringApplication.run(TrinoGatewayApplication.class, Arrays.asList("").toArray(new String[0]));
+        dao = applicationContext.getBean(ClusterGroupDao.class);
 
         client = new SimpleHttpClient().getClient();
         mediaType = MediaType.parse("application/x-www-form-urlencoded");
