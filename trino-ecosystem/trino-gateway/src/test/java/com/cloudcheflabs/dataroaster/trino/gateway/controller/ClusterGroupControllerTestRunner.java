@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -22,10 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.io.InputStream;
 import java.util.Properties;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = TrinoGatewayApplication.class)
-@TestPropertySource(locations = "classpath:application-test.properties")
-@AutoConfigureMockMvc
+
 public class ClusterGroupControllerTestRunner {
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterGroupControllerTestRunner.class);
@@ -45,6 +43,8 @@ public class ClusterGroupControllerTestRunner {
 
     @Before
     public void setup() throws Exception {
+        SpringApplication.run(TrinoGatewayApplication.class, null);
+
         client = new SimpleHttpClient().getClient();
         mediaType = MediaType.parse("application/x-www-form-urlencoded");
 
