@@ -1,5 +1,6 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.controller;
 
+import com.cloudcheflabs.dataroaster.common.util.FileUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.ClusterGroupDao;
 import com.cloudcheflabs.dataroaster.trino.gateway.component.SimpleHttpClient;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
@@ -18,8 +19,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 @RunWith(SpringRunner.class)
-@TestPropertySource(locations = "classpath:application-test.properties")
 @SpringBootTest(properties = {
         "spring.config.location=classpath:application-test.properties"
 })
@@ -34,8 +37,6 @@ public class ClusterGroupControllerTestRunner {
     private OkHttpClient client;
     private MediaType mediaType;
 
-    @Value("${server.port}")
-    private int port;
     private String serverUrl;
 
 
@@ -44,6 +45,11 @@ public class ClusterGroupControllerTestRunner {
     public void setup() throws Exception {
         client = new SimpleHttpClient().getClient();
         mediaType = MediaType.parse("application/x-www-form-urlencoded");
+
+        InputStream is = FileUtils.readFileFromClasspath("application-test.properties");
+        Properties prop = new Properties();
+        prop.load(is);
+        String port = prop.getProperty("server.port");
         serverUrl = "http://localhost:" + port;
     }
 
