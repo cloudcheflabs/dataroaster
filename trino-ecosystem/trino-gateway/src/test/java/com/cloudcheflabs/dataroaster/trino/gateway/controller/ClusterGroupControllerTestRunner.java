@@ -21,6 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Properties;
 
 
@@ -43,7 +44,7 @@ public class ClusterGroupControllerTestRunner {
 
     @Before
     public void setup() throws Exception {
-        SpringApplication.run(TrinoGatewayApplication.class, null);
+        SpringApplication.run(TrinoGatewayApplication.class, Arrays.asList("").toArray(new String[0]));
 
         client = new SimpleHttpClient().getClient();
         mediaType = MediaType.parse("application/x-www-form-urlencoded");
