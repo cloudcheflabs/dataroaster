@@ -12,27 +12,30 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
-        "spring.config.location=classpath:application-test.properties",
-        "mysql.config.location=classpath:persistence-mysql.properties"
+        "spring.config.location=classpath:application-test.properties"
 })
+@TestPropertySource("/application-test.properties")
 public class ClusterGroupControllerTestRunner {
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterGroupControllerTestRunner.class);
 
-    @Autowired
-    private Environment env;
 
     @Autowired
     private ClusterGroupDao dao;
 
     private OkHttpClient client;
     private MediaType mediaType;
+
+    @Value("${server.port}")
+    private int port;
     private String serverUrl;
 
 
@@ -41,7 +44,6 @@ public class ClusterGroupControllerTestRunner {
     public void setup() throws Exception {
         client = new SimpleHttpClient().getClient();
         mediaType = MediaType.parse("application/x-www-form-urlencoded");
-        int port = Integer.valueOf(env.getProperty("server.port"));
         serverUrl = "http://localhost:" + port;
     }
 
