@@ -119,7 +119,6 @@ public class TrinoProxy implements InitializingBean {
 
         try {
             server.start();
-            server.join();
         } catch (Exception e) {
             LOG.error("exception", e);
         }
