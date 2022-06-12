@@ -1,5 +1,6 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.controller;
 
+import com.cloudcheflabs.dataroaster.common.util.FileUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.TrinoGatewayApplication;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.ClusterGroupDao;
 import com.cloudcheflabs.dataroaster.trino.gateway.component.SimpleHttpClient;
@@ -12,10 +13,12 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.io.InputStream;
+import java.util.Properties;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TrinoGatewayApplication.class)
@@ -24,14 +27,12 @@ public class ClusterGroupControllerTestRunner {
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterGroupControllerTestRunner.class);
 
+
     @Autowired
     private ClusterGroupDao dao;
 
     private OkHttpClient client;
     private MediaType mediaType;
-
-    @Value("${server.port}")
-    private int port;
 
     private String serverUrl;
 
@@ -41,6 +42,11 @@ public class ClusterGroupControllerTestRunner {
     public void setup() throws Exception {
         client = new SimpleHttpClient().getClient();
         mediaType = MediaType.parse("application/x-www-form-urlencoded");
+
+        InputStream is = FileUtils.readFileFromClasspath("application-test.properties");
+        Properties prop = new Properties();
+        prop.load(is);
+        String port = prop.getProperty("server.port");
         serverUrl = "http://localhost:" + port;
         LOG.info("serverUrl: [{}]", serverUrl);
     }
