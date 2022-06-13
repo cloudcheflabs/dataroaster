@@ -21,7 +21,7 @@ public class SpringBootTestRunnerBase {
 
     protected static Environment env;
     protected static ClusterGroupDao clusterGroupDao;
-    private static ClusterDao clusterDao;
+    protected static ClusterDao clusterDao;
 
     protected static OkHttpClient client;
     protected static MediaType mediaType;
