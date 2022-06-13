@@ -1,6 +1,5 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.controller;
 
-import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Users;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.BCryptUtils;
 import okhttp3.*;

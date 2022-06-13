@@ -10,9 +10,9 @@ trino:
     authentication: true
     tls:
       enabled: true
-      keystorePath: /home/vagrant/key-tool/keystore.jks
+      keystorePath: /home/opc/keystore.jks
       keystorePass: changeit
-      trustStorePath: /home/vagrant/.keystore
+      trustStorePath: /home/opc/.keystore
       trustStorePass: changeit
 # jdbc
 jdbc:

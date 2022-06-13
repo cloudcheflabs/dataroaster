@@ -1,9 +1,11 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.controller;
 
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
-import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import okhttp3.*;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
