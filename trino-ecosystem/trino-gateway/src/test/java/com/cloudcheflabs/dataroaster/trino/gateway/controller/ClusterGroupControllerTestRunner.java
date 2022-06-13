@@ -12,10 +12,6 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterGroupControllerTestRunner.class);
 
-    public ClusterGroupControllerTestRunner() {
-        super();
-    }
-
     @Test
     public void create() throws Exception {
         doCreateClusterGroup();

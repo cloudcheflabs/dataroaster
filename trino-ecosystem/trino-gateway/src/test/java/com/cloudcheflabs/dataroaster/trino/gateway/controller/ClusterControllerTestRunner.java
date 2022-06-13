@@ -14,11 +14,6 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterControllerTestRunner.class);
 
-    public ClusterControllerTestRunner() {
-        super();
-    }
-
-
     @Test
     public void create() throws Exception {
         // create cluster group.
