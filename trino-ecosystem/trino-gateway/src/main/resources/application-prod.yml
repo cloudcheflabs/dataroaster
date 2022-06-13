@@ -1,7 +1,9 @@
+# spring boot server
 server:
   port: 8099
   servlet:
     context-path: /
+# trino proxy
 trino:
   proxy:
     port: 18080
@@ -12,3 +14,15 @@ trino:
       keystorePass: changeit
       trustStorePath: /home/vagrant/.keystore
       trustStorePass: changeit
+# jdbc
+jdbc:
+  driverClassName: com.mysql.jdbc.Driver
+  url: jdbc:mysql://localhost:3306/trino_proxy?useSSL=false
+  user: trino
+  pass: Trino123!
+
+# hibernate
+hibernate:
+  dialect: org.hibernate.dialect.MySQL5Dialect
+  show_sql: false
+  globally_quoted_identifiers: true

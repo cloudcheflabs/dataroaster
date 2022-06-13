@@ -23,7 +23,6 @@ import java.util.Properties;
                  "com.cloudcheflabs.dataroaster.trino.gateway.api.service",
                  "com.cloudcheflabs.dataroaster.trino.gateway.service",
                  "com.cloudcheflabs.dataroaster.trino.gateway.domain.model"})
-@PropertySource({ "classpath:persistence-mysql.properties" })
 public class HibernateConfigurer {
 
     @Autowired

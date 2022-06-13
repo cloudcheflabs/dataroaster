@@ -324,7 +324,6 @@
 			<id>dev</id>
 			<properties>
 				<api.spring.profiles.active>dev</api.spring.profiles.active>
-				<trino-gateway.hibernate.show.query>true</trino-gateway.hibernate.show.query>
 			</properties>
 			<activation>
 				<activeByDefault>true</activeByDefault>
@@ -336,7 +335,6 @@
 						<filtering>true</filtering>
 						<includes>
 							<include>application*.*</include>
-							<include>persistent-mysql.*</include>
 						</includes>
 					</resource>
 				</resources>
@@ -346,7 +344,6 @@
 			<id>prod</id>
 			<properties>
 				<api.spring.profiles.active>prod</api.spring.profiles.active>
-				<trino-gateway.hibernate.show.query>false</trino-gateway.hibernate.show.query>
 			</properties>
 			<activation>
 				<activeByDefault>false</activeByDefault>
@@ -358,7 +355,6 @@
 						<filtering>true</filtering>
 						<includes>
 							<include>application*.*</include>
-							<include>persistent-mysql.*</include>
 						</includes>
 					</resource>
 				</resources>
