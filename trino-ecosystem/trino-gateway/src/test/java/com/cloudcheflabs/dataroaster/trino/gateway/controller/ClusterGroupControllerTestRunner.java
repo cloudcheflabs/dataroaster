@@ -18,6 +18,11 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
     public static void setup() {
         init();
     }
+
+    @Test
+    public void clearData() throws Exception {
+        this.doDeleteClusterGroup();
+    }
     @Test
     public void create() throws Exception {
         doCreateClusterGroup();
@@ -69,9 +74,10 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
                 .build();
         Response response = client.newCall(request).execute();
         ResponseBody responseBody = response.body();
-        Assert.assertTrue(response.isSuccessful());
-        String ret = responseBody.string();
-        LOG.info("ret: [{}]", ret);
+        if(responseBody != null) {
+            String ret = responseBody.string();
+            LOG.info("ret: [{}]", ret);
+        }
 
         ClusterGroup clusterGroup = clusterGroupDao.findOne(groupName);
         Assert.assertNull(clusterGroup);

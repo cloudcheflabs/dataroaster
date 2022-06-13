@@ -21,6 +21,12 @@ public class UsersControllerTestRunner extends ClusterGroupControllerTestRunner 
     }
 
     @Test
+    public void clearData() throws Exception {
+        doDeleteUsers();
+        this.doDeleteClusterGroup();
+    }
+
+    @Test
     public void create() throws Exception {
         doCreate();
     }
@@ -130,9 +136,10 @@ public class UsersControllerTestRunner extends ClusterGroupControllerTestRunner 
                 .build();
         Response response = client.newCall(request).execute();
         ResponseBody responseBody = response.body();
-        Assert.assertTrue(response.isSuccessful());
-        String ret = responseBody.string();
-        LOG.info("ret: [{}]", ret);
+        if(responseBody != null) {
+            String ret = responseBody.string();
+            LOG.info("ret: [{}]", ret);
+        }
 
         Users users = usersDao.findOne(user);
         Assert.assertNull(users);
