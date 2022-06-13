@@ -19,20 +19,17 @@ public class SpringBootTestRunnerBase {
 
     protected static ConfigurableApplicationContext applicationContext;
 
-    protected Environment env;
-    protected ClusterGroupDao clusterGroupDao;
-    private ClusterDao clusterDao;
+    protected static Environment env;
+    protected static ClusterGroupDao clusterGroupDao;
+    private static ClusterDao clusterDao;
 
-    protected OkHttpClient client;
-    protected MediaType mediaType;
+    protected static OkHttpClient client;
+    protected static MediaType mediaType;
 
-    protected String serverUrl;
+    protected static String serverUrl;
 
-    public SpringBootTestRunnerBase() {
-        init();
-    }
 
-    private void init() {
+    public static void init() {
         // run spring boot application.
         applicationContext =
                 SpringApplication.run(TrinoGatewayApplication.class, Arrays.asList("").toArray(new String[0]));
