@@ -24,7 +24,7 @@ public class SpringBootTestRunnerBase {
 
     protected static String serverUrl;
 
-    public SpringBootTestRunnerBase() {
+    protected static void init() {
         // run spring boot application.
         applicationContext =
                 SpringApplication.run(TrinoGatewayApplication.class, Arrays.asList("").toArray(new String[0]));

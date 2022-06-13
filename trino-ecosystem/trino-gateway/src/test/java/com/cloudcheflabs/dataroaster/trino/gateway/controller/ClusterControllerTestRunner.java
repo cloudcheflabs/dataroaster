@@ -14,6 +14,7 @@ public class ClusterControllerTestRunner extends SpringBootTestRunnerBase {
 
     @BeforeClass
     public static void setup() throws Exception {
+        init();
         dao = applicationContext.getBean(ClusterDao.class);
     }
 }
