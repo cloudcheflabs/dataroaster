@@ -20,10 +20,6 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
     }
 
     @Test
-    public void clearData() throws Exception {
-        this.doDeleteClusterGroup();
-    }
-    @Test
     public void create() throws Exception {
         doCreateClusterGroup();
     }

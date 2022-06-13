@@ -20,11 +20,6 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
         init();
     }
 
-    @Test
-    public void clearData() throws Exception {
-        doDeleteCluster();
-        this.doDeleteClusterGroup();
-    }
 
     @Test
     public void create() throws Exception {

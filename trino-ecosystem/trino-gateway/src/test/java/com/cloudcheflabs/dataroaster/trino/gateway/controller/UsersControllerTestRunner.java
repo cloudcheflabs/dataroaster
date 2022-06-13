@@ -21,12 +21,6 @@ public class UsersControllerTestRunner extends ClusterGroupControllerTestRunner 
     }
 
     @Test
-    public void clearData() throws Exception {
-        doDeleteUsers();
-        this.doDeleteClusterGroup();
-    }
-
-    @Test
     public void create() throws Exception {
         doCreate();
     }
