@@ -324,6 +324,7 @@
 			<id>dev</id>
 			<properties>
 				<api.spring.profiles.active>dev</api.spring.profiles.active>
+				<trino-gateway.hibernate.show.query>true</trino-gateway.hibernate.show.query>
 			</properties>
 			<activation>
 				<activeByDefault>true</activeByDefault>
@@ -344,6 +345,7 @@
 			<id>prod</id>
 			<properties>
 				<api.spring.profiles.active>prod</api.spring.profiles.active>
+				<trino-gateway.hibernate.show.query>false</trino-gateway.hibernate.show.query>
 			</properties>
 			<activation>
 				<activeByDefault>false</activeByDefault>
