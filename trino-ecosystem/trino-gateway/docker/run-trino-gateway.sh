@@ -2,6 +2,7 @@
 
 set -eux;
 
+# run trino gateway spring boot application.
 java \
 -cp trino-gateway-*.jar \
 -Dloader.path=/opt/trino-gateway/ \

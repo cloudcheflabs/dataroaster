@@ -1,0 +1,7 @@
+apiVersion: v2
+name: dataroaster-trino-gateway-mysql
+version: v1.0.0
+appVersion: 5.7
+description: dataroaster mysql for trino gateway.
+
+

@@ -1,0 +1,48 @@
+namespace: trino-gateway
+serviceAccount: trino-gateway
+image: cloudcheflabs/trino-gateway:v1.0.0
+imagePullPolicy: Always
+resources:
+  requests:
+    cpu: 200m
+    memory: 1Gi
+  limits:
+    cpu: 300m
+    memory: 1500Mi
+priorityClassName: ""
+annotations: null
+affinity: null
+tolerations: null
+nodeSelector: null
+hostNetwork: false
+
+# ingress.
+ingress:
+  ingressClassName: nginx
+  proxyHostName: trino-gateway-proxy-test.cloudchef-labs.com
+  restHostName: trino-gateway-rest-test.cloudchef-labs.com
+
+# spring boot server
+server:
+  port: 8099
+# trino proxy
+trino:
+  proxy:
+    port: 18080
+    authentication: true
+    tls:
+      enabled: false
+      keystorePath: /home/opc/keystore.jks
+      keystorePass: changeit
+      trustStorePath: /home/opc/.keystore
+      trustStorePass: changeit
+# jdbc
+jdbc:
+  url: jdbc:mysql://mysql-service.trino-gateway.svc:3306/trino_proxy?useSSL=false
+  user: trino
+  pass: Trino123!
+
+# hibernate
+hibernate:
+  show_sql: false
+  globally_quoted_identifiers: true
