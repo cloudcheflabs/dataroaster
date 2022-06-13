@@ -14,8 +14,6 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterControllerTestRunner.class);
 
-    private static ClusterDao dao;
-
     public ClusterControllerTestRunner() {
         super();
     }

@@ -1,10 +1,8 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.controller;
 
-import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.ClusterGroupDao;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import okhttp3.*;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,16 +12,8 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterGroupControllerTestRunner.class);
 
-    private static ClusterGroupDao dao;
-
     public ClusterGroupControllerTestRunner() {
         super();
-    }
-
-
-    @BeforeClass
-    public static void setup() throws Exception {
-        dao = applicationContext.getBean(ClusterGroupDao.class);
     }
 
     @Test
@@ -51,7 +41,7 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
         String ret = responseBody.string();
         LOG.info("ret: [{}]", ret);
 
-        ClusterGroup clusterGroup = dao.findOne(groupName);
+        ClusterGroup clusterGroup = clusterGroupDao.findOne(groupName);
         Assert.assertNotNull(clusterGroup);
         Assert.assertEquals(groupName, clusterGroup.getGroupName());
     }
@@ -81,7 +71,7 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
         String ret = responseBody.string();
         LOG.info("ret: [{}]", ret);
 
-        ClusterGroup clusterGroup = dao.findOne(groupName);
+        ClusterGroup clusterGroup = clusterGroupDao.findOne(groupName);
         Assert.assertNull(clusterGroup);
     }
 

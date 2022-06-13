@@ -1,6 +1,8 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.controller;
 
 import com.cloudcheflabs.dataroaster.trino.gateway.TrinoGatewayApplication;
+import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.ClusterDao;
+import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.ClusterGroupDao;
 import com.cloudcheflabs.dataroaster.trino.gateway.component.SimpleHttpClient;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -18,6 +20,8 @@ public class SpringBootTestRunnerBase {
     protected static ConfigurableApplicationContext applicationContext;
 
     protected Environment env;
+    protected ClusterGroupDao clusterGroupDao;
+    private ClusterDao clusterDao;
 
     protected OkHttpClient client;
     protected MediaType mediaType;
@@ -33,6 +37,8 @@ public class SpringBootTestRunnerBase {
         applicationContext =
                 SpringApplication.run(TrinoGatewayApplication.class, Arrays.asList("").toArray(new String[0]));
         env = applicationContext.getBean(Environment.class);
+        clusterGroupDao = applicationContext.getBean(ClusterGroupDao.class);
+        clusterDao = applicationContext.getBean(ClusterDao.class);
 
         client = new SimpleHttpClient().getClient();
         mediaType = MediaType.parse("application/x-www-form-urlencoded");
