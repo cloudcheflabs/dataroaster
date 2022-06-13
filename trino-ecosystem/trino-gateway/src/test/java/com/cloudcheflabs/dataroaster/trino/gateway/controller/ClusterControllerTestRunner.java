@@ -106,7 +106,7 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
         LOG.info("ret: [{}]", ret);
 
         Cluster cluster = clusterDao.findOne(clusterName);
-        Assert.assertEquals(Boolean.valueOf(activated), !cluster.isActivated());
+        Assert.assertTrue(!cluster.isActivated());
     }
 
     @Test

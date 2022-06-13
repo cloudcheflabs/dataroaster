@@ -25,7 +25,6 @@ public class Cluster implements Serializable {
     private ClusterGroup clusterGroup;
 
 
-
     public String getClusterName() {
         return clusterName;
     }
