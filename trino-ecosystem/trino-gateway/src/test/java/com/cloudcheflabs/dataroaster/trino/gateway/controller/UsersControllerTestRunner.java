@@ -4,6 +4,7 @@ import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Users;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.BCryptUtils;
 import okhttp3.*;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -137,5 +138,11 @@ public class UsersControllerTestRunner extends ClusterGroupControllerTestRunner 
 
         Users users = usersDao.findOne(user);
         Assert.assertNull(users);
+    }
+
+    @AfterClass
+    public void clearData() throws Exception {
+        doDeleteUsers();
+        this.doDeleteClusterGroup();
     }
 }

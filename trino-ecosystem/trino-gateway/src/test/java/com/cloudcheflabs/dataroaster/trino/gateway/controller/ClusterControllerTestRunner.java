@@ -3,10 +3,7 @@ package com.cloudcheflabs.dataroaster.trino.gateway.controller;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import okhttp3.*;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,5 +136,11 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
 
         Cluster cluste = clusterDao.findOne(clusterName);
         Assert.assertNull(cluste);
+    }
+
+    @AfterClass
+    public void clearData() throws Exception {
+        doDeleteCluster();
+        this.doDeleteClusterGroup();
     }
 }

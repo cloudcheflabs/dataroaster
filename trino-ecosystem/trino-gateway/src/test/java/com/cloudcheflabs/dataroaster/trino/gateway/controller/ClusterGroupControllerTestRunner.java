@@ -2,10 +2,7 @@ package com.cloudcheflabs.dataroaster.trino.gateway.controller;
 
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import okhttp3.*;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,5 +100,10 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
         Assert.assertTrue(response.isSuccessful());
         String ret = responseBody.string();
         LOG.info("ret: [{}]", ret);
+    }
+
+    @AfterClass
+    public void clearData() throws Exception {
+        this.doDeleteClusterGroup();
     }
 }
