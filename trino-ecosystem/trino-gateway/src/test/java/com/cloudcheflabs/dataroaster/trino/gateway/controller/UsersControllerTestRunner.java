@@ -115,7 +115,7 @@ public class UsersControllerTestRunner extends ClusterGroupControllerTestRunner 
         this.doDeleteClusterGroup();
     }
 
-    public void doDeleteUsers() throws Exception {
+    public static void doDeleteUsers() throws Exception {
         String urlPath = serverUrl + "/v1/users/delete";
 
         String user = "trino";
@@ -141,8 +141,8 @@ public class UsersControllerTestRunner extends ClusterGroupControllerTestRunner 
     }
 
     @AfterClass
-    public void clearData() throws Exception {
+    public static void clearData() throws Exception {
         doDeleteUsers();
-        this.doDeleteClusterGroup();
+        doDeleteClusterGroup();
     }
 }

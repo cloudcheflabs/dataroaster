@@ -51,7 +51,7 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
         doDeleteClusterGroup();
     }
 
-    public void doDeleteClusterGroup() throws Exception {
+    public static void doDeleteClusterGroup() throws Exception {
         String urlPath = serverUrl + "/v1/cluster_group/delete";
 
         String groupName = "etl";
@@ -103,7 +103,7 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
     }
 
     @AfterClass
-    public void clearData() throws Exception {
-        this.doDeleteClusterGroup();
+    public static void clearData() throws Exception {
+        doDeleteClusterGroup();
     }
 }

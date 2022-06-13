@@ -114,7 +114,7 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
         this.doDeleteClusterGroup();
     }
 
-    public void doDeleteCluster() throws Exception {
+    public static void doDeleteCluster() throws Exception {
         String urlPath = serverUrl + "/v1/cluster/delete";
 
         String clusterName = "trino-etl-1";
@@ -139,8 +139,8 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
     }
 
     @AfterClass
-    public void clearData() throws Exception {
+    public static void clearData() throws Exception {
         doDeleteCluster();
-        this.doDeleteClusterGroup();
+        doDeleteClusterGroup();
     }
 }
