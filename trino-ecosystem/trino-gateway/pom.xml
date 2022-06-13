@@ -326,7 +326,7 @@
 				<api.spring.profiles.active>dev</api.spring.profiles.active>
 			</properties>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<build>
 				<resources>
@@ -346,7 +346,7 @@
 				<api.spring.profiles.active>prod</api.spring.profiles.active>
 			</properties>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<activeByDefault>false</activeByDefault>
 			</activation>
 			<build>
 				<resources>

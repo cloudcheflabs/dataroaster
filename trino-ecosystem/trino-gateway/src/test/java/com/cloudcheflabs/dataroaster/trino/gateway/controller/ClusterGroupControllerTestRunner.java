@@ -1,8 +1,6 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.controller;
 
-import com.cloudcheflabs.dataroaster.trino.gateway.TrinoGatewayApplication;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.ClusterGroupDao;
-import com.cloudcheflabs.dataroaster.trino.gateway.component.SimpleHttpClient;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import okhttp3.*;
 import org.junit.Assert;
@@ -10,40 +8,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.env.Environment;
-
-import java.util.Arrays;
 
 
-public class ClusterGroupControllerTestRunner {
+public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterGroupControllerTestRunner.class);
 
     private static ClusterGroupDao dao;
 
-    private static Environment env;
-
-    private static OkHttpClient client;
-    private static MediaType mediaType;
-
-    private static String serverUrl;
 
 
     @BeforeClass
     public static void setup() throws Exception {
-        // run spring boot application.
-        ConfigurableApplicationContext applicationContext =
-                SpringApplication.run(TrinoGatewayApplication.class, Arrays.asList("").toArray(new String[0]));
         dao = applicationContext.getBean(ClusterGroupDao.class);
-        env = applicationContext.getBean(Environment.class);
-
-        client = new SimpleHttpClient().getClient();
-        mediaType = MediaType.parse("application/x-www-form-urlencoded");
-        String port = env.getProperty("server.port");
-        serverUrl = "http://localhost:" + port;
-        LOG.info("serverUrl: [{}]", serverUrl);
     }
 
     @Test
