@@ -44,10 +44,10 @@ spec:
               mountPath: /opt/trino-gateway/conf/application-prod.yml
               subPath: application-prod.yml
           ports:
-            - name: trino-gateway-proxy
+            - name: proxy
               containerPort: {{ .Values.trino.proxy.port }}
               protocol: TCP
-            - name: trino-gateway-rest
+            - name: rest
               containerPort: {{ .Values.server.port }}
               protocol: TCP
       volumes:

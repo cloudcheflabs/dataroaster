@@ -9,7 +9,7 @@ spec:
   type: ClusterIP
   ports:
     - port: {{ .Values.trino.proxy.port }}
-      targetPort: trino-gateway-proxy
+      targetPort: proxy
       protocol: TCP
       name: trino-gateway-proxy
   selector:
@@ -27,7 +27,7 @@ spec:
   type: ClusterIP
   ports:
     - port: {{ .Values.server.port }}
-      targetPort: trino-gateway-rest
+      targetPort: rest
       protocol: TCP
       name: trino-gateway-rest
   selector:
