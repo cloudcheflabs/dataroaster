@@ -22,6 +22,10 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
 
     @Test
     public void create() throws Exception {
+        doCreate();
+    }
+
+    public void doCreate() throws Exception {
         // create cluster group.
         this.doCreateClusterGroup();
 
@@ -58,6 +62,8 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
 
     @Test
     public void list() throws Exception {
+        doCreate();
+
         String urlPath = serverUrl + "/v1/cluster/list";
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse(urlPath).newBuilder();
@@ -76,6 +82,8 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
 
     @Test
     public void updateActivated() throws Exception{
+        doCreate();
+
         String urlPath = serverUrl + "/v1/cluster/update/activated";
 
         String clusterName = "trino-etl-1";
@@ -103,6 +111,14 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
 
     @Test
     public void delete() throws Exception{
+        create();
+
+        doDeleteCluster();
+
+        this.doDeleteClusterGroup();
+    }
+
+    public void doDeleteCluster() throws Exception {
         String urlPath = serverUrl + "/v1/cluster/delete";
 
         String clusterName = "trino-etl-1";
@@ -124,7 +140,5 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
 
         Cluster cluste = clusterDao.findOne(clusterName);
         Assert.assertNull(cluste);
-
-        this.doDeleteClusterGroup();
     }
 }
