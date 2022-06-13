@@ -17,14 +17,18 @@ public class SpringBootTestRunnerBase {
 
     protected static ConfigurableApplicationContext applicationContext;
 
-    protected static Environment env;
+    protected Environment env;
 
-    protected static OkHttpClient client;
-    protected static MediaType mediaType;
+    protected OkHttpClient client;
+    protected MediaType mediaType;
 
-    protected static String serverUrl;
+    protected String serverUrl;
 
-    protected static void init() {
+    public SpringBootTestRunnerBase() {
+        init();
+    }
+
+    private void init() {
         // run spring boot application.
         applicationContext =
                 SpringApplication.run(TrinoGatewayApplication.class, Arrays.asList("").toArray(new String[0]));

@@ -16,19 +16,22 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
 
     private static ClusterGroupDao dao;
 
+    public ClusterGroupControllerTestRunner() {
+        super();
+    }
+
 
     @BeforeClass
     public static void setup() throws Exception {
-        init();
         dao = applicationContext.getBean(ClusterGroupDao.class);
     }
 
     @Test
     public void create() throws Exception {
-        doCreate();
+        doCreateClusterGroup();
     }
 
-    private void doCreate() throws Exception {
+    public void doCreateClusterGroup() throws Exception {
         String urlPath = serverUrl + "/v1/cluster_group/create";
 
         String groupName = "etl";
@@ -55,10 +58,10 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
 
     @Test
     public void delete() throws Exception {
-        doDelete();
+        doDeleteClusterGroup();
     }
 
-    private void doDelete() throws Exception {
+    public void doDeleteClusterGroup() throws Exception {
         String urlPath = serverUrl + "/v1/cluster_group/delete";
 
         String groupName = "etl";
@@ -84,14 +87,14 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
 
     @Test
     public void list() throws Exception {
-        doCreate();
+        doCreateClusterGroup();
 
-        doList();
+        doListClusterGroup();
 
-        doDelete();
+        doDeleteClusterGroup();
     }
 
-    private void doList() throws Exception {
+    public void doListClusterGroup() throws Exception {
         String urlPath = serverUrl + "/v1/cluster_group/list";
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse(urlPath).newBuilder();
