@@ -4,6 +4,7 @@ import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import okhttp3.*;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,7 @@ public class ClusterGroupControllerTestRunner extends SpringBootTestRunnerBase {
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterGroupControllerTestRunner.class);
 
-    @Before
+    @BeforeClass
     public static void setup() {
         init();
     }

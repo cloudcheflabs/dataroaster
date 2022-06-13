@@ -3,6 +3,7 @@ package com.cloudcheflabs.dataroaster.trino.gateway.controller;
 import okhttp3.*;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,7 @@ public class ClusterControllerTestRunner extends ClusterGroupControllerTestRunne
 
     private static Logger LOG = LoggerFactory.getLogger(ClusterControllerTestRunner.class);
 
-    @Before
+    @BeforeClass
     public static void setup() {
         init();
     }
