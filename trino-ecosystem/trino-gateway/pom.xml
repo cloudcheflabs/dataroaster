@@ -76,6 +76,9 @@
 
 		<!-- favre bcrypt -->
 		<favre-bcrypt.version>0.8.0</favre-bcrypt.version>
+
+		<!-- java.xml.bind module -->
+		<xml-bind.version>2.3.2</xml-bind.version>
 	</properties>
 
 	<dependencies>
@@ -265,6 +268,16 @@
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>${joda-time.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>${xml-bind.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>${xml-bind.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
