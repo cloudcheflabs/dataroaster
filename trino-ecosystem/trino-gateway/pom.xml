@@ -336,6 +336,7 @@
 						<filtering>true</filtering>
 						<includes>
 							<include>application*.*</include>
+							<include>persistent-mysql.*</include>
 						</includes>
 					</resource>
 				</resources>
@@ -357,6 +358,7 @@
 						<filtering>true</filtering>
 						<includes>
 							<include>application*.*</include>
+							<include>persistent-mysql.*</include>
 						</includes>
 					</resource>
 				</resources>
