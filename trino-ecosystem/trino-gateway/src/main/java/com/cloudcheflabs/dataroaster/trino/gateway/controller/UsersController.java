@@ -67,8 +67,12 @@ public class UsersController {
             String bcryptEncodedPassword = BCryptUtils.encodeWithBCrypt(password);
 
             Users users = usersService.findOne(user);
-            users.setPassword(bcryptEncodedPassword);
-            usersService.update(users);
+            if(users != null) {
+                users.setPassword(bcryptEncodedPassword);
+                usersService.update(users);
+            } else {
+                throw new IllegalStateException("user [" + user + "] not found!");
+            }
             return ControllerUtils.successMessage();
         });
     }

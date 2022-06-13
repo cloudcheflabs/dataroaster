@@ -64,8 +64,12 @@ public class ClusterController {
             String activated = params.get("activated");
 
             Cluster cluster = clusterService.findOne(clusterName);
-            cluster.setActivated(Boolean.valueOf(activated));
-            clusterService.update(cluster);
+            if(cluster != null) {
+                cluster.setActivated(Boolean.valueOf(activated));
+                clusterService.update(cluster);
+            } else {
+                throw new IllegalStateException("cluster [" + clusterName + "] not found!");
+            }
             return ControllerUtils.successMessage();
         });
     }
