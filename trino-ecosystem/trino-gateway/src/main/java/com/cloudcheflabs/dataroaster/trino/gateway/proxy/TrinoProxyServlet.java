@@ -110,6 +110,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
       // authenticate user, and get target trino address.
       Users users = usersService.findOne(user);
+      if(users == null) {
+        throw new IllegalStateException("user [" + user + "] does not exist!");
+      }
       String bcryptEncodedPassword = users.getPassword();
       boolean isMatched = BCryptUtils.isMatched(password, bcryptEncodedPassword);
       if(isMatched) {
