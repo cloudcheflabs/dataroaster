@@ -59,7 +59,7 @@ public class ClusterController {
 
     @PutMapping("/v1/cluster/update/activated")
     public String updateActivated(@RequestParam Map<String, String> params) {
-        return ControllerUtils.doProcess(Roles.ROLE_USER, context, () -> {
+        return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
             String clusterName = params.get("cluster_name");
             String activated = params.get("activated");
 
