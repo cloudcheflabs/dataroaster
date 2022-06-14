@@ -163,13 +163,6 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                                    Callback callback) {
 
     if(LOG.isDebugEnabled()) LOG.debug("onResponseContent buffer: [{}]", new String(buffer));
-
     super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
-    try {
-      response.getOutputStream().flush();
-      if(LOG.isDebugEnabled()) LOG.debug("onResponseContent flushed.");
-    } catch (IOException e) {
-      LOG.warn("Error flushing", e);
-    }
   }
 }
