@@ -96,7 +96,9 @@ public class TrinoProxy implements InitializingBean, DisposableBean {
                             new SslConnectionFactory(tlsContextFactory, HttpVersion.HTTP_1_1.asString()),
                             new HttpConnectionFactory(httpsConfig));
         } else {
-            connector = new ServerConnector(server);
+            HttpConfiguration httpConfig = new HttpConfiguration();
+            httpConfig.setOutputBufferSize(1024);
+            connector = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
         }
         connector.setHost("0.0.0.0");
         connector.setPort(port);
