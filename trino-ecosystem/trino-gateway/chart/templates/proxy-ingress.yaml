@@ -1,23 +1,20 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: trino-gateway-proxy-ingress
   namespace: {{ .Values.namespace }}
   annotations:
+    kubernetes.io/ingress.class: {{ .Values.ingress.ingressClassName }}
     cert-manager.io/cluster-issuer: {{ .Values.certManager.clusterIssue }}
 spec:
-  ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
     - host: {{ .Values.ingress.proxyHostName }}
       http:
         paths:
           - backend:
-              service:
-                name: trino-gateway-proxy-service
-                port:
-                  number: {{ .Values.trino.proxy.port }}
+              serviceName: trino-gateway-proxy-service
+              servicePort: {{ .Values.trino.proxy.port }}
             path: /
-            pathType: ImplementationSpecific
   tls:
     - hosts:
         - {{ .Values.ingress.proxyHostName }}
