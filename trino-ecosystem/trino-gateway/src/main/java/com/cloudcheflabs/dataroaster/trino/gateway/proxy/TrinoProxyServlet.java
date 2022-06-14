@@ -10,8 +10,11 @@ import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Users;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.BCryptUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.RandomUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.client.api.Request;
+import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.proxy.ProxyServlet;
+import org.eclipse.jetty.util.Callback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -147,5 +150,19 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         throw new IllegalStateException("User Authentication Failed...");
       }
     }
+  }
+
+  @Override
+  protected void onResponseContent(HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   Response proxyResponse,
+                                   byte[] buffer,
+                                   int offset,
+                                   int length,
+                                   Callback callback) {
+
+    LOG.info("onResponseContent buffer: [{}]", new String(buffer));
+
+    super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
   }
 }
