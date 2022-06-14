@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -164,5 +165,10 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     LOG.info("onResponseContent buffer: [{}]", new String(buffer));
 
     super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
+    try {
+      response.getOutputStream().flush();
+    } catch (IOException e) {
+      LOG.warn("Error flushing", e);
+    }
   }
 }
