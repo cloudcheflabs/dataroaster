@@ -45,6 +45,7 @@ public class RequestFilter implements jakarta.servlet.Filter {
       String[] userPassTokens = userPassword.split(":");
       String user = userPassTokens[0];
       String password = userPassTokens[1];
+      LOG.info("user: [{}], password: [{}]", user, password);
 
       req.setAttribute(ATTR_BASIC_AUTHENTICATION, new BasicAuthentication(user, password));
     }
