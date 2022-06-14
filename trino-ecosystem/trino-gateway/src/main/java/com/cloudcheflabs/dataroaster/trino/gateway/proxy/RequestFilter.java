@@ -33,7 +33,7 @@ public class RequestFilter implements jakarta.servlet.Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     HttpServletRequest req = (HttpServletRequest) request;
     String authValue = req.getHeader(HEADER_HTTP_AUTHORIZATION);
-    LOG.debug("authValue: [{}]", authValue);
+    if(LOG.isDebugEnabled()) LOG.debug("authValue: [{}]", authValue);
 
     // set credentials to attribute to authenticate user later.
     if(authValue != null) {
@@ -45,7 +45,7 @@ public class RequestFilter implements jakarta.servlet.Filter {
       String[] userPassTokens = userPassword.split(":");
       String user = userPassTokens[0];
       String password = userPassTokens[1];
-      LOG.debug("user: [{}], password: [{}]", user, password);
+      if(LOG.isDebugEnabled()) LOG.debug("user: [{}], password: [{}]", user, password);
 
       req.setAttribute(ATTR_BASIC_AUTHENTICATION, new BasicAuthentication(user, password));
     }
@@ -63,7 +63,7 @@ public class RequestFilter implements jakarta.servlet.Filter {
       }
 
       String body = requestWrapper.getBody();
-      LOG.debug("body: [{}]", body);
+      if(LOG.isDebugEnabled()) LOG.debug("body: [{}]", body);
     }
 
     HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper((HttpServletResponse) response);
