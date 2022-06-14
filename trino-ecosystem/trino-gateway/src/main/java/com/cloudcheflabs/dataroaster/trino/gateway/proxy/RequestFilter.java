@@ -33,6 +33,7 @@ public class RequestFilter implements jakarta.servlet.Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     HttpServletRequest req = (HttpServletRequest) request;
     String authValue = req.getHeader(HEADER_HTTP_AUTHORIZATION);
+    LOG.info("authValue: [{}]", authValue);
 
     // set credentials to attribute to authenticate user later.
     if(authValue != null) {
