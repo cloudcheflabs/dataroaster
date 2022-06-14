@@ -22,6 +22,10 @@ ingress:
   proxyHostName: trino-gateway-proxy-test.cloudchef-labs.com
   restHostName: trino-gateway-rest-test.cloudchef-labs.com
 
+# cert-manager.
+certManager:
+  clusterIssue: letsencrypt-prod
+
 # spring boot server
 server:
   port: 8099
