@@ -7,9 +7,9 @@ server:
 trino:
   proxy:
     port: 18080
-    authentication: true
+    authentication: false
     tls:
-      enabled: true
+      enabled: false
       keystorePath: /home/opc/keystore.jks
       keystorePass: changeit
       trustStorePath: /home/opc/.keystore
