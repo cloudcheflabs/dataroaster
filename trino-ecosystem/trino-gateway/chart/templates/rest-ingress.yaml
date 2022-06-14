@@ -1,20 +1,23 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: trino-gateway-rest-ingress
   namespace: {{ .Values.namespace }}
   annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingress.ingressClassName }}
     cert-manager.io/cluster-issuer: {{ .Values.certManager.clusterIssue }}
 spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
     - host: {{ .Values.ingress.restHostName }}
       http:
         paths:
           - backend:
-              serviceName: trino-gateway-rest-service
-              servicePort: {{ .Values.server.port }}
+              service:
+                name: trino-gateway-rest-service
+                port:
+                  number: {{ .Values.server.port }}
             path: /
+            pathType: ImplementationSpecific
   tls:
     - hosts:
         - {{ .Values.ingress.restHostName }}
