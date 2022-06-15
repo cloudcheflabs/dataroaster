@@ -15,13 +15,13 @@ public class TrinoJdbcTestRunner {
     public void connect() throws Exception {
         String host = System.getProperty("host", "trino-gateway-proxy-test.cloudchef-labs.com:443");
         LOG.info("host: [{}]", host);
-        boolean tls = Boolean.valueOf(System.getProperty("tls", "true"));
-        LOG.info("tls: [{}]", tls);
+        boolean auth = Boolean.valueOf(System.getProperty("auth", "true"));
+        LOG.info("auth: [{}]", auth);
 
         String url = "jdbc:trino://" + host + "/tpch/tiny";
         Properties properties = new Properties();
         properties.setProperty("user", "trino");
-        if(tls) {
+        if(auth) {
             properties.setProperty("password", "trino123");
             properties.setProperty("SSL", "true");
         }
