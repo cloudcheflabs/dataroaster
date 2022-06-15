@@ -161,6 +161,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                                    int length,
                                    Callback callback) {
 
+
     if(LOG.isDebugEnabled()) LOG.debug("onResponseContent buffer: [{}]", new String(buffer));
     HttpFields fields = proxyResponse.getHeaders();
     Enumeration<String> headerNames = fields.getFieldNames();
@@ -168,6 +169,14 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
       LOG.info("response header: [{}], value: [{}]", fields.getField(header).getValue());
     }
 
-    super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
+    try {
+      response.getOutputStream().write(buffer, offset, length);
+      callback.succeeded();
+    } catch (Throwable e) {
+      callback.failed(e);
+      LOG.error("callback failed.", e);
+    }
+
+    //super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
   }
 }
