@@ -22,14 +22,17 @@ public class TrinoJdbcTestRunner {
         LOG.info("tls: [{}]", tls);
 
         String url = "jdbc:trino://" + host + "/tpch/tiny";
-        Properties properties = null;
+        Connection connection = null;
         if(tls) {
-            properties = new Properties();
+            Properties properties = new Properties();
             properties.setProperty("user", "trino");
             properties.setProperty("password", "trino123");
             properties.setProperty("SSL", "true");
+            connection = DriverManager.getConnection(url, properties);
+        } else {
+            url = "jdbc:trino://" + host + "/tpch/tiny?SSL=false";
+            connection = DriverManager.getConnection(url);
         }
-        Connection connection = DriverManager.getConnection(url, properties);
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT count(*) FROM tpch.tiny.nation");
 
