@@ -2,7 +2,7 @@
 
 DataRoaster Trino Gateway is used to route trino queries dynamically to downstream trino clusters.
 
-# Trino Gateway Architecture
+## Trino Gateway Architecture
 
 ![Trino Gateway Architecture](https://github.com/cloudcheflabs/dataroaster/blob/master/trino-ecosystem/trino-gateway/docs/images/trino-gateway.jpg)
 
