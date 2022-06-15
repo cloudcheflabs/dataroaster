@@ -95,8 +95,9 @@
 		</dependency>
 		<dependency>
 			<groupId>io.trino</groupId>
-			<artifactId>trino-client</artifactId>
+			<artifactId>trino-jdbc</artifactId>
 			<version>${trino.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
