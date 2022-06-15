@@ -163,20 +163,10 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
 
     if(LOG.isDebugEnabled()) LOG.debug("onResponseContent buffer: [{}]", new String(buffer));
-    HttpFields fields = proxyResponse.getHeaders();
-    Enumeration<String> headerNames = fields.getFieldNames();
-    for(String header : Collections.list(headerNames)) {
-      LOG.info("response header: [{}], value: [{}]", fields.getField(header).getValue());
+    for(String header : response.getHeaderNames()) {
+      LOG.info("header [{}]: [{}]", header, response.getHeader(header));
     }
 
-    try {
-      response.getOutputStream().write(buffer, offset, length);
-      callback.succeeded();
-    } catch (Throwable e) {
-      callback.failed(e);
-      LOG.error("callback failed.", e);
-    }
-
-    //super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
+    super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
   }
 }
