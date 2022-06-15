@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trino-gateway
+  labels:
+    app: trino-gateway
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trino-gateway
+  template:
+    metadata:
+      labels:
+        app: trino-gateway
+      annotations:
+      {{- toYaml $.Values.tolerations | nindent 8 }}
+    spec:
+      affinity:
+      {{- toYaml $.Values.affinity | nindent 8 }}
+      tolerations:
+      {{- toYaml $.Values.tolerations | nindent 8 }}
+      nodeSelector:
+      {{- toYaml $.Values.nodeSelector | nindent 8 }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
+      hostNetwork: {{ .Values.hostNetwork }}
+      serviceAccountName: {{ .Values.serviceAccount }}
+      containers:
+        - name: trino-gateway
+          image: {{ .Values.image }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          resources: 
+          {{- toYaml $.Values.resources | nindent 12 }}
+          command:
+            - "./run-trino-gateway.sh"
+          volumeMounts:
+            - name: trino-gateway-volume
+              mountPath: /opt/trino-gateway/conf/application.properties
+              subPath: application.properties
+            - name: trino-gateway-volume
+              mountPath: /opt/trino-gateway/conf/application-prod.yml
+              subPath: application-prod.yml
+          ports:
+            - name: proxy
+              containerPort: {{ .Values.trino.proxy.port }}
+              protocol: TCP
+            - name: rest
+              containerPort: {{ .Values.server.port }}
+              protocol: TCP
+      volumes:
+        - name: trino-gateway-volume
+          configMap:
+            name: trino-gateway

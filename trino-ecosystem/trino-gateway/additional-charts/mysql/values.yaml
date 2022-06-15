@@ -1,0 +1,5 @@
+namespace: trino-gateway
+storage:
+  storageClass: standard
+  size: 5Gi
+rootPassword: mysqlpass123
