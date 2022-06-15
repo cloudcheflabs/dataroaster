@@ -104,6 +104,8 @@ public class TrinoProxy implements InitializingBean, DisposableBean {
         connector.setPort(port);
         connector.setName("Trino Proxy");
         connector.setAccepting(true);
+        connector.setAcceptedTcpNoDelay(true);
+        connector.setReuseAddress(true);
         server.addConnector(connector);
 
         ConnectHandler proxyConnectHandler = new ConnectHandler();
