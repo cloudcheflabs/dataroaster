@@ -98,7 +98,6 @@ public class TrinoProxy implements InitializingBean, DisposableBean {
         } else {
             HttpConfiguration httpConfig = new HttpConfiguration();
             httpConfig.setOutputBufferSize(32768);
-            httpConfig.setIdleTimeout(-1);
             connector = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
         }
         connector.setHost("0.0.0.0");

@@ -24,8 +24,8 @@ public class TrinoJdbcTestRunner {
         if(tls) {
             properties.setProperty("user", "trino");
             properties.setProperty("password", "trino123");
-            properties.setProperty("SSL", "true");
         }
+        properties.setProperty("SSL", String.valueOf(tls));
         Connection connection = DriverManager.getConnection(url, properties);
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT count(*) FROM tpch.tiny.nation");
