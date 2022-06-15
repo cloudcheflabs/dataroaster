@@ -33,7 +33,7 @@ public class TrinoJdbcTestRunner {
         int columnCount = meta.getColumnCount();
         while (rs.next()) {
             for(int count = 0; count < columnCount; count++) {
-                LOG.info("[{}]: [{}]", meta.getColumnName(count + 1), rs.getObject(count + 1));
+                LOG.info("{}: {}", meta.getColumnName(count + 1), rs.getObject(count + 1));
             }
             LOG.info("-------------------");
         }
