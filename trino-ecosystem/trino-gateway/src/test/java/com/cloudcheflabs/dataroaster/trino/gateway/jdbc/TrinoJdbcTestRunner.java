@@ -4,10 +4,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Properties;
 
 public class TrinoJdbcTestRunner {
@@ -32,11 +29,13 @@ public class TrinoJdbcTestRunner {
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT count(*) FROM tpch.tiny.nation");
 
+        ResultSetMetaData meta = rs.getMetaData();
+        int columnCount = meta.getColumnCount();
         while (rs.next()) {
-            LOG.info("nationkey: " + rs.getInt("nationkey"));
-            LOG.info(", name: " + rs.getString("name"));
-            LOG.info(", regionkey: " + rs.getInt("regionkey"));
-            LOG.info(", comment: " + rs.getString("comment"));
+            for(int count = 0; count < columnCount; count++) {
+                LOG.info("[{}]: [{}]", meta.getColumnName(count), rs.getObject(count));
+            }
+            LOG.info("-------------------");
         }
     }
 }
