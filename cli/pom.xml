@@ -3,13 +3,13 @@
     <parent>
         <groupId>com.cloudcheflabs.dataroaster</groupId>
         <artifactId>dataroaster-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 	<modelVersion>4.0.0</modelVersion>
     <groupId>com.cloudcheflabs.dataroaster</groupId>
     <artifactId>cli</artifactId>
-    <version>3.2.0</version>
+    <version>3.3.0-SNAPSHOT</version>
 	<name>CLI</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>com.cloudcheflabs.dataroaster</groupId>
             <artifactId>common</artifactId>
-            <version>3.2.0</version>
+            <version>3.3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>

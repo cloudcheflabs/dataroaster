@@ -41,7 +41,7 @@ import picocli.CommandLine;
                 Blueprint.class,
                 CommandLine.HelpCommand.class
         },
-        version = "dataroaster 3.2.0",
+        version = "dataroaster 3.3.0-SNAPSHOT",
         description = "DataRoaster CLI Console.")
 public class Console implements Runnable {
 
