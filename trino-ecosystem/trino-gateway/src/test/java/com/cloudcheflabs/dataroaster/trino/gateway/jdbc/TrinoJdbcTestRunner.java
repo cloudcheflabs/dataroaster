@@ -17,15 +17,18 @@ public class TrinoJdbcTestRunner {
     @Test
     public void connect() throws Exception {
         String host = System.getProperty("host", "trino-gateway-proxy-test.cloudchef-labs.com:443");
+        LOG.info("host: [{}]", host);
         boolean tls = Boolean.valueOf(System.getProperty("tls", "true"));
+        LOG.info("tls: [{}]", tls);
 
         String url = "jdbc:trino://" + host + "/tpch/tiny";
-        Properties properties = new Properties();
+        Properties properties = null;
         if(tls) {
+            properties = new Properties();
             properties.setProperty("user", "trino");
             properties.setProperty("password", "trino123");
+            properties.setProperty("SSL", "true");
         }
-        properties.setProperty("SSL", String.valueOf(tls));
         Connection connection = DriverManager.getConnection(url, properties);
         Statement stmt = connection.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT count(*) FROM tpch.tiny.nation");
