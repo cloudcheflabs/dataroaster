@@ -4,7 +4,7 @@ DataRoaster Trino Gateway is used to route trino queries dynamically to downstre
 
 # Trino Gateway Architecture
 
-![Trino Gateway Architecture](https://github.com/cloudcheflabs/dataroaster/tree/master/trino-ecosystem/trino-gateway/docs/image/trino-gateway.jpg)
+![Trino Gateway Architecture](https://github.com/cloudcheflabs/dataroaster/blob/master/trino-ecosystem/trino-gateway/docs/images/trino-gateway.jpg)
 
 * `Admin` creates and deletes trino clusters using trino operator like [DataRoaster Trino Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/trino).
 * After creating trino clusters on kubernetes, `Admin` registers trino cluster and users to `Trino Gateway` to route trino queries to the registered trino clusters.
