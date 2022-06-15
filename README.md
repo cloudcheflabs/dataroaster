@@ -1116,6 +1116,12 @@ DataRoaster Trino Operator is used to create/delete trino clusters easily.
 
 See [DataRoaster Trino Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/trino) for more details.
 
+## DataRoaster Trino Gateway
+DataRoaster Trino Gateway is used to route the trino queries dynamically to downstream trino clusters.
+
+See [DataRoaster Trino Gateway]([https://github.com/cloudcheflabs/dataroaster/tree/master/operators/trino](https://github.com/cloudcheflabs/dataroaster/tree/master/trino-ecosystem/trino-gateway) for more details.
+
+
 ## Community
 
 * DataRoaster Community Mailing Lists: https://groups.google.com/g/dataroaster
