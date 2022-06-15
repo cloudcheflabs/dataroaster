@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
+import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.proxy.ProxyServlet;
 import org.eclipse.jetty.util.Callback;
 import org.slf4j.Logger;
@@ -24,9 +25,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class TrinoProxyServlet extends ProxyServlet.Transparent implements InitializingBean {
@@ -163,6 +162,12 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                                    Callback callback) {
 
     if(LOG.isDebugEnabled()) LOG.debug("onResponseContent buffer: [{}]", new String(buffer));
+    HttpFields fields = proxyResponse.getHeaders();
+    Enumeration<String> headerNames = fields.getFieldNames();
+    for(String header : Collections.list(headerNames)) {
+      LOG.info("response header: [{}], value: [{}]", fields.getField(header).getValue());
+    }
+
     super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
   }
 }
