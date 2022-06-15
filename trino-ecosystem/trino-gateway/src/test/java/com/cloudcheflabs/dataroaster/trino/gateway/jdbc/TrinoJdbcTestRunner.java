@@ -27,7 +27,7 @@ public class TrinoJdbcTestRunner {
         }
         Connection connection = DriverManager.getConnection(url, properties);
         Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT count(*) FROM tpch.tiny.nation");
+        ResultSet rs = stmt.executeQuery("SELECT * FROM tpch.tiny.nation");
 
         ResultSetMetaData meta = rs.getMetaData();
         int columnCount = meta.getColumnCount();
