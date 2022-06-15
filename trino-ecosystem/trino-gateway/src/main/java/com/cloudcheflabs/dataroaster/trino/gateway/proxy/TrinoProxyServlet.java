@@ -165,6 +165,12 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     if(LOG.isDebugEnabled()) LOG.debug("onResponseContent buffer: [{}]", new String(buffer));
     for(String header : response.getHeaderNames()) {
       LOG.info("header [{}]: [{}]", header, response.getHeader(header));
+      // TODO: authentication in downstream trino cluster not supported at the moment!!!
+      if(header.equals("Location")) {
+        String newValue = response.getHeader(header).replace("https://", "http://");
+        response.setHeader("Location", newValue);
+        LOG.info("new location: [{}]", newValue);
+      }
     }
 
     super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
