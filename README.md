@@ -1119,7 +1119,7 @@ See [DataRoaster Trino Operator](https://github.com/cloudcheflabs/dataroaster/tr
 ## DataRoaster Trino Gateway
 DataRoaster Trino Gateway is used to route the trino queries dynamically to downstream trino clusters.
 
-See [DataRoaster Trino Gateway]([https://github.com/cloudcheflabs/dataroaster/tree/master/operators/trino](https://github.com/cloudcheflabs/dataroaster/tree/master/trino-ecosystem/trino-gateway) for more details.
+See [DataRoaster Trino Gateway](https://github.com/cloudcheflabs/dataroaster/tree/master/trino-ecosystem/trino-gateway) for more details.
 
 
 ## Community
