@@ -637,4 +637,6 @@ http://localhost:8099/v1/users/delete \
 ```
  
 
+## Publishment
+* [Route trino queries dynamically using Trino Gateway](https://itnext.io/route-trino-queries-dynamically-using-trino-gateway-9772d62b1630)
  
