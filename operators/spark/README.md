@@ -132,7 +132,7 @@ spec:
 
 
 
-## Deploy Spark Applications using Spark Operator
+## Publishment
 
 * [Deploy spark thrift server to kubernetes using dataroaster spark operator](https://mykidong.medium.com/hive-on-spark-with-spark-operator-9a43ea7ebe06)
 
