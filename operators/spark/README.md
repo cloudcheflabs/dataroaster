@@ -6,27 +6,24 @@ For instance, Spark Thrift Server which is one of the components provided by Dat
 
 ## Install DataRoaster Spark Operator
 
-After cloning dataroaster sources, move to the spark operator chart directory.
-```
-cd ~;
-git clone https://github.com/cloudcheflabs/dataroaster.git;
-cd ~/dataroaster/operators/spark/chart;
-```
-
 Install spark operator with helm.
 ```
+helm repo add dataroaster-spark-operator https://cloudcheflabs.github.io/helm-repository/
+helm repo update
+
 helm install \
+spark-operator \
 --create-namespace \
 --namespace spark-operator \
-spark-operator \
-./;
+--version v1.0.0 \
+dataroaster-spark-operator/dataroaster-spark-operator;
 ```
 
 Check if spark operator is running.
 ```
 kubectl get po -n spark-operator
 NAME                              READY   STATUS    RESTARTS   AGE
-spark-operator-756fbf4479-shkcr   1/1     Running   0          36m
+spark-operator-756fbf4479-s2zjt   1/1     Running   0          52s
 ```
 
 ## Custom Resource
