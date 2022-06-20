@@ -1,0 +1,13 @@
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: ingress-nginx
+  namespace: helm-operator
+spec:
+  repo: https://kubernetes.github.io/ingress-nginx
+  chartName: ingress-nginx
+  name: ingress-nginx
+  version: 4.0.17
+  namespace: ingress-nginx
+    
+
