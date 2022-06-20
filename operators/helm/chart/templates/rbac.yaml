@@ -158,6 +158,7 @@ rules:
       - serviceaccounts
       - services
       - services/status
+      - clusterroles
     verbs:
       - get
       - list
