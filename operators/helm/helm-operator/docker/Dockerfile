@@ -30,11 +30,11 @@ ADD run-helm-operator.sh ${HELM_OPERATOR_HOME}
 RUN chmod +x ${HELM_OPERATOR_HOME}/*.sh
 RUN chown ${HELM_OPERATOR_USER}: -R ${HELM_OPERATOR_HOME}
 
-# change work directory.
-USER ${HELM_OPERATOR_USER}
-WORKDIR ${HELM_OPERATOR_HOME}
-
 # install helm.
 RUN set -eux; \
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash; \
     helm
+
+# change work directory.
+USER ${HELM_OPERATOR_USER}
+WORKDIR ${HELM_OPERATOR_HOME}
