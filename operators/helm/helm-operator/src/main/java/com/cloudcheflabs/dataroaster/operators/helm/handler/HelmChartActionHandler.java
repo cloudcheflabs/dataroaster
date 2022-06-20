@@ -24,8 +24,8 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
 
         String tempDirectory = FileUtils.createHelmTempDirectory();
         String valuesFile = "custom-values.yaml";
+        String valuesFilePath = tempDirectory + "/" + valuesFile;
         if(values != null) {
-            String valuesFilePath = tempDirectory + "/" + valuesFile;
             // create values yaml.
             com.cloudcheflabs.dataroaster.common.util.FileUtils.stringToFile(values, valuesFilePath, false);
             LOG.info("custom-values.yaml: \n{}", com.cloudcheflabs.dataroaster.common.util.FileUtils.fileToString(valuesFilePath, false));
@@ -42,7 +42,7 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
         cmd.append("--namespace ").append(spec.getNamespace()).append(" ").append("\\").append("\n");;
         cmd.append("--version ").append(spec.getVersion()).append(" ").append("\\").append("\n");;
         if(values != null) {
-            cmd.append("--values ").append("./").append(valuesFile).append(" ").append("\\").append("\n");;
+            cmd.append("--values ").append(valuesFilePath).append(" ").append("\\").append("\n");;
         }
         cmd.append(chartName).append("/").append(chartName);
 
@@ -67,14 +67,13 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
 
         String tempDirectory = FileUtils.createHelmTempDirectory();
         String valuesFile = "custom-values.yaml";
+        String valuesFilePath = tempDirectory + "/" + valuesFile;
         if(values != null) {
-            String valuesFilePath = tempDirectory + "/" + valuesFile;
             // create values yaml.
             com.cloudcheflabs.dataroaster.common.util.FileUtils.stringToFile(values, valuesFilePath, false);
             LOG.info("custom-values.yaml: \n{}", com.cloudcheflabs.dataroaster.common.util.FileUtils.fileToString(valuesFilePath, false));
         }
-
-
+        
         StringBuffer cmd = new StringBuffer();
         cmd.append("helm repo add ").append(chartName).append(" ").append(spec.getRepo()).append("\n");;
         cmd.append("helm repo update").append("\n").append("\n");;
@@ -84,7 +83,7 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
         cmd.append("--namespace ").append(spec.getNamespace()).append(" ").append("\\").append("\n");;
         cmd.append("--version ").append(spec.getVersion()).append(" ").append("\\").append("\n");;
         if(values != null) {
-            cmd.append("--values ").append("./").append(valuesFile).append(" ").append("\\").append("\n");;
+            cmd.append("--values ").append(valuesFilePath).append(" ").append("\\").append("\n");;
         }
         cmd.append(chartName).append("/").append(chartName);
 
