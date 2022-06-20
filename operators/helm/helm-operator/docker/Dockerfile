@@ -35,4 +35,6 @@ USER ${HELM_OPERATOR_USER}
 WORKDIR ${HELM_OPERATOR_HOME}
 
 # install helm.
-RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+RUN set -eux; \
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash; \
+    helm
