@@ -1,0 +1,16 @@
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: dataroaster-trino-gateway-mysql
+  namespace: helm-operator
+spec:
+  repo: https://cloudcheflabs.github.io/mysql-helm-repo/
+  chartName: dataroaster-trino-gateway-mysql
+  name: mysql
+  version: v1.0.0
+  namespace: trino-gateway
+  values: |
+    storage:
+      storageClass: standard
+    
+

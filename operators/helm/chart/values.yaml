@@ -1,0 +1,16 @@
+serviceAccount: helm-operator
+image: cloudcheflabs/helm-operator:3.0.0
+imagePullPolicy: Always
+resources:
+  requests:
+    cpu: 200m
+    memory: 1Gi
+  limits:
+    cpu: 300m
+    memory: 1500Mi
+priorityClassName: ""
+annotations: null
+affinity: null
+tolerations: null
+nodeSelector: null
+hostNetwork: false

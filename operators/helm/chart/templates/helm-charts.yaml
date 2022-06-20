@@ -1,0 +1,37 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: helmcharts.helm-operator.cloudchef-labs.com
+spec:
+  group: helm-operator.cloudchef-labs.com
+  names:
+    plural: helmcharts
+    singular: helmchart
+    kind: HelmChart
+    shortNames:
+      - helmchart
+  scope: Namespaced
+  versions:
+    - name: v1beta1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                repo:
+                  type: string
+                chartName:
+                  type: string
+                name:
+                  type: string
+                version:
+                  type: string
+                namespace:
+                  type: string
+                values:
+                  type: string
+

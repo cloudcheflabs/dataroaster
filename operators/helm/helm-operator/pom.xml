@@ -1,0 +1,184 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>com.cloudcheflabs.dataroaster</groupId>
+		<artifactId>dataroaster-parent</artifactId>
+		<version>3.3.0-SNAPSHOT</version>
+		<relativePath>../../../pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>helm-operator</artifactId>
+	<name>Helm Operator</name>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<!-- fabric8 kubernetes client -->
+		<fabric8.k8s.client.version>5.12.2</fabric8.k8s.client.version>
+
+		<!-- mock web server -->
+		<mockwebserver.version>0.2.2</mockwebserver.version>
+
+		<!-- assertj -->
+		<assertj.core.version>3.23.1</assertj.core.version>
+
+		<!-- logback -->
+		<logback.version>1.2.6</logback.version>
+
+		<!-- slf4j -->
+		<slf4j.version>1.7.30</slf4j.version>
+
+		<!-- junit -->
+		<junit.version>4.12</junit.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.cloudcheflabs.dataroaster</groupId>
+			<artifactId>common</artifactId>
+			<version>3.3.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-annotations</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.fabric8</groupId>
+			<artifactId>kubernetes-client</artifactId>
+			<version>${fabric8.k8s.client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.fabric8</groupId>
+			<artifactId>crd-generator-apt</artifactId>
+			<version>${fabric8.k8s.client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.fabric8</groupId>
+			<artifactId>kubernetes-server-mock</artifactId>
+			<version>${fabric8.k8s.client.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.fabric8</groupId>
+			<artifactId>mockwebserver</artifactId>
+			<version>${mockwebserver.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${assertj.core.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+    </dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.4.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.4</version>
+				<configuration>
+					<artifactSet>
+						<excludes>
+							<exclude>org.apache.spark</exclude>
+							<exclude>junit:junit</exclude>
+							<exclude>jmock:*</exclude>
+							<exclude>*:xml-apis</exclude>
+							<exclude>log4j:log4j:jar:</exclude>
+						</excludes>
+					</artifactSet>
+					<createDependencyReducedPom>false</createDependencyReducedPom>
+					<shadedArtifactAttached>true</shadedArtifactAttached>
+					<shadedClassifierName>fat</shadedClassifierName>
+					<relocations>
+						<relocation>
+							<pattern>com.google</pattern>
+							<shadedPattern>com.cloudcheflabs.dataroaster.shaded.google</shadedPattern>
+							<excludes>
+								<exclude>com.google.common.base.Optional</exclude>
+							</excludes>
+						</relocation>
+					</relocations>
+					<transformers>
+						<transformer
+								implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+						<transformer
+								implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+							<resource>META-INF/spring.handlers</resource>
+						</transformer>
+						<transformer
+								implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+							<resource>META-INF/spring.schemas</resource>
+						</transformer>
+					</transformers>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>org/datanucleus/**</exclude>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+							</excludes>
+						</filter>
+					</filters>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

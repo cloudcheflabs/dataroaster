@@ -1,9 +1,9 @@
 package com.cloudcheflabs.dataroaster.operators.spark.config;
 
-import com.cloudcheflabs.dataroaster.operators.spark.domain.Pod;
 import com.cloudcheflabs.dataroaster.operators.spark.crd.PodTemplate;
 import com.cloudcheflabs.dataroaster.operators.spark.crd.Volume;
 import com.cloudcheflabs.dataroaster.operators.spark.crd.VolumeMount;
+import com.cloudcheflabs.dataroaster.operators.spark.domain.Pod;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
