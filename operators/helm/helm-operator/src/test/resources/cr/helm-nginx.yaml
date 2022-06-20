@@ -9,5 +9,8 @@ spec:
   name: ingress-nginx
   version: 4.0.17
   namespace: ingress-nginx
+  values: |
+    replicaCount: 1
+    minAvailable: 1
     
 
