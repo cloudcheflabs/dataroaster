@@ -33,17 +33,18 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
 
 
         StringBuffer cmd = new StringBuffer();
-        cmd.append("helm repo add ").append(chartName).append(" ").append(spec.getRepo()).append("\\");
-        cmd.append("helm repo update").append("\\");
-        cmd.append("helm install ").append("\\");
-        cmd.append(spec.getName()).append(" ").append("\\");
-        cmd.append("--create-namespace ").append("\\");
-        cmd.append("--namespace ").append(spec.getNamespace()).append(" ").append("\\");
-        cmd.append("--version ").append(spec.getVersion()).append(" ").append("\\");
+        cmd.append("helm repo add ").append(chartName).append(" ").append(spec.getRepo()).append("\n");
+        cmd.append("helm repo update").append("\n").append("\n");;
+
+        cmd.append("helm install ").append("\\").append("\n");;
+        cmd.append(spec.getName()).append(" ").append("\\").append("\n");;
+        cmd.append("--create-namespace ").append("\\").append("\n");;
+        cmd.append("--namespace ").append(spec.getNamespace()).append(" ").append("\\").append("\n");;
+        cmd.append("--version ").append(spec.getVersion()).append(" ").append("\\").append("\n");;
         if(values != null) {
-            cmd.append("--values ").append("./").append(valuesFile).append(" ").append("\\");
+            cmd.append("--values ").append("./").append(valuesFile).append(" ").append("\\").append("\n");;
         }
-        cmd.append(chartName).append("/").append(chartName).append(";");
+        cmd.append(chartName).append("/").append(chartName);
 
         String runHelmShell = "run-helm.sh";
         String runHelmShellPath = tempDirectory + "/" + runHelmShell;
@@ -75,16 +76,17 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
 
 
         StringBuffer cmd = new StringBuffer();
-        cmd.append("helm repo add ").append(chartName).append(" ").append(spec.getRepo()).append("\\");
-        cmd.append("helm repo update").append("\\");
-        cmd.append("helm upgrade ").append("\\");
-        cmd.append(spec.getName()).append(" ").append("\\");
-        cmd.append("--namespace ").append(spec.getNamespace()).append(" ").append("\\");
-        cmd.append("--version ").append(spec.getVersion()).append(" ").append("\\");
+        cmd.append("helm repo add ").append(chartName).append(" ").append(spec.getRepo()).append("\n");;
+        cmd.append("helm repo update").append("\n").append("\n");;
+
+        cmd.append("helm upgrade ").append("\\").append("\n");;
+        cmd.append(spec.getName()).append(" ").append("\\").append("\n");;
+        cmd.append("--namespace ").append(spec.getNamespace()).append(" ").append("\\").append("\n");;
+        cmd.append("--version ").append(spec.getVersion()).append(" ").append("\\").append("\n");;
         if(values != null) {
-            cmd.append("--values ").append("./").append(valuesFile).append(" ").append("\\");
+            cmd.append("--values ").append("./").append(valuesFile).append(" ").append("\\").append("\n");;
         }
-        cmd.append(chartName).append("/").append(chartName).append(";");
+        cmd.append(chartName).append("/").append(chartName);
 
         String runHelmShell = "run-helm.sh";
         String runHelmShellPath = tempDirectory + "/" + runHelmShell;
@@ -109,11 +111,12 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
         String tempDirectory = FileUtils.createHelmTempDirectory();
 
         StringBuffer cmd = new StringBuffer();
-        cmd.append("helm repo add ").append(chartName).append(" ").append(spec.getRepo()).append("\\");
-        cmd.append("helm repo update").append("\\");
-        cmd.append("helm uninstall ").append("\\");
-        cmd.append(spec.getName()).append(" ").append("\\");
-        cmd.append("--namespace ").append(spec.getNamespace()).append(";");
+        cmd.append("helm repo add ").append(chartName).append(" ").append(spec.getRepo()).append("\n");;
+        cmd.append("helm repo update").append("\n").append("\n");;
+
+        cmd.append("helm uninstall ").append("\\").append("\n");;
+        cmd.append(spec.getName()).append(" ").append("\\").append("\n");;
+        cmd.append("--namespace ").append(spec.getNamespace());
 
         String runHelmShell = "run-helm.sh";
         String runHelmShellPath = tempDirectory + "/" + runHelmShell;
