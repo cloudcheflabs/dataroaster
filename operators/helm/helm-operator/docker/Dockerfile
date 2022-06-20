@@ -35,6 +35,9 @@ RUN set -eux; \
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash; \
     helm
 
+# set kubeconfig env.
+ENV KUBECONFIG ${HELM_OPERATOR_HOME}/.kube/config
+
 # change work directory.
 USER ${HELM_OPERATOR_USER}
 WORKDIR ${HELM_OPERATOR_HOME}

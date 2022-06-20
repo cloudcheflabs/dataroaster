@@ -26,7 +26,9 @@ public class HelmOperator {
         //LOG.info("token: {}", token);
 
         // kubeconfig file path.
-        String kubeconfigFilePath = System.getProperty("user.home") + "/.kube/config";
+        String kubeConfigDir = System.getProperty("user.home") + "/.kube/config";
+        FileUtils.createDirectory(kubeConfigDir);
+        String kubeconfigFilePath = kubeConfigDir + "/config";
 
         // replace token param with token value and save kubeconfig file.
         Map<String, Object> kv = new HashMap<>();
