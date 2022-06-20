@@ -56,7 +56,7 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
         HelmProcessExecutor helmProcessExecutor = new HelmProcessExecutor();
         helmProcessExecutor.doExec(runHelmShellPath);
 
-        //FileUtils.deleteDirectory(tempDirectory);
+        FileUtils.deleteDirectory(tempDirectory);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
         helmProcessExecutor.doExec(runHelmShellPath);
 
 
-        //FileUtils.deleteDirectory(tempDirectory);
+        FileUtils.deleteDirectory(tempDirectory);
 
     }
 
@@ -128,7 +128,7 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
         helmProcessExecutor.doExec(runHelmShellPath);
 
 
-        //FileUtils.deleteDirectory(tempDirectory);
+        FileUtils.deleteDirectory(tempDirectory);
 
     }
 }
