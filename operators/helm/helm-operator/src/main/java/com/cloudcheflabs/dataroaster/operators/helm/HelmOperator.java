@@ -35,6 +35,9 @@ public class HelmOperator {
         kv.put("token", token);
         TemplateUtils.toFile("/templates/kubeconfig/config", true, kv, kubeconfigFilePath, false);
 
+        // kubeconfig.
+        LOG.info("kubeconfig: \n{}", com.cloudcheflabs.dataroaster.common.util.FileUtils.fileToString(kubeconfigFilePath, false));
+
         // helm chart kubernetes client.
         HelmChartClient helmChartClient = new HelmChartClient(new DefaultKubernetesClient());
 
