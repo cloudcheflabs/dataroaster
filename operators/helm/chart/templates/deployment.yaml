@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helm-operator
+  labels:
+    app: helm-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helm-operator
+  template:
+    metadata:
+      labels:
+        app: helm-operator
+      annotations:
+      {{- toYaml $.Values.tolerations | nindent 8 }}
+    spec:
+      affinity:
+      {{- toYaml $.Values.affinity | nindent 8 }}
+      tolerations:
+      {{- toYaml $.Values.tolerations | nindent 8 }}
+      nodeSelector:
+      {{- toYaml $.Values.nodeSelector | nindent 8 }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
+      hostNetwork: {{ .Values.hostNetwork }}
+      serviceAccountName: {{ .Values.serviceAccount }}
+      containers:
+        - name: helm-operator
+          image: {{ .Values.image }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          resources: 
+          {{- toYaml $.Values.resources | nindent 12 }}
+          command:
+            - "./run-helm-operator.sh"

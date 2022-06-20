@@ -14,6 +14,7 @@
 		<module>authorizer</module>
         <module>cli</module>
         <module>components/hive/spark-thrift-server</module>
+        <module>operators/helm/helm-operator</module>
         <module>operators/spark/spark-operator</module>
         <module>operators/trino/trino-operator</module>
         <module>trino-ecosystem/trino-gateway</module>
