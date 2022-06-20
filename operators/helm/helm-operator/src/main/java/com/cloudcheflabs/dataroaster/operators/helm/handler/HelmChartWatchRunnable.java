@@ -1,5 +1,6 @@
 package com.cloudcheflabs.dataroaster.operators.helm.handler;
 
+import com.cloudcheflabs.dataroaster.operators.helm.config.SpringContextSingleton;
 import com.cloudcheflabs.dataroaster.operators.helm.crd.HelmChart;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
@@ -16,8 +17,8 @@ public class HelmChartWatchRunnable implements Runnable{
     private BlockingQueue<HelmChartActionEvent> queue;
     private MixedOperation<HelmChart, KubernetesResourceList<HelmChart>, Resource<HelmChart>> helmChartClient;
 
-    public HelmChartWatchRunnable(HelmChartClient helmChartClient, BlockingQueue<HelmChartActionEvent> queue) {
-        this.helmChartClient = helmChartClient.getHelmChartClient();
+    public HelmChartWatchRunnable(BlockingQueue<HelmChartActionEvent> queue) {
+        helmChartClient = SpringContextSingleton.getInstance().getBean(HelmChartClient.class).getHelmChartClient();
         this.queue = queue;
     }
 

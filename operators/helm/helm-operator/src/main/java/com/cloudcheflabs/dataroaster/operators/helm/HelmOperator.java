@@ -36,10 +36,7 @@ public class HelmOperator {
         TemplateUtils.toFile("/templates/kubeconfig/config", true, kv, kubeconfigFilePath, false);
 
         // kubeconfig.
-        LOG.info("kubeconfig: \n{}", com.cloudcheflabs.dataroaster.common.util.FileUtils.fileToString(kubeconfigFilePath, false));
-
-        // helm chart kubernetes client.
-        HelmChartClient helmChartClient = new HelmChartClient(new DefaultKubernetesClient());
+        //LOG.info("kubeconfig: \n{}", com.cloudcheflabs.dataroaster.common.util.FileUtils.fileToString(kubeconfigFilePath, false));
 
         // queue for helm chart action events.
         BlockingQueue<HelmChartActionEvent> queue = new LinkedBlockingQueue<>(10);
@@ -52,7 +49,7 @@ public class HelmOperator {
         LOG.info("helm chart queue consumer started...");
 
         // start helm chart watcher.
-        new Thread(new HelmChartWatchRunnable(helmChartClient, queue)).start();
+        new Thread(new HelmChartWatchRunnable(queue)).start();
         LOG.info("helm chart watcher started...");
 
         LOG.info("helm operator is running now...");
