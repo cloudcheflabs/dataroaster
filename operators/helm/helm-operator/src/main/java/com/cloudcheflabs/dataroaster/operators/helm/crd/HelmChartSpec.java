@@ -11,7 +11,6 @@ public class HelmChartSpec implements KubernetesResource {
 
     private String repo;
     private String chartName;
-    private String action;
     private String name;
     private String version;
     private String namespace;
@@ -31,14 +30,6 @@ public class HelmChartSpec implements KubernetesResource {
 
     public void setChartName(String chartName) {
         this.chartName = chartName;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
     }
 
     public String getName() {

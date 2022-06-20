@@ -26,12 +26,6 @@ spec:
                   type: string
                 chartName:
                   type: string
-                action:
-                  type: string
-                  enum:
-                    - install
-                    - upgrade
-                    - uninstall
                 name:
                   type: string
                 version:

@@ -6,7 +6,6 @@ metadata:
 spec:
   repo: https://cloudcheflabs.github.io/mysql-helm-repo/
   chartName: dataroaster-trino-gateway-mysql
-  action: install
   name: mysql
   version: v1.0.0
   namespace: trino-gateway
