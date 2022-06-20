@@ -73,7 +73,7 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
             com.cloudcheflabs.dataroaster.common.util.FileUtils.stringToFile(values, valuesFilePath, false);
             LOG.info("custom-values.yaml: \n{}", com.cloudcheflabs.dataroaster.common.util.FileUtils.fileToString(valuesFilePath, false));
         }
-        
+
         StringBuffer cmd = new StringBuffer();
         cmd.append("helm repo add ").append(chartName).append(" ").append(spec.getRepo()).append("\n");;
         cmd.append("helm repo update").append("\n").append("\n");;

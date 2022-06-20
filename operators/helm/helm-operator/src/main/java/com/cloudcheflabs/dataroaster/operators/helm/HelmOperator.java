@@ -26,7 +26,7 @@ public class HelmOperator {
         //LOG.info("token: {}", token);
 
         // kubeconfig file path.
-        String kubeConfigDir = System.getProperty("user.home") + "/.kube/config";
+        String kubeConfigDir = System.getProperty("user.home") + "/.kube";
         FileUtils.createDirectory(kubeConfigDir);
         String kubeconfigFilePath = kubeConfigDir + "/config";
 
