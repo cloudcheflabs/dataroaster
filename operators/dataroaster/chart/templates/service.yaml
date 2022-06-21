@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino-gateway-proxy-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: trino-gateway
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.trino.proxy.port }}
+      targetPort: proxy
+      protocol: TCP
+      name: trino-gateway-proxy
+  selector:
+    app: trino-gateway
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino-gateway-rest-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: trino-gateway
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.server.port }}
+      targetPort: rest
+      protocol: TCP
+      name: trino-gateway-rest
+  selector:
+    app: trino-gateway
