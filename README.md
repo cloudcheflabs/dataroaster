@@ -1122,6 +1122,12 @@ DataRoaster Trino Gateway is used to route the trino queries dynamically to down
 See [DataRoaster Trino Gateway](https://github.com/cloudcheflabs/dataroaster/tree/master/trino-ecosystem/trino-gateway) for more details.
 
 
+## DataRoaster Helm Operator
+DataRoaster Helm Operator is used to install / upgrade / uninstall applications of helm charts easily.
+
+See [DataRoaster Helm Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/helm) for more details.
+
+
 ## Community
 
 * DataRoaster Community Mailing Lists: https://groups.google.com/g/dataroaster
