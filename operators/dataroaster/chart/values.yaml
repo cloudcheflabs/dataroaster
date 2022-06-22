@@ -1,7 +1,7 @@
-namespace: trino-gateway
-serviceAccount: trino-gateway
-image: cloudcheflabs/trino-gateway:v1.0.1
+serviceAccount: dataroaster-operator
+image: cloudcheflabs/dataroaster-operator:3.3.0
 imagePullPolicy: Always
+replicas: 1
 resources:
   requests:
     cpu: 200m
@@ -16,35 +16,14 @@ tolerations: null
 nodeSelector: null
 hostNetwork: false
 
-# ingress.
-ingress:
-  ingressClassName: nginx
-  proxyHostName: trino-gateway-proxy-test.cloudchef-labs.com
-  restHostName: trino-gateway-rest-test.cloudchef-labs.com
-
-# cert-manager.
-certManager:
-  clusterIssue: letsencrypt-prod
-
 # spring boot server
 server:
-  port: 8099
-# trino proxy
-trino:
-  proxy:
-    port: 18080
-    authentication: true
-    tls:
-      enabled: false
-      keystorePath: /home/opc/keystore.jks
-      keystorePass: changeit
-      trustStorePath: /home/opc/.keystore
-      trustStorePass: changeit
+  port: 8089
+
 # jdbc
 jdbc:
-  url: jdbc:mysql://mysql-service.trino-gateway.svc:3306/trino_proxy?useSSL=false
-  user: trino
-  pass: Trino123!
+  user: admin
+  pass: Admin123!
 
 # hibernate
 hibernate:

@@ -1,19 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: trino-gateway
+  name: dataroaster-operator
   labels:
-    app: trino-gateway
-  namespace: {{ .Values.namespace }}
+    app: dataroaster-operator
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: trino-gateway
+      app: dataroaster-operator
   template:
     metadata:
       labels:
-        app: trino-gateway
+        app: dataroaster-operator
       annotations:
       {{- toYaml $.Values.tolerations | nindent 8 }}
     spec:
@@ -29,28 +28,25 @@ spec:
       hostNetwork: {{ .Values.hostNetwork }}
       serviceAccountName: {{ .Values.serviceAccount }}
       containers:
-        - name: trino-gateway
+        - name: dataroaster-operator
           image: {{ .Values.image }}
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           resources: 
           {{- toYaml $.Values.resources | nindent 12 }}
           command:
-            - "./run-trino-gateway.sh"
+            - "./run-dataroaster-operator.sh"
           volumeMounts:
-            - name: trino-gateway-volume
-              mountPath: /opt/trino-gateway/conf/application.properties
+            - name: dataroaster-operator-volume
+              mountPath: /opt/dataroaster-operator/conf/application.properties
               subPath: application.properties
-            - name: trino-gateway-volume
-              mountPath: /opt/trino-gateway/conf/application-prod.yml
+            - name: dataroaster-operator-volume
+              mountPath: /opt/dataroaster-operator/conf/application-prod.yml
               subPath: application-prod.yml
           ports:
-            - name: proxy
-              containerPort: {{ .Values.trino.proxy.port }}
-              protocol: TCP
             - name: rest
               containerPort: {{ .Values.server.port }}
               protocol: TCP
       volumes:
-        - name: trino-gateway-volume
+        - name: dataroaster-operator-volume
           configMap:
-            name: trino-gateway
+            name: dataroaster-operator

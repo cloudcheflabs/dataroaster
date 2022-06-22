@@ -1,6 +1,18 @@
-
 apiVersion: v2
-name: dataroaster-trino-gateway
-version: v1.0.3
-appVersion: v1.0.1
-description: dataroaster trino gateway
+name: dataroaster-operator
+version: v1.0.0
+appVersion: 3.3.0
+description: dataroaster operator
+
+dependencies:
+  - name: dataroaster-helm-operator
+    version: v1.0.0
+    repository: https://cloudcheflabs.github.io/helm-operator-helm-repo/
+
+  - name: dataroaster-trino-operator
+    version: v1.0.0
+    repository: https://cloudcheflabs.github.io/trino-helm-repo/
+
+  - name: dataroaster-spark-operator
+    version: v1.0.0
+    repository: https://cloudcheflabs.github.io/helm-repository/

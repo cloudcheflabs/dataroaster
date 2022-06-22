@@ -1,10 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: trino-gateway
-  namespace: {{ .Values.namespace }}
+  name: dataroaster-operator
   labels:
-    app: trino-gateway
+    app: dataroaster-operator
 data:
   application.properties: |
     spring.profiles.active=@api.spring.profiles.active@
@@ -14,21 +13,10 @@ data:
       port: {{ .Values.server.port }}
       servlet:
         context-path: /
-    # trino proxy
-    trino:
-      proxy:
-        port: {{ .Values.trino.proxy.port }}
-        authentication: {{ .Values.trino.proxy.authentication }}
-        tls:
-          enabled: {{ .Values.trino.proxy.tls.enabled }}
-          keystorePath: {{ .Values.trino.proxy.tls.keystorePath }}
-          keystorePass: {{ .Values.trino.proxy.tls.keystorePass }}
-          trustStorePath: {{ .Values.trino.proxy.tls.trustStorePath }}
-          trustStorePass: {{ .Values.trino.proxy.tls.trustStorePass }}
     # jdbc
     jdbc:
       driverClassName: com.mysql.jdbc.Driver
-      url: {{ .Values.jdbc.url }}
+      url: {{ template "jdbc.url" . }}
       user: {{ .Values.jdbc.user }}
       pass: {{ .Values.jdbc.pass }}  
     # hibernate
