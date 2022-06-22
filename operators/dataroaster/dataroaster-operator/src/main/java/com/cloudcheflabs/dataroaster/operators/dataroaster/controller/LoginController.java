@@ -50,7 +50,7 @@ public class LoginController {
         return ControllerUtils.doProcess(Roles.ROLE_USER, context, () -> {
             String user = params.get("user");
             String password = params.get("password");
-            LOG.info("password: [{}]", password);
+            //LOG.info("password: [{}]", password);
 
             Users users = usersService.findOne(user);
             if(users != null) {

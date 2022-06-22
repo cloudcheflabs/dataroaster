@@ -64,7 +64,7 @@ public class CustomResourceController {
             LOG.info("decodedYaml: \n{}", decodedYaml);
 
             // create custom resource on kubernetes.
-            CustomResource customResource = CustomResourceUtils.fromYaml(yaml);
+            CustomResource customResource = CustomResourceUtils.fromYaml(decodedYaml);
             k8sResourceService.createCustomResource(customResource);
 
             return ControllerUtils.successMessage();
