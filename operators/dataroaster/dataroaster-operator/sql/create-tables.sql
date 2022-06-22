@@ -22,7 +22,7 @@ create table if not exists dataroaster.users
 -- user token
 create table if not exists dataroaster.user_token
 (
-    `token`  varchar(1000) NOT NULL,
+    `token`  varchar(200) NOT NULL,
     `expiration` bigint(11) unsigned NOT NULL,
     `user`  varchar(100) NOT NULL,
     PRIMARY KEY (`token`)
