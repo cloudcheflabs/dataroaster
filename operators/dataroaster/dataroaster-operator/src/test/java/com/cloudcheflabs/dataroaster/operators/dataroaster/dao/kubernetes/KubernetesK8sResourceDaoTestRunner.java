@@ -23,7 +23,7 @@ public class KubernetesK8sResourceDaoTestRunner extends SpringBootTestRunnerBase
     @BeforeClass
     public static void setup() throws Exception {
         init();
-        k8sResourceDao = applicationContext.getBean(K8sResourceDao.class);
+        k8sResourceDao = applicationContext.getBean("kubernetesK8sResourceDao", K8sResourceDao.class);
         kubernetesClient = applicationContext.getBean(KubernetesClient.class);
     }
 
