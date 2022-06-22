@@ -14,7 +14,7 @@ public class RandomUtils {
 
     public static String randomPassword() {
         String randomText = randomText();
-        String encodedString = Base64.getEncoder().encodeToString(randomText);
+        String encodedString = Base64.getEncoder().encodeToString(randomText.getBytes());
 
         return encodedString;
     }
