@@ -29,3 +29,10 @@ jdbc:
 hibernate:
   show_sql: false
   globally_quoted_identifiers: true
+
+# dependency
+dependency:
+  dataroaster-trino-operator:
+    namespace: trino-operator
+  dataroaster-spark-operator:
+    namespace: spark-operator
