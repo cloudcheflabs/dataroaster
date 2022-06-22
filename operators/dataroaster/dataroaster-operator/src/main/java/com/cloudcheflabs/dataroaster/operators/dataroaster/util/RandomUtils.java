@@ -7,7 +7,7 @@ import java.util.Random;
 public class RandomUtils {
 
     public static String randomText() {
-        byte[] array = new byte[20];
+        byte[] array = new byte[10];
         new Random().nextBytes(array);
         return new String(array);
     }
