@@ -9,6 +9,7 @@ import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.Users;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.util.BCryptUtils;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.util.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.catalina.User;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.slf4j.Logger;
@@ -20,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 public class LoginController {
@@ -54,19 +57,34 @@ public class LoginController {
                 String bcryptedPassword = users.getPassword();
                 boolean isMatched = BCryptUtils.isMatched(password, bcryptedPassword);
                 if(isMatched) {
-                    // create token and save it with expiration.
-                    String newToken = TokenUtils.newToken();
-                    DateTime dt = new DateTime(DateTimeUtils.currentTimeMillis()).plusHours(UserToken.EXPIRATION_IN_HOUR);
-                    long expiration = dt.getMillis();
+                    Set<UserToken> userTokenSet = users.getUserTokenSet();
+                    String token = null;
+                    long expiration = -1;
 
-                    UserToken userToken = new UserToken();
-                    userToken.setToken(newToken);
-                    userToken.setExpiration(expiration);
-                    userToken.setUsers(users);
-                    userTokenService.create(userToken);
+                    if(userTokenSet.size() == 0) {
+                        // create token and save it with expiration.
+                        UserToken userToken = createNewToken(users, userTokenService);
+                        token = userToken.getToken();
+                        expiration = userToken.getExpiration();
+                    } else {
+                        long now = DateTimeUtils.currentTimeMillis();
+                        UserToken userTokenTemp = Arrays.asList(userTokenSet.toArray(new UserToken[0])).get(0);
+                        long expirationTemp = userTokenTemp.getExpiration();
+                        if(now > expirationTemp) {
+                            userTokenService.delete(userTokenTemp);
+                            
+                            // create new one.
+                            UserToken userToken = createNewToken(users, userTokenService);
+                            token = userToken.getToken();
+                            expiration = userToken.getExpiration();
+                        } else {
+                            token = userTokenTemp.getToken();
+                            expiration = userTokenTemp.getExpiration();
+                        }
+                    }
 
                     Map<String, Object> map = new HashMap<>();
-                    map.put("token", newToken);
+                    map.put("token", token);
                     map.put("expiration", new DateTime(expiration).toString());
 
                     return JsonUtils.toJson(mapper, map);
@@ -77,5 +95,19 @@ public class LoginController {
                 throw new IllegalStateException("user [" + user + "] does not exist!");
             }
         });
+    }
+
+    private static UserToken createNewToken(Users users, UserTokenService userTokenService) {
+        String newToken = TokenUtils.newToken();
+        DateTime dt = new DateTime(DateTimeUtils.currentTimeMillis()).plusHours(UserToken.EXPIRATION_IN_HOUR);
+        long expiration = dt.getMillis();
+
+        UserToken userToken = new UserToken();
+        userToken.setToken(newToken);
+        userToken.setExpiration(expiration);
+        userToken.setUsers(users);
+        userTokenService.create(userToken);
+
+        return userToken;
     }
 }
