@@ -13,7 +13,7 @@ flush privileges;
 create table if not exists dataroaster.users
 (
     `user`  varchar(100) NOT NULL,
-    `password`  varchar(1000) NOT NULL
+    `password`  varchar(1000) NOT NULL,
     PRIMARY KEY (`user`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -24,7 +24,7 @@ create table if not exists dataroaster.user_token
 (
     `token`  varchar(1000) NOT NULL,
     `expiration` bigint(11) unsigned NOT NULL,
-    `user`  varchar(100) NOT NULL
+    `user`  varchar(100) NOT NULL,
     PRIMARY KEY (`token`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
