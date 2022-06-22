@@ -52,4 +52,5 @@ public class KubernetesK8sResourceDaoTestRunner extends SpringBootTestRunnerBase
             LOG.info("crd selected: \n{}", YamlUtils.objectToYaml(selectedCRD));
         }
     }
+
 }
