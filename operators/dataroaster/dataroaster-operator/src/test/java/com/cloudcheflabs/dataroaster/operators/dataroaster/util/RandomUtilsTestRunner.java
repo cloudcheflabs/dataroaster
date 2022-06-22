@@ -11,6 +11,9 @@ public class RandomUtilsTestRunner {
     @Test
     public void random() throws Exception {
 
-        LOG.info("random base64 encoded: [{}]", RandomUtils.randomPassword());
+        String random = RandomUtils.randomPassword();
+        LOG.info("random: [{}]", random);
+
+        LOG.info("bcrypted: [{}]", BCryptUtils.encodeWithBCrypt(random));
     }
 }
