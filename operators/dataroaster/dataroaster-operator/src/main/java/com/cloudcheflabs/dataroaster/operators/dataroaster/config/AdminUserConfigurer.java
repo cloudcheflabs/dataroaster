@@ -20,12 +20,12 @@ public class AdminUserConfigurer {
 
     @Bean
     public String createAdminUser() {
-        String randomPassword = RandomUtils.randomPassword();
-        LOG.info("randomly generated password for user 'admin': {}", randomPassword);
-        String bcryptedPassword = BCryptUtils.encodeWithBCrypt(randomPassword);
-
         Users users = usersService.findOne("admin");
         if(users == null) {
+            String randomPassword = RandomUtils.randomPassword();
+            LOG.info("randomly generated password for user 'admin': {}", randomPassword);
+            String bcryptedPassword = BCryptUtils.encodeWithBCrypt(randomPassword);
+
             users = new Users();
             users.setUser("admin");
             users.setPassword(bcryptedPassword);
