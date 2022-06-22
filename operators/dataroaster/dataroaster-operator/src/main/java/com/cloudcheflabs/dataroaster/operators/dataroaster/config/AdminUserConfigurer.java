@@ -22,16 +22,18 @@ public class AdminUserConfigurer {
     public String createAdminUser() {
         String randomPassword = RandomUtils.randomPassword();
         LOG.info("randomly generated password for user 'admin': {}", randomPassword);
-
         String bcryptedPassword = BCryptUtils.encodeWithBCrypt(randomPassword);
 
-        Users users = new Users();
-        users.setUser("admin");
-        users.setPassword(bcryptedPassword);
+        Users users = usersService.findOne("admin");
+        if(users == null) {
+            users = new Users();
+            users.setUser("admin");
+            users.setPassword(bcryptedPassword);
+            usersService.create(users);
+            LOG.info("user admin created.");
+        }
 
-        usersService.create(users);
-
-        return "admin user created";
+        return "admin user created if not already exist";
     }
 
 
