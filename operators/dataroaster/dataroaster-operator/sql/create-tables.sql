@@ -37,7 +37,7 @@ ALTER TABLE `dataroaster`.`user_token`
 -- custom resource
 create table if not exists dataroaster.custom_resource
 (
-    `id` varchar(1000) NOT NULL,
+    `id` varchar(200) NOT NULL,
     `kind`  varchar(100) NOT NULL,
     `name`  varchar(100) NOT NULL,
     `namespace`  varchar(100) NOT NULL,
