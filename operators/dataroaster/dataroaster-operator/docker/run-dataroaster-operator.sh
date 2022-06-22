@@ -2,11 +2,11 @@
 
 set -eux;
 
-# run trino gateway spring boot application.
+# run dataroaster operator spring boot application.
 java \
--cp trino-gateway-*.jar \
--Dloader.path=/opt/trino-gateway/ \
--Dspring.config.location=file:///opt/trino-gateway/conf/application.properties \
--Dspring.config.location=file:///opt/trino-gateway/conf/application-prod.yml \
+-cp dataroaster-operator-*.jar \
+-Dloader.path=/opt/dataroaster-operator/ \
+-Dspring.config.location=file:///opt/dataroaster-operator/conf/application.properties \
+-Dspring.config.location=file:///opt/dataroaster-operator/conf/application-prod.yml \
 -Dspring.profiles.active=prod \
 org.springframework.boot.loader.PropertiesLauncher

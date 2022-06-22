@@ -12,27 +12,27 @@ RUN set -eux; \
     yum install java-11-openjdk java-11-openjdk-devel -y;
 
 
-# install trino gateway.
-ENV TRINO_GATEWAY_HOME /opt/trino-gateway
-ENV TRINO_GATEWAY_USER trino
+# install dataroaster operator.
+ENV DATAROASTER_OPERATOR_HOME /opt/dataroaster-operator
+ENV DATAROASTER_OPERATOR_USER dataroaster
 
-RUN useradd -ms /bin/bash -d ${TRINO_GATEWAY_HOME} ${TRINO_GATEWAY_USER}
+RUN useradd -ms /bin/bash -d ${DATAROASTER_OPERATOR_HOME} ${DATAROASTER_OPERATOR_USER}
 
 
-# add trino gateway jar.
-ARG TRINO_GATEWAY_JAR
-ADD ${TRINO_GATEWAY_JAR} ${TRINO_GATEWAY_HOME}
+# add dataroaster operator jar.
+ARG DATAROASTER_OPERATOR_JAR
+ADD ${DATAROASTER_OPERATOR_JAR} ${DATAROASTER_OPERATOR_HOME}
 
 # make conf directory.
-RUN mkdir -p ${TRINO_GATEWAY_HOME}/conf
+RUN mkdir -p ${DATAROASTER_OPERATOR_HOME}/conf
 
-# add trino run shell.
-ADD run-trino-gateway.sh ${TRINO_GATEWAY_HOME}
+# add dataroaster operator run shell.
+ADD run-dataroaster-operator.sh ${DATAROASTER_OPERATOR_HOME}
 
 # add permissions.
-RUN chmod +x ${TRINO_GATEWAY_HOME}/*.sh
-RUN chown ${TRINO_GATEWAY_USER}: -R ${TRINO_GATEWAY_HOME}
+RUN chmod +x ${DATAROASTER_OPERATOR_HOME}/*.sh
+RUN chown ${DATAROASTER_OPERATOR_USER}: -R ${DATAROASTER_OPERATOR_HOME}
 
 # change work directory.
-USER ${TRINO_GATEWAY_USER}
-WORKDIR ${TRINO_GATEWAY_HOME}
+USER ${DATAROASTER_OPERATOR_USER}
+WORKDIR ${DATAROASTER_OPERATOR_HOME}
