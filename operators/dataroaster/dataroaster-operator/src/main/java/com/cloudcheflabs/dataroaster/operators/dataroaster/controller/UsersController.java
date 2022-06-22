@@ -1,8 +1,10 @@
 package com.cloudcheflabs.dataroaster.operators.dataroaster.controller;
 
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
+import com.cloudcheflabs.dataroaster.operators.dataroaster.api.service.UserTokenService;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.api.service.UsersService;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.Roles;
+import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.UserToken;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.Users;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.util.BCryptUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,10 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class UsersController {
@@ -31,6 +30,10 @@ public class UsersController {
     @Autowired
     @Qualifier("usersServiceImpl")
     private UsersService usersService;
+
+    @Autowired
+    @Qualifier("userTokenServiceImpl")
+    private UserTokenService userTokenService;
 
 
     @PostMapping("/v1/users/create")
@@ -76,7 +79,12 @@ public class UsersController {
     public String delete(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
             String user = params.get("user");
-            usersService.deleteById(user);
+            Users users = usersService.findOne(user);
+            Set<UserToken> userTokenSet = users.getUserTokenSet();
+            for(UserToken userToken : userTokenSet) {
+                userTokenService.delete(userToken);
+            }
+            usersService.delete(users);
             return ControllerUtils.successMessage();
         });
     }
