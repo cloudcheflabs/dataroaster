@@ -7,6 +7,8 @@ import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.CustomRe
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 @Transactional
 public class HibernateCustomResourceDao extends AbstractHibernateDao<CustomResource> implements CustomResourceDao {
@@ -14,5 +16,16 @@ public class HibernateCustomResourceDao extends AbstractHibernateDao<CustomResou
     public HibernateCustomResourceDao() {
         super();
         setClazz(CustomResource.class);
+    }
+
+    @Override
+    public CustomResource findCustomResource(String name, String namespace, String kind) {
+        List<CustomResource> list = getCurrentSession()
+                .createQuery("from " + clazz.getName() + " where name = :name and namespace = :namespace and kind = :kind")
+                .setParameter("name", name)
+                .setParameter("namespace", namespace)
+                .setParameter("kind", kind).list();
+
+        return (list.size() > 0) ? list.get(0) : null;
     }
 }

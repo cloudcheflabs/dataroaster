@@ -5,4 +5,6 @@ import com.cloudcheflabs.dataroaster.operators.dataroaster.api.dao.common.Operat
 import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.CustomResource;
 
 public interface CustomResourceDao extends Operations<CustomResource> {
+
+    CustomResource findCustomResource(String name, String namespace, String kind);
 }

@@ -54,8 +54,11 @@ public class CustomResourceController {
     @PutMapping("/v1/cr/update")
     public String update(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
+            String yaml = params.get("yaml");
 
-            // TODO
+            // create custom resource on kubernetes.
+            CustomResource customResource = CustomResourceUtils.fromYaml(yaml);
+            k8sResourceService.createCustomResource(customResource);
 
             return ControllerUtils.successMessage();
         });
@@ -65,9 +68,10 @@ public class CustomResourceController {
     @DeleteMapping("/v1/cr/delete")
     public String delete(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
-
-            // TODO
-
+            String name = params.get("name");
+            String namespace = params.get("namespace");
+            String kind = params.get("kind");
+            k8sResourceService.deleteCustomResource(name, namespace, kind);
             return ControllerUtils.successMessage();
         });
     }

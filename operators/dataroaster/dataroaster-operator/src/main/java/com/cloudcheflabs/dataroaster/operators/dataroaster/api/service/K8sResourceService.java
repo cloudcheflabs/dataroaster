@@ -6,7 +6,7 @@ public interface K8sResourceService {
 
     void createCustomResource(CustomResource customResource);
 
-    void deleteCustomResource(String name, String namespace);
+    void deleteCustomResource(String name, String namespace, String kind);
 
     void updateCustomResource(CustomResource customResource);
 }
