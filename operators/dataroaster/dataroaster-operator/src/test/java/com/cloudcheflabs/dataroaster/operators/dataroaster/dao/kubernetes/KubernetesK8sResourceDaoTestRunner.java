@@ -2,6 +2,7 @@ package com.cloudcheflabs.dataroaster.operators.dataroaster.dao.kubernetes;
 
 import com.cloudcheflabs.dataroaster.operators.dataroaster.api.dao.K8sResourceDao;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.test.SpringBootTestRunnerBase;
+import com.cloudcheflabs.dataroaster.operators.dataroaster.util.YamlUtils;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinitionList;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinitionSpec;
@@ -42,13 +43,13 @@ public class KubernetesK8sResourceDaoTestRunner extends SpringBootTestRunnerBase
             String kind = spec.getNames().getKind();
             LOG.info("group: [{}], kind: [{}]", group, kind);
 
-            if(group.contains("cloudchef-labs.com") && kind.equals("")) {
+            if(group.contains("cloudchef-labs.com") && kind.equals("TrinoCluster")) {
                 selectedCRD = crd;
                 break;
             }
         }
-        if(selectedCRD == null) {
-            // CRD not found exception thrown!
+        if(selectedCRD != null) {
+            LOG.info("crd selected: \n{}", YamlUtils.objectToYaml(selectedCRD));
         }
     }
 }

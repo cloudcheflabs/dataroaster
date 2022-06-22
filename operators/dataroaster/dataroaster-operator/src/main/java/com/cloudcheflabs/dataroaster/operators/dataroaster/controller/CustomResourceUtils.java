@@ -14,9 +14,9 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
 
-public class YamlUtils {
+public class CustomResourceUtils {
 
-    private static Logger LOG = LoggerFactory.getLogger(YamlUtils.class);
+    private static Logger LOG = LoggerFactory.getLogger(CustomResourceUtils.class);
 
     public static CustomResource fromYaml(String yamlContents) {
 
