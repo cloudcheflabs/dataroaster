@@ -32,7 +32,7 @@ hibernate:
 
 # dependency
 dependency:
-  dataroaster-trino-operator:
+  "dataroaster-trino-operator":
     namespace: trino-operator
-  dataroaster-spark-operator:
+  "dataroaster-spark-operator":
     namespace: spark-operator
