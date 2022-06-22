@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{ .Values.dependency.'dataroaster-trino-operator'.namespace }}
+  name: {{ .Values.dependency.trinoOperator.namespace }}
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{ .Values.dependency.'dataroaster-spark-operator'.namespace }}
+  name: {{ .Values.dependency.sparkOperator.namespace }}
