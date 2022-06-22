@@ -1,4 +1,0 @@
-namespace: {{ jenkinsNamespace }}
-ingress:
-  host: {{ jenkinsIngressHost }}
-storageClass: {{ storageClass }}

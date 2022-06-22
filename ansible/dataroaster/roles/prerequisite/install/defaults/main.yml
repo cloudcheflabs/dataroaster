@@ -1,9 +1,0 @@
-dataroaster_exec_user: dataroaster
-dataroaster_home_dir: /opt/dataroaster
-
-prerequisite_helm_temp_dir: /tmp/helm
-prerequisite_helm_version: 3.6.2
-
-prerequisite_maven_home_dir: /opt/maven
-prerequisite_maven_version: 3.8.4
-prerequisite_maven_profile: /etc/profile.d/maven.sh

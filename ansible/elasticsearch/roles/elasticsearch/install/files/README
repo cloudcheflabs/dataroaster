@@ -1,4 +1,0 @@
-NOTE: the following files of elasticsearch stack must be downloaded on this directory.
-
-- elasticsearch: curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.12.1-linux-x86_64.tar.gz
-- kibana: curl -L -O https://artifacts.elastic.co/downloads/kibana/kibana-7.12.1-linux-x86_64.tar.gz

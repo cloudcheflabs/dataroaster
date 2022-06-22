@@ -1,7 +1,0 @@
-mysql_vault_user: dataroaster
-mysql_vault_password: dataroaster123
-
-mysql_dataroaster_user: dataroaster
-mysql_dataroaster_password: dataroaster123
-
-mysql_temp_dir: /tmp/mysql

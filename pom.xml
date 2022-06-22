@@ -10,10 +10,7 @@
     <name>DataRoaster: Parent</name>
     <modules>
         <module>common</module>
-        <module>api-server</module>
-		<module>authorizer</module>
-        <module>cli</module>
-        <module>components/hive/spark-thrift-server</module>
+         <module>components/hive/spark-thrift-server</module>
         <module>operators/dataroaster/dataroaster-operator</module>
         <module>operators/helm/helm-operator</module>
         <module>operators/spark/spark-operator</module>

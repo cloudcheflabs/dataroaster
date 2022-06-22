@@ -1,7 +1,0 @@
-es_home: /opt/elasticsearch
-es_data_dir:
-  - /data01/es/data
-es_log_dir: /data01/es/log
-
-kibana_home: /opt/kibana
-kibana_data_dir: /data01/kibana

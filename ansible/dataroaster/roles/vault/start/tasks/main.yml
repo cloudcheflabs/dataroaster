@@ -1,5 +1,0 @@
-- name: start vault
-  service:
-    name: vault
-    state: started
-  become: true

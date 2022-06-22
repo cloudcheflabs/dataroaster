@@ -1,2 +1,0 @@
-prerequisite_maven_home_dir: /opt/maven
-prerequisite_maven_profile: /etc/profile.d/maven.sh

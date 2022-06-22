@@ -1,3 +1,0 @@
-namespace: {{ filebeatNamespace }}
-logstash:
-  namespace: {{ logstashNamespace }}

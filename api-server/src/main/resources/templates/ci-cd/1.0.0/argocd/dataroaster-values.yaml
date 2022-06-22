@@ -1,4 +1,0 @@
-namespace: {{ argocdNamespace }}
-ingress:
-  host: {{ argocdIngressHost }}
-storageClass: {{ storageClass }}

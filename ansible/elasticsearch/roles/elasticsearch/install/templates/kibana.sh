@@ -1,1 +1,0 @@
-export KIBANA_HOME={{ kibana_home }}

@@ -1,9 +1,0 @@
-dataroaster_version: 3.0.0
-dataroaster_home_dir: /opt/dataroaster
-dataroaster_log_dir: /data/dataroaster/logs
-dataroaster_exec_user: dataroaster
-
-authorizer_home_dir: "{{ dataroaster_home_dir }}/authorizer"
-
-mysql_dataroaster_user: dataroaster
-mysql_dataroaster_password: dataroaster123

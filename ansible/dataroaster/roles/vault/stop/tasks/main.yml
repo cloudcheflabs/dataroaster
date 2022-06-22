@@ -1,5 +1,0 @@
-- name: stop vault
-  service:
-    name: vault
-    state: stopped
-  become: true

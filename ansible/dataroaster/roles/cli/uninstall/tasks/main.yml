@@ -1,8 +1,0 @@
-- name: delete cli
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - "{{ cli_binary }}"
-  become: true
-  ignore_errors: true
