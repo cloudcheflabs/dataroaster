@@ -73,6 +73,13 @@ randomly generated password for user 'admin': 9a87f65688a64e999e62c8c308509708
 `9a87f65688a64e999e62c8c308509708` is the temporary admin password which can be used for the first time and should be changed in the future.
 
 
+To access DataRoaster from local, port-forward the service of `dataroaster-operator-service`.
+
+```
+kubectl port-forward svc/dataroaster-operator-service 8089 -n dataroaster-operator;
+```
+
+
 ## REST API
 
 ### Login
