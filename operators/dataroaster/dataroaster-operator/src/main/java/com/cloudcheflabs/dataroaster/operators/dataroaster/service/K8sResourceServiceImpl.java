@@ -5,7 +5,9 @@ import com.cloudcheflabs.dataroaster.operators.dataroaster.api.dao.CustomResourc
 import com.cloudcheflabs.dataroaster.operators.dataroaster.api.dao.K8sResourceDao;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.api.service.K8sResourceService;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.CustomResource;
-import jdk.internal.org.jline.utils.Log;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class K8sResourceServiceImpl implements K8sResourceService {
+
+    private static Logger LOG = LoggerFactory.getLogger(K8sResourceServiceImpl.class);
 
     @Autowired
     @Qualifier("kubernetesK8sResourceDao")
@@ -37,7 +41,7 @@ public class K8sResourceServiceImpl implements K8sResourceService {
         if(retCustomResource != null) {
             customResourceDao.delete(retCustomResource);
         } else {
-            Log.warn("custom resource [{}] not found in db!", name);
+            LOG.warn("custom resource [{}] not found in db!", name);
         }
     }
 
@@ -48,7 +52,7 @@ public class K8sResourceServiceImpl implements K8sResourceService {
         CustomResource retCustomResource = customResourceDao
                 .findCustomResource(customResource.getName(), customResource.getNamespace(), customResource.getKind());
         if(retCustomResource == null) {
-            Log.warn("customResource [{}] not found in db!", JsonUtils.toJson(customResource));
+            LOG.warn("customResource [{}] not found in db!", JsonUtils.toJson(customResource));
             customResourceDao.create(customResource);
         } else {
             retCustomResource.setYaml(customResource.getYaml());

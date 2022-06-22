@@ -9,12 +9,13 @@ public class RandomUtils {
     public static String randomText() {
         byte[] array = new byte[20];
         new Random().nextBytes(array);
-        return new String(array, Charset.forName("UTF-8"));
+        return new String(array);
     }
 
     public static String randomPassword() {
         String randomText = randomText();
-        String encodedString = Base64.getEncoder().encodeToString(randomText.getBytes());
+        String bcrypted = BCryptUtils.encodeWithBCrypt(randomText);
+        String encodedString = Base64.getEncoder().encodeToString(bcrypted.getBytes());
 
         return encodedString;
     }
