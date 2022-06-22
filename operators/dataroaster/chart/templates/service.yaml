@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dataroaster-operator-service
+  labels:
+    app: dataroaster-operator
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.server.port }}
+      targetPort: rest
+      protocol: TCP
+      name: rest
+  selector:
+    app: dataroaster-operator

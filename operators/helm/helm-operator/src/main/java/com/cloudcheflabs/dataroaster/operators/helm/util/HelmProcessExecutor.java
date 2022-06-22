@@ -87,6 +87,9 @@ public class HelmProcessExecutor {
                 LOG.info("abnormal exit, cmd [{}]", cmd);
             }
 
+            // destroy process.
+            this.destroy();
+
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("cmd: [{}], error: [{}]", cmd, e.getMessage());

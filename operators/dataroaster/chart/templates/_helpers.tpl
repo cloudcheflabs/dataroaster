@@ -1,0 +1,1 @@
+{{- define "jdbc.url" -}}jdbc:mysql://mysql-service.{{ .Release.Namespace }}.svc:3306/dataroaster?useSSL=false{{- end -}}

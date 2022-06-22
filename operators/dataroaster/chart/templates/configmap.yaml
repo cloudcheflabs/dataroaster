@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dataroaster-operator
+  labels:
+    app: dataroaster-operator
+data:
+  application.properties: |
+    spring.profiles.active=@api.spring.profiles.active@
+  application-prod.yml: |
+    # spring boot server
+    server:
+      port: {{ .Values.server.port }}
+      servlet:
+        context-path: /
+    # jdbc
+    jdbc:
+      driverClassName: com.mysql.jdbc.Driver
+      url: {{ template "jdbc.url" . }}
+      user: {{ .Values.jdbc.user }}
+      pass: {{ .Values.jdbc.pass }}  
+    # hibernate
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL5Dialect
+      show_sql: {{ .Values.hibernate.show_sql }}  
+      globally_quoted_identifiers: {{ .Values.hibernate.globally_quoted_identifiers }}  

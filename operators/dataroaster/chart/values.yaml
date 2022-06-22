@@ -1,0 +1,38 @@
+serviceAccount: dataroaster-operator
+image: cloudcheflabs/dataroaster-operator:3.3.0
+imagePullPolicy: Always
+replicas: 1
+resources:
+  requests:
+    cpu: 200m
+    memory: 1Gi
+  limits:
+    cpu: 300m
+    memory: 1500Mi
+priorityClassName: ""
+annotations: null
+affinity: null
+tolerations: null
+nodeSelector: null
+hostNetwork: false
+
+# spring boot server
+server:
+  port: 8089
+
+# jdbc
+jdbc:
+  user: admin
+  pass: Admin123!
+
+# hibernate
+hibernate:
+  show_sql: false
+  globally_quoted_identifiers: true
+
+# dependency
+dependency:
+  trinoOperator:
+    namespace: trino-operator
+  sparkOperator:
+    namespace: spark-operator

@@ -1,0 +1,17 @@
+# spring boot server
+server:
+  port: 8089
+  servlet:
+    context-path: /
+# jdbc
+jdbc:
+  driverClassName: com.mysql.jdbc.Driver
+  url: jdbc:mysql://localhost:3306/dataroaster?useSSL=false
+  user: admin
+  pass: Admin123!
+
+# hibernate
+hibernate:
+  dialect: org.hibernate.dialect.MySQL5Dialect
+  show_sql: true
+  globally_quoted_identifiers: true
