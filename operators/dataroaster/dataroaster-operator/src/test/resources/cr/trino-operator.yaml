@@ -1,0 +1,13 @@
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: trino-operator
+  namespace: helm-operator
+spec:
+  repo: https://cloudcheflabs.github.io/trino-helm-repo/
+  chartName: dataroaster-trino-operator
+  name: trino-operator
+  version: v1.0.0
+  namespace: trino-operator
+    
+

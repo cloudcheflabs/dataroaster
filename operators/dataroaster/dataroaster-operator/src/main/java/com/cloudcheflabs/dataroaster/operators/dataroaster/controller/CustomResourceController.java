@@ -5,6 +5,7 @@ import com.cloudcheflabs.dataroaster.operators.dataroaster.api.service.CustomRes
 import com.cloudcheflabs.dataroaster.operators.dataroaster.api.service.K8sResourceService;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.Roles;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.CustomResource;
+import com.cloudcheflabs.dataroaster.operators.dataroaster.util.Base64Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +44,11 @@ public class CustomResourceController {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
             String yaml = params.get("yaml");
 
+            String decodedYaml = Base64Utils.decodeBase64(yaml);
+            LOG.info("decodedYaml: \n{}", decodedYaml);
+
             // create custom resource on kubernetes.
-            CustomResource customResource = CustomResourceUtils.fromYaml(yaml);
+            CustomResource customResource = CustomResourceUtils.fromYaml(decodedYaml);
             k8sResourceService.createCustomResource(customResource);
 
             return ControllerUtils.successMessage();
@@ -55,6 +59,9 @@ public class CustomResourceController {
     public String update(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
             String yaml = params.get("yaml");
+
+            String decodedYaml = Base64Utils.decodeBase64(yaml);
+            LOG.info("decodedYaml: \n{}", decodedYaml);
 
             // create custom resource on kubernetes.
             CustomResource customResource = CustomResourceUtils.fromYaml(yaml);
