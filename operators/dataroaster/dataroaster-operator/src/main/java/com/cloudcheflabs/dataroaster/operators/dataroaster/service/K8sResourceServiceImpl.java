@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class KubernetesK8sResourceService implements K8sResourceService {
+public class K8sResourceServiceImpl implements K8sResourceService {
 
     @Autowired
     @Qualifier("kubernetesK8sResourceDao")
