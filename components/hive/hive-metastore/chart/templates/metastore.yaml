@@ -120,7 +120,7 @@ spec:
           image: {{ .Values.image }}
           command: [ "/opt/hive-metastore/bin/schematool" ]
           args: [ "--verbose" ,"-initSchema" , "-dbType", "mysql" , "-userName", "{{ .Values.jdbc.user }}",
-                    "-passWord", "{{ .Values.jdbc.password }}" , "-url", "jdbc:mysql://mysql-service.{{ .Values.namespace }}.svc:3306/metastore_db?createDatabaseIfNotExist=true" ]
+                    "-passWord", "{{ .Values.jdbc.password }}" , "-url", "jdbc:mysql://mysql-service.{{ .Values.namespace }}.svc:3306/metastore_db?createDatabaseIfNotExist=true&useSSL=false" ]
       containers:
         - name: metastore
           image: {{ .Values.image }}
