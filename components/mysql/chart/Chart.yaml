@@ -1,0 +1,7 @@
+apiVersion: v2
+name: dataroaster-mysql
+version: v1.0.1
+appVersion: 5.7
+description: dataroaster mysql.
+
+

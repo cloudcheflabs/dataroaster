@@ -1,0 +1,10 @@
+namespace: hive-metastore
+image: cloudcheflabs/hivemetastore:v3.0.0
+s3:
+  bucket: any-bucket
+  accessKey: any-access-key
+  secretKey: any-secret
+  endpoint: any-endpoint
+jdbc:
+  user: root
+  password: mysqlpass123

@@ -3,7 +3,7 @@
 set -e
 
 REPONAME=cloudcheflabs
-TAG=hivemetastore:v3.0.3
+TAG=hivemetastore:v3.0.0
 
 docker build -t $TAG .
 
