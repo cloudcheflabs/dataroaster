@@ -1,0 +1,18 @@
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: nfs
+  namespace: dataroaster-operator
+spec:
+  repo: https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner/
+  chartName: nfs-server-provisioner
+  name: nfs
+  version: 1.4.0
+  namespace: nfs
+  values: |
+    replicaCount: 1
+    namespace: nfs
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: oci
