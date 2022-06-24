@@ -1,3 +1,0 @@
-namespace: dataroaster-filebeat
-logstash:
-  namespace: dataroaster-logstash

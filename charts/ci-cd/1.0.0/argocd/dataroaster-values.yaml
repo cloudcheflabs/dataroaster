@@ -1,4 +1,0 @@
-namespace: dataroaster-argocd
-ingress:
-  host: argocd-test.cloudchef-labs.com
-storageClass: ceph-rbd-sc

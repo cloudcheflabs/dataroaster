@@ -1,9 +1,0 @@
-namespace: dataroaster-hivemetastore
-s3:
-  bucket: mykidong
-  accessKey: TOW32G9ULH63MTUI6NNW
-  secretKey: jXqViVmSqIDTEKKKzdgSssHVykBrX4RrlnSeVgMi
-  endpoint: https://ceph-rgw-test.cloudchef-labs.com
-jdbc:
-  user: root
-  password: icarus0337

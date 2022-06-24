@@ -1,7 +1,0 @@
-apiVersion: v2
-name: dataroaster-argo-workflow
-version: 1.0.0
-appVersion: 3.0.10
-description: dataroaster hivemetastore mysql.
-
-

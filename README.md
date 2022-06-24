@@ -12,33 +12,6 @@ DataRoaster has a simple architecture. There are several operators in DataRoaste
 
 ## Install DataRoaster
 
-### Install MySQL Server
-MySQL server needs to be installed first.
-```
-helm repo add dataroaster-mysql https://cloudcheflabs.github.io/mysql-helm-repo/
-helm repo update
-
-helm install \
-mysql \
---create-namespace \
---namespace dataroaster-operator \
---version v1.0.1 \
---set storage.storageClass=oci \
-dataroaster-mysql/dataroaster-mysql;
-```
-
-`storage.storageClass` needs to be replaced with storage class of your kubernetes cluster.
-
-
-To create db schema, download db schema file of [create-tables.sql](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/dataroaster/dataroaster-operator/sql/create-tables.sql), and run the following.
-
-
-```
-kubectl exec -it mysql-statefulset-0 -n dataroaster-operator -- mysql -u root -pmysqlpass123 < ./create-tables.sql;
-```
-
-### Install DataRoaster Operator
-
 ```
 helm repo add dataroaster-operator https://cloudcheflabs.github.io/dataroaster-operator-helm-repo/
 helm repo update;
@@ -47,25 +20,17 @@ helm install \
 dataroaster-operator \
 --create-namespace \
 --namespace dataroaster-operator \
---version v1.0.0 \
+--version v2.0.0 \
 dataroaster-operator/dataroaster-operator;
-```
-
-Let's list pods in dataroaster namespace.
-
-```
-kubectl get po -n dataroaster-operator;
-NAME                                   READY   STATUS    RESTARTS   AGE
-dataroaster-operator-5d9c6cbf9-n5nww   1/1     Running   0          12m
-helm-operator-5464cdc75f-z96ld         1/1     Running   0          12m
-mysql-statefulset-0                    1/1     Running   0          8h
 ```
 
 
 You need to copy the randomly generated admin password which will be used to access dataroaster api.
 
 ```
-kubectl logs -f dataroaster-operator-5d9c6cbf9-n5nww -n dataroaster-operator;
+kubectl logs -f $(kubectl get pod -l app=dataroaster-operator -o jsonpath="{.items[0].metadata.name}" -n dataroaster-operator) -n dataroaster-operator | grep "randomly generated password for user";
+
+
 ...
 randomly generated password for user 'admin': 9a87f65688a64e999e62c8c308509708
 ...
@@ -111,14 +76,6 @@ Parameters:
 * `password`: Password.
 
 ```
-# get token.
-curl -XPOST \
-http://localhost:8089/v1/login \
--d  "user=admin" \
--d "password=9a87f65688a64e999e62c8c308509708" > auth.json;
-export ACCESS_TOKEN="$(jq -r '.token' auth.json)";
-
-# request.
 curl -XPOST -H "Authorization: Bearer $ACCESS_TOKEN" \
 http://localhost:8089/v1/users/create \
 -d  "user=user1" \
@@ -132,14 +89,6 @@ Parameters:
 * `password`: Password.
 
 ```
-# get token
-curl -XPOST \
-http://localhost:8089/v1/login \
--d  "user=admin" \
--d "password=9a87f65688a64e999e62c8c308509708" > auth.json;
-export ACCESS_TOKEN="$(jq -r '.token' auth.json)";
-
-# request.
 curl -XPUT -H "Authorization: Bearer $ACCESS_TOKEN" \
 http://localhost:8089/v1/users/update/password \
 -d  "user=admin" \
@@ -151,14 +100,6 @@ http://localhost:8089/v1/users/update/password \
 Parameters: NONE
 
 ```
-# get token.
-curl -XPOST \
-http://localhost:8089/v1/login \
--d  "user=admin" \
--d "password=adminpass" > auth.json;
-export ACCESS_TOKEN="$(jq -r '.token' auth.json)";
-
-# request.
 curl -XGET -H "Authorization: Bearer $ACCESS_TOKEN" \
 http://localhost:8089/v1/users/list ;
 ```
@@ -170,28 +111,192 @@ Parameters:
 * `user`: Username.
 
 ```
-# get token.
-curl -XPOST \
-http://localhost:8089/v1/login \
--d  "user=admin" \
--d "password=adminpass" > auth.json;
-export ACCESS_TOKEN="$(jq -r '.token' auth.json)"; 
-
-# request.
 curl -XDELETE -H "Authorization: Bearer $ACCESS_TOKEN" \
 http://localhost:8089/v1/users/delete \
 -d "user=user1";
 ```
 
 
-### Custom Resource
+### Hive Metastore
 
 #### Create
 Parameters:
-* `yaml`:  Base64 encoded string of custom resource yaml file.
+* `mysql_storage_class`: storage class for mysql.
+* `mysql_storage_size`: mysql storage size in Gi.
+* `yaml`:  base64 encoded string of hive metastore custom resource yaml file.
 
 
-For instance, create trino cluster.
+```
+cat <<EOF > hive-metastore.yaml
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: hive-metastore
+  namespace: dataroaster-operator
+spec:
+  repo: https://cloudcheflabs.github.io/hive-metastore-helm-repo/
+  chartName: dataroaster-hivemetastore
+  name: hive-metastore
+  version: v2.0.0
+  namespace: hive-metastore
+  values: |
+    image: cloudcheflabs/hivemetastore:v3.0.0
+    s3:
+      bucket: any-bucket
+      accessKey: any-access-key
+      secretKey: any-secret-key
+      endpoint: https://any-endpoint
+EOF
+   
+```
+
+
+```
+curl -XPOST -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/hive_metastore/create \
+-d  "mysql_storage_class=standard" \
+-d  "mysql_storage_size=5" \
+-d  "yaml=$(base64 -w 0 ./hive-metastore.yaml)";
+```
+
+
+
+#### List
+Parameters: NONE
+
+```
+curl -XGET -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/hive_metastore/list ;
+```
+
+
+#### Delete
+Parameters: NONE
+
+```
+curl -XDELETE -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/hive_metastore/delete ;
+```
+
+
+### Spark Thrift Server
+
+#### Create
+Parameters:
+* `nfs_storage_class`: storage class for nfs.
+* `nfs_storage_size`: nfs storage size in Gi.
+* `s3_access_key`: s3 access key.
+* `s3_secret_key`: s3 secret key.
+* `yaml`:  base64 encoded string of spark thrift server custom resource yaml file.
+
+
+```
+cat <<EOF > spark-thrift-server.yaml
+apiVersion: "spark-operator.cloudchef-labs.com/v1alpha1"
+kind: SparkApplication
+metadata:
+  name: spark-thrift-server
+  namespace: spark-operator
+spec:
+  core:
+    applicationType: EndlessRun
+    deployMode: Cluster
+    container:
+      image: "cloudcheflabs/spark:v3.0.3"
+      imagePullPolicy: Always
+    class: com.cloudcheflabs.dataroaster.hive.SparkThriftServerRunner
+    applicationFileUrl: "s3a://mykidong/spark-app/spark-thrift-server-3.0.3-spark-job.jar"
+    namespace: spark-thrift-server
+    s3:
+      bucket: mykidong
+      accessKey:
+        valueFrom:
+          secretKeyRef:
+            name: s3-secret
+            key: accessKey
+      secretKey:
+        valueFrom:
+          secretKeyRef:
+            name: s3-secret
+            key: secretKey
+      endpoint: "https://cnobgk2u8blu.compat.objectstorage.ap-seoul-1.oraclecloud.com"
+    hive:
+      metastoreUris:
+        - "thrift://metastore.hive-metastore.svc:9083"
+  driver:
+    serviceAccountName: spark-thrift-server
+    label:
+      application-name: spark-thrift-server-driver
+    resources:
+      cores: "1"
+      limitCores: "1200m"
+      memory: "512m"
+    volumeMounts:
+      - name: driver-local-dir
+        mountPath: "/tmp/local-dir"
+  executor:
+    instances: 1
+    label:
+      application-name: spark-thrift-server-executor
+    resources:
+      cores: "1"
+      limitCores: "1200m"
+      memory: "1g"
+    volumeMounts:
+      - name: executor-local-dir
+        mountPath: "/tmp/local-dir"
+  volumes:
+    - name: driver-local-dir
+      type: SparkLocalDir
+      persistentVolumeClaim:
+        claimName: nfs-pvc-driver
+    - name: executor-local-dir
+      type: SparkLocalDir
+      persistentVolumeClaim:
+        claimName: nfs-pvc-executor
+EOF 
+```
+
+
+```
+curl -XPOST -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/spark_thrift_server/create \
+-d  "nfs_storage_class=standard" \
+-d  "nfs_storage_size=10" \
+-d  "s3_access_key=$(echo -n 'any-access-key' | base64)" \
+-d  "s3_secret_key=$(echo -n 'any-secret-key' | base64)" \
+-d  "pvc_size=1" \
+-d  "yaml=$(base64 -w 0 ./spark-thrift-server.yaml)";
+```
+
+
+
+#### List
+Parameters: NONE
+
+```
+curl -XGET -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/spark_thrift_server/list ;
+```
+
+
+#### Delete
+Parameters: NONE
+
+```
+curl -XDELETE -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/spark_thrift_server/delete ;
+```
+
+
+
+### Trino
+
+#### Create
+Parameters:
+* `yaml`:  base64 encoded string of trino custom resource yaml file.
+
+
 ```
 cat <<EOF > trino-cluster-etl.yaml
 apiVersion: "trino-operator.cloudchef-labs.com/v1beta1"
@@ -266,6 +371,20 @@ spec:
         value: |
           connector.name=tpcds
           tpcds.splits-per-node=4
+      - name: hive.properties
+        path: /etc/trino/catalog
+        value: |
+          connector.name=hive-hadoop2
+          hive.metastore.uri=thrift://metastore.hive-metastore.svc:9083
+          hive.allow-drop-table=true
+          hive.max-partitions-per-scan=1000000
+          hive.compression-codec=NONE
+          hive.s3.path-style-access=true
+          hive.s3.ssl.enabled=true
+          hive.s3.max-connections=100
+          hive.s3.endpoint=https://any-endpoint
+          hive.s3.aws-access-key=any-access-key
+          hive.s3.aws-secret-key=any-secret-key
   worker:
     replicas: 2
     autoscaler:
@@ -325,87 +444,50 @@ spec:
         value: |
           connector.name=tpcds
           tpcds.splits-per-node=4
+      - name: hive.properties
+        path: /etc/trino/catalog
+        value: |
+          connector.name=hive-hadoop2
+          hive.metastore.uri=thrift://metastore.hive-metastore.svc:9083
+          hive.allow-drop-table=true
+          hive.max-partitions-per-scan=1000000
+          hive.compression-codec=NONE
+          hive.s3.path-style-access=true
+          hive.s3.ssl.enabled=true
+          hive.s3.max-connections=100
+          hive.s3.endpoint=https://any-endpoint
+          hive.s3.aws-access-key=any-access-key
+          hive.s3.aws-secret-key=any-secret-key
 EOF
-
-   
 ```
 
 
 ```
-# get token.
-curl -XPOST \
-http://localhost:8089/v1/login \
--d  "user=admin" \
--d "password=adminpass" > auth.json;
-export ACCESS_TOKEN="$(jq -r '.token' auth.json)";
-
-# request.
 curl -XPOST -H "Authorization: Bearer $ACCESS_TOKEN" \
-http://localhost:8089/v1/cr/create \
+http://localhost:8089/v1/trino/create \
 -d  "yaml=$(base64 -w 0 ./trino-cluster-etl.yaml)";
 ```
 
-
-
-#### Update
-Parameters:
-* `yaml`:  Base64 encoded string of custom resource yaml file.
-
-
-```
-# get token.
-curl -XPOST \
-http://localhost:8089/v1/login \
--d  "user=admin" \
--d "password=adminpass" > auth.json;
-export ACCESS_TOKEN="$(jq -r '.token' auth.json)";
-
-# request.
-curl -XPUT -H "Authorization: Bearer $ACCESS_TOKEN" \
-http://localhost:8089/v1/cr/update \
--d  "yaml=$(base64 -w 0 ./any-custom-resource.yaml)";
-```
 
 
 #### List
 Parameters: NONE
 
 ```
-# get token.
-curl -XPOST \
-http://localhost:8089/v1/login \
--d  "user=admin" \
--d "password=adminpass" > auth.json;
-export ACCESS_TOKEN="$(jq -r '.token' auth.json)";
-
-# request.
 curl -XGET -H "Authorization: Bearer $ACCESS_TOKEN" \
-http://localhost:8089/v1/cr/list ;
+http://localhost:8089/v1/trino/list ;
 ```
 
 
 #### Delete
-Parameters:
-* `name`:  Custom resource name.
-* `namespace`:  Namespace where custom resource is located.
-* `kind`:  Kind of custom resource.
-
+Parameters: NONE
 
 ```
-# get token.
-curl -XPOST \
-http://localhost:8089/v1/login \
--d  "user=admin" \
--d "password=adminpass" > auth.json;
-export ACCESS_TOKEN="$(jq -r '.token' auth.json)";
-
-# request.
 curl -XDELETE -H "Authorization: Bearer $ACCESS_TOKEN" \
-http://localhost:8089/v1/cr/delete \
--d  "name=trino-cluster-etl" \
--d  "namespace=trino-operator" \
--d  "kind=TrinoCluster";
+http://localhost:8089/v1/trino/delete ;
 ```
+
+
 
 
 ## DataRoaster Spark Operator
