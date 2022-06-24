@@ -8,6 +8,9 @@ RUN yum install -y tzdata openssl curl ca-certificates fontconfig gzip tar \
 # install mysql repo.
 RUN yum install -y https://dev.mysql.com/get/mysql80-community-release-el7-6.noarch.rpm
 
+# gpg check will not be executed.
+RUN sed -n s/gpgcheck=1/gpgcheck=0/g /etc/yum.repos.d/mysql-community.repo
+
 # check mysql yum repo.
 RUN yum repolist enabled | grep "mysql.*"
 
