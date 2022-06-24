@@ -126,12 +126,14 @@ public class DBSchemaCreator {
                 .upload(Paths.get(runShellPath));
 
 
-        ExecWatch watch = newExecWatch(kubernetesClient, namespace, podName, "chmod +x /tmp/*.sh");
-
-        ExecWatch watch2 = newExecWatch(kubernetesClient, namespace, podName, scriptTargetFile);
+        try {
+            ExecWatch watch = newExecWatch(kubernetesClient, namespace, podName, "chmod +x /tmp/*.sh");
+            ExecWatch watch2 = newExecWatch(kubernetesClient, namespace, podName, scriptTargetFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         TempFileUtils.deleteDirectory(tempDirectory);
-
     }
 
 
