@@ -34,8 +34,9 @@ public class DBSchemaCreator {
         int count = 0;
         String namespace = getNamespace();
         System.out.printf("namespace: [%s]\n", namespace);
+        boolean running = true;
         // watch mysql pod if it has the status of RUNNING.
-        while (true) {
+        while (running) {
             PodList podList = kubernetesClient.pods().inNamespace(namespace).list();
             for(Pod pod : podList.getItems()) {
                 ObjectMeta metadata = pod.getMetadata();
@@ -58,7 +59,7 @@ public class DBSchemaCreator {
                                 ContainerStateRunning containerStateRunning = state.getRunning();
                                 if(containerStateRunning != null) {
                                     System.out.printf("mysql has running status now.\n");
-                                    runSqlScript(host, user, password, sqlPath);
+                                    running = false;
                                     break;
                                 }
                             }
@@ -80,6 +81,9 @@ public class DBSchemaCreator {
                 throw new IllegalStateException("mysql has no running status!");
             }
         }
+
+        System.out.printf("ready to run sql script...\n");
+        runSqlScript(host, user, password, sqlPath);
     }
 
     private static void runSqlScript(String host, String user, String password, String sqlPath) {
