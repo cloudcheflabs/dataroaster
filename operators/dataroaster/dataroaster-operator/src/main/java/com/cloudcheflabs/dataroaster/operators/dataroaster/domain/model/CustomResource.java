@@ -1,9 +1,6 @@
 package com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -26,6 +23,17 @@ public class CustomResource implements Serializable {
     @Column(name = "yaml")
     private String yaml;
 
+    @ManyToOne
+    @JoinColumn(name ="comp_name")
+    private Components components;
+
+    public Components getComponents() {
+        return components;
+    }
+
+    public void setComponents(Components components) {
+        this.components = components;
+    }
 
     public String getId() {
         return id;
