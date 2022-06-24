@@ -5,17 +5,17 @@ appVersion: 3.3.1
 description: dataroaster operator
 
 dependencies:
-  - name: dataroaster-mysql
-    version: v1.0.1
+  - name: dataroastermysql
+    version: v1.0.2
     repository: https://cloudcheflabs.github.io/mysql-helm-repo/
-  - name: dataroaster-helm-operator
-    version: v1.0.0
+  - name: dataroasterhelmoperator
+    version: v1.0.1
     repository: https://cloudcheflabs.github.io/helm-operator-helm-repo/
 
-  - name: dataroaster-trino-operator
-    version: v1.0.0
+  - name: dataroastertrinooperator
+    version: v1.0.1
     repository: https://cloudcheflabs.github.io/trino-helm-repo/
 
-  - name: dataroaster-spark-operator
-    version: v1.0.0
+  - name: dataroastersparkoperator
+    version: v1.0.1
     repository: https://cloudcheflabs.github.io/helm-repository/
