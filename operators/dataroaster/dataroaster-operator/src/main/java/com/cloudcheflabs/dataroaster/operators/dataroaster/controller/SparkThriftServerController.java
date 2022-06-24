@@ -75,6 +75,12 @@ public class SparkThriftServerController {
             String decodedYaml = Base64Utils.decodeBase64(yaml);
             LOG.info("decodedYaml: {}", decodedYaml);
 
+            s3AccessKey = Base64Utils.decodeBase64(s3AccessKey);
+            LOG.info("s3AccessKey: {}", s3AccessKey);
+
+            s3SecretKey = Base64Utils.decodeBase64(s3SecretKey);
+            LOG.info("s3SecretKey: {}", s3SecretKey);
+
             Components components = componentsService.findOne(COMPONENT_SPARK_THRIFT_SERVER);
             if(components == null) {
                 components = new Components();
