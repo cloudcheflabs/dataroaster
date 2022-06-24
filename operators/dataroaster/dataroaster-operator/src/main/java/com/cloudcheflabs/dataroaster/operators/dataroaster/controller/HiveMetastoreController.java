@@ -10,7 +10,6 @@ import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.Componen
 import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.CustomResource;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.util.Base64Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,64 +89,18 @@ public class HiveMetastoreController {
             k8sResourceService.createCustomResource(mysqlCustomResource);
             
             // check if mysql pod is running status.
-            checkMySQLStatus(hiveMetastoreCustomResource.getNamespace());
+            ContainerStatusChecker.checkContainerStatus(kubernetesClient,
+                    "mysql",
+                    CustomResourceUtils.getTargetNamespace(mysqlCustomResource.getYaml()),
+                    "app",
+                    "mysql");
+
 
             // create hive metastore on kubernetes.
             k8sResourceService.createCustomResource(hiveMetastoreCustomResource);
 
             return ControllerUtils.successMessage();
         });
-    }
-
-    private void checkMySQLStatus(String namespace) {
-        int MAX_COUNT = 20;
-        int count = 0;
-        boolean running = true;
-        // watch mysql pod if it has the status of RUNNING.
-        while (running) {
-            PodList podList = kubernetesClient.pods().inNamespace(namespace).list();
-            for(Pod pod : podList.getItems()) {
-                ObjectMeta metadata = pod.getMetadata();
-                LOG.info("metadata: [{}]", JsonUtils.toJson(metadata));
-                Map<String, String> labels = metadata.getLabels();
-                LOG.info("labels: [{}]", JsonUtils.toJson(labels));
-                for(String key : labels.keySet()) {
-                    LOG.info("key: [{}]", key);
-                    if(key.equals("app")) {
-                        String value = labels.get(key);
-                        LOG.info("key: [{}], value: [{}]", key, value);
-                        if(value.equals("mysql")) {
-                            PodStatus status = pod.getStatus();
-                            List<ContainerStatus> containerStatuses = status.getContainerStatuses();
-                            LOG.info("containerStatuses: [{}]", containerStatuses.size());
-                            if (!containerStatuses.isEmpty()) {
-                                ContainerStatus containerStatus = containerStatuses.get(0);
-                                ContainerState state = containerStatus.getState();
-                                LOG.info("state: [{}]", state.toString());
-                                ContainerStateRunning containerStateRunning = state.getRunning();
-                                if(containerStateRunning != null) {
-                                    LOG.info("mysql has running status now.");
-                                    running = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(count < MAX_COUNT) {
-                count++;
-                try {
-                    Thread.sleep(5000);
-                    continue;
-                } catch (Exception e) {
-                    System.err.println(e);
-                }
-            } else {
-                throw new IllegalStateException("mysql has no running status!");
-            }
-        }
     }
 
 
