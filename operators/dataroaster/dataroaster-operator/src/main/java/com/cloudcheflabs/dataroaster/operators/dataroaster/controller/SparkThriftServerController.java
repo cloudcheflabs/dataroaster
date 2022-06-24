@@ -10,6 +10,7 @@ import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.Componen
 import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.CustomResource;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.util.Base64Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.ServiceAccountBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -211,8 +212,21 @@ public class SparkThriftServerController {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
             Components components = componentsService.findOne(COMPONENT_SPARK_THRIFT_SERVER);
             if(components != null) {
+                String targetNamespace = null;
                 for(CustomResource customResource : components.getCustomResourceSet()) {
                     k8sResourceService.deleteCustomResource(customResource.getName(), customResource.getNamespace(), customResource.getKind());
+                    if(targetNamespace == null) {
+                        targetNamespace = CustomResourceUtils.getTargetNamespace(customResource.getYaml());
+                    }
+                }
+                if(targetNamespace != null) {
+                    for(Namespace ns : kubernetesClient.namespaces().list().getItems()) {
+                        if(ns.getMetadata().getName().equals(targetNamespace)) {
+                            boolean deleted = kubernetesClient.namespaces().delete(ns);
+                            LOG.info("ns [{}] deleted [{}]", targetNamespace, deleted);
+                            break;
+                        }
+                    }
                 }
             }
             return ControllerUtils.successMessage();
