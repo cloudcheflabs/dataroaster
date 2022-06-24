@@ -5,6 +5,18 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 RUN yum install -y tzdata openssl curl ca-certificates fontconfig gzip tar \
     && yum update -y; yum clean all
 
+# install mysql repo.
+RUN yum install -y https://dev.mysql.com/get/mysql80-community-release-el7-6.noarch.rpm
+
+# check mysql yum repo.
+RUN yum repolist enabled | grep "mysql.*"
+
+# install mysql client.
+RUN yum install mysql-community-client -y;
+
+# just run mysql client.
+RUN mysql
+
 
 # install jdk.
 
@@ -18,6 +30,10 @@ ENV DATAROASTER_OPERATOR_USER dataroaster
 
 RUN useradd -ms /bin/bash -d ${DATAROASTER_OPERATOR_HOME} ${DATAROASTER_OPERATOR_USER}
 
+# add db schema sql.
+ARG DATAROASTER_DB_SCHEMA
+ADD ${DATAROASTER_DB_SCHEMA} ${DATAROASTER_OPERATOR_HOME}
+
 
 # add dataroaster operator jar.
 ARG DATAROASTER_OPERATOR_JAR
@@ -26,8 +42,9 @@ ADD ${DATAROASTER_OPERATOR_JAR} ${DATAROASTER_OPERATOR_HOME}
 # make conf directory.
 RUN mkdir -p ${DATAROASTER_OPERATOR_HOME}/conf
 
-# add dataroaster operator run shell.
+# add run shell.
 ADD run-dataroaster-operator.sh ${DATAROASTER_OPERATOR_HOME}
+ADD create-db-schema.sh ${DATAROASTER_OPERATOR_HOME}
 
 # add permissions.
 RUN chmod +x ${DATAROASTER_OPERATOR_HOME}/*.sh

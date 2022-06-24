@@ -34,15 +34,15 @@ public class HelmChartActionHandler implements ActionHandler<HelmChart> {
 
         StringBuffer cmd = new StringBuffer();
         cmd.append("helm repo add ").append(chartName).append(" ").append(spec.getRepo()).append("\n");
-        cmd.append("helm repo update").append("\n").append("\n");;
+        cmd.append("helm repo update").append("\n").append("\n");
 
-        cmd.append("helm install ").append("\\").append("\n");;
-        cmd.append(spec.getName()).append(" ").append("\\").append("\n");;
-        cmd.append("--create-namespace ").append("\\").append("\n");;
-        cmd.append("--namespace ").append(spec.getNamespace()).append(" ").append("\\").append("\n");;
-        cmd.append("--version ").append(spec.getVersion()).append(" ").append("\\").append("\n");;
+        cmd.append("helm install ").append("\\").append("\n");
+        cmd.append(spec.getName()).append(" ").append("\\").append("\n");
+        cmd.append("--create-namespace ").append("\\").append("\n");
+        cmd.append("--namespace ").append(spec.getNamespace()).append(" ").append("\\").append("\n");
+        cmd.append("--version ").append(spec.getVersion()).append(" ").append("\\").append("\n");
         if(values != null) {
-            cmd.append("--values ").append(valuesFilePath).append(" ").append("\\").append("\n");;
+            cmd.append("--values ").append(valuesFilePath).append(" ").append("\\").append("\n");
         }
         cmd.append(chartName).append("/").append(chartName);
 
