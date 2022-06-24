@@ -26,6 +26,8 @@ public class DBSchemaCreator {
         String password = args[2];
         String sqlPath = args[3];
 
+        System.out.println("=========");
+
         LOG.info("args: [{}]", JsonUtils.toJson(Arrays.asList(args)));
 
         // application context.
