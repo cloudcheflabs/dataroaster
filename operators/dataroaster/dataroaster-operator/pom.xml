@@ -76,6 +76,9 @@
 
 		<!-- java.xml.bind module -->
 		<xml-bind.version>2.3.2</xml-bind.version>
+
+		<!-- commons-compress -->
+		<commons-compress.version>1.21</commons-compress.version>
 	</properties>
 
 	<dependencies>
@@ -266,12 +269,11 @@
 			<artifactId>jaxb-runtime</artifactId>
 			<version>${xml-bind.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>com.cloudcheflabs.dataroaster</groupId>
-            <artifactId>trino-gateway</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>${commons-compress.version}</version>
+		</dependency>
     </dependencies>
 	<build>
 		<pluginManagement>
