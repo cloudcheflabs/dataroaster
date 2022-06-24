@@ -30,7 +30,7 @@ public class DBSchemaCreator {
         // kubernetes client.
         KubernetesClient kubernetesClient = applicationContext.getBean(KubernetesClient.class);
 
-        int MAX_COUNT = 10;
+        int MAX_COUNT = 20;
         int count = 0;
         // watch mysql pod if it has the status of RUNNING.
         while (true) {
