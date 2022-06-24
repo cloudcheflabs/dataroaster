@@ -188,8 +188,8 @@ http://localhost:8089/v1/hive_metastore/delete ;
 Parameters:
 * `nfs_storage_class`: storage class for nfs.
 * `nfs_storage_size`: nfs storage size in Gi.
-* `s3_access_key`: s3 access key.
-* `s3_secret_key`: s3 secret key.
+* `s3_access_key`: base64 encoded string of s3 access key.
+* `s3_secret_key`: base64 encoded string of s3 secret key.
 * `yaml`:  base64 encoded string of spark thrift server custom resource yaml file.
 
 
