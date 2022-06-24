@@ -6,8 +6,6 @@ import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.util.TempFileUtils;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.util.Arrays;
@@ -15,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 public class DBSchemaCreator {
-
-    private static Logger LOG = LoggerFactory.getLogger(DBSchemaCreator.class);
 
     public static final String DEFAULT_DATAROASTER_NAMESPACE = "dataroaster-operator";
 
@@ -26,7 +22,7 @@ public class DBSchemaCreator {
         String password = args[2];
         String sqlPath = args[3];
 
-        LOG.info("args: [{}]", JsonUtils.toJson(Arrays.asList(args)));
+        System.out.printf("args: [%s]\n", JsonUtils.toJson(Arrays.asList(args)));
 
         // application context.
         ApplicationContext applicationContext = SpringContextSingleton.getInstance();
@@ -36,24 +32,32 @@ public class DBSchemaCreator {
 
         int MAX_COUNT = 20;
         int count = 0;
+        String namespace = getNamespace();
+        System.out.printf("namespace: [%s]\n", namespace);
         // watch mysql pod if it has the status of RUNNING.
         while (true) {
-            PodList podList = kubernetesClient.pods().inNamespace(getNamespace()).list();
+            PodList podList = kubernetesClient.pods().inNamespace(namespace).list();
             for(Pod pod : podList.getItems()) {
                 ObjectMeta metadata = pod.getMetadata();
+                System.out.printf("metadata: [%s]\n", JsonUtils.toJson(metadata));
                 Map<String, String> labels = metadata.getLabels();
+                System.out.printf("labels: [%s]\n", JsonUtils.toJson(labels));
                 for(String key : labels.keySet()) {
+                    System.out.printf("key: [%s]\n", key);
                     if(key.equals("app")) {
                         String value = labels.get(key);
+                        System.out.printf("key: [%s], value: [%s]\n", key, value);
                         if(value.equals("mysql")) {
                             PodStatus status = pod.getStatus();
                             List<ContainerStatus> containerStatuses = status.getContainerStatuses();
+                            System.out.printf("containerStatuses: [%d]\n", containerStatuses.size());
                             if (!containerStatuses.isEmpty()) {
                                 ContainerStatus containerStatus = containerStatuses.get(0);
                                 ContainerState state = containerStatus.getState();
+                                System.out.printf("state: [%s]\n", state.toString());
                                 ContainerStateRunning containerStateRunning = state.getRunning();
                                 if(containerStateRunning != null) {
-                                    LOG.info("mysql has running status now.");
+                                    System.out.printf("mysql has running status now.\n");
                                     runSqlScript(host, user, password, sqlPath);
                                     break;
                                 }
@@ -66,11 +70,11 @@ public class DBSchemaCreator {
             if(count < MAX_COUNT) {
                 count++;
                 try {
-                    LOG.info("mysql is not running status now...");
+                    System.out.printf("mysql is not running status now...\n");
                     Thread.sleep(5000);
                     continue;
                 } catch (Exception e) {
-                    LOG.error("error", e);
+                    System.err.println(e);
                 }
             } else {
                 throw new IllegalStateException("mysql has no running status!");
@@ -90,7 +94,7 @@ public class DBSchemaCreator {
 
         // create run helm shell.
         FileUtils.stringToFile(cmd.toString(), runShellPath, true);
-        LOG.info("run-mysql-query.sh: \n{}", FileUtils.fileToString(runShellPath, false));
+        System.out.printf("run-mysql-query.sh: \n%s\n", FileUtils.fileToString(runShellPath, false));
 
         // run helm shell.
         DBSchemaProcessExecutor processExecutor = new DBSchemaProcessExecutor();
@@ -104,7 +108,7 @@ public class DBSchemaCreator {
             String namespaceFile = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
             return FileUtils.fileToString(namespaceFile, false);
         } catch (Exception e) {
-            LOG.warn("instead return default dataroaster operator namespace [{}]", DEFAULT_DATAROASTER_NAMESPACE);
+            System.out.printf("instead return default dataroaster operator namespace [%s]\n", DEFAULT_DATAROASTER_NAMESPACE);
             return DEFAULT_DATAROASTER_NAMESPACE;
         }
     }
