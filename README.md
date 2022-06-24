@@ -21,8 +21,10 @@ dataroaster-operator \
 --create-namespace \
 --namespace dataroaster-operator \
 --version v2.0.0 \
+--set dataroastermysql.storage.storageClass=oci \
 dataroaster-operator/dataroaster-operator;
 ```
+`dataroastermysql.storage.storageClass` is mysql storage class which needs to be replaced with one of your kubernetes cluster.
 
 
 You need to copy the randomly generated admin password which will be used to access dataroaster api.

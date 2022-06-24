@@ -1,5 +1,5 @@
 serviceAccount: dataroaster-operator
-image: cloudcheflabs/dataroaster-operator:3.3.2
+image: cloudcheflabs/dataroaster-operator:4.1.0
 imagePullPolicy: Always
 replicas: 1
 resources:
