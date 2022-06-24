@@ -29,7 +29,7 @@ spec:
       serviceAccountName: {{ .Values.serviceAccount }}
       initContainers:
         - name: init-create-schema
-          image: { { .Values.image } }
+          image: {{ .Values.image }}
           command: [ "./create-db-schema.sh" ]
           args: [ "mysql-service.{{ .Release.Namespace }}.svc" ,"root" , "{{ .Values.dataroastermysql.rootPassword }}", "/opt/dataroaster-operator/create-tables.sql" ]
       containers:
