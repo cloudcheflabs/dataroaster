@@ -89,6 +89,14 @@ public class DBSchemaCreator {
             }
         }
 
+        // take a time for a while to access mysql pod.
+        try {
+            Thread.sleep(20000);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+
+
         final String podName = mysqlPod.getMetadata().getName();
         String[] pathTokens = sqlPath.split("/");
         String fileName = pathTokens[pathTokens.length - 1];
