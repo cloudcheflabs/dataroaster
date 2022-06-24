@@ -115,8 +115,26 @@ public class DBSchemaCreator {
         StringBuffer cmd = new StringBuffer();
         cmd.append("mysql").append(" -u ").append(user).append(" -p").append(password).append(" < ").append(targetFileName);
 
-        String cmdOutput = execCommandOnPod(podName, namespace, cmd.toString().split(" "));
+        String tempDirectory = TempFileUtils.createTempDirectory();
+
+        // make run script.
+        String runShell = "run-script.sh";
+        String runShellPath = tempDirectory + "/" + runShell;
+        // create run helm shell.
+        com.cloudcheflabs.dataroaster.common.util.FileUtils.stringToFile(cmd.toString(), runShellPath, true);
+        System.out.printf("run-script.sh: %s\n", com.cloudcheflabs.dataroaster.common.util.FileUtils.fileToString(runShellPath, false));
+
+        // upload run script.
+        String scriptTargetFile = "/tmp/run-script.sh";
+        kubernetesClient.pods().inNamespace(namespace)
+                .withName(podName)
+                .file(scriptTargetFile)
+                .upload(Paths.get(runShellPath));
+
+        String cmdOutput = execCommandOnPod(podName, namespace, scriptTargetFile);
         System.out.println(cmdOutput);
+
+        TempFileUtils.deleteDirectory(tempDirectory);
     }
 
     public static String execCommandOnPod(String podName, String namespace, String... cmd) {
