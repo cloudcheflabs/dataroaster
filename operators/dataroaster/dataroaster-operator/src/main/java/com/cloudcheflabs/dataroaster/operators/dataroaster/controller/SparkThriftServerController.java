@@ -65,7 +65,9 @@ public class SparkThriftServerController {
             String nfsStorageClass = params.get("nfs_storage_class");
             String nfsStorageSize = params.get("nfs_storage_size");
 
+            // base64 encoded.
             String s3AccessKey = params.get("s3_access_key");
+            // base64 encoded.
             String s3SecretKey = params.get("s3_secret_key");
 
             String pvcSize = params.get("pvc_size");
@@ -74,12 +76,6 @@ public class SparkThriftServerController {
 
             String decodedYaml = Base64Utils.decodeBase64(yaml);
             LOG.info("decodedYaml: {}", decodedYaml);
-
-            s3AccessKey = Base64Utils.decodeBase64(s3AccessKey);
-            LOG.info("s3AccessKey: {}", s3AccessKey);
-
-            s3SecretKey = Base64Utils.decodeBase64(s3SecretKey);
-            LOG.info("s3SecretKey: {}", s3SecretKey);
 
             Components components = componentsService.findOne(COMPONENT_SPARK_THRIFT_SERVER);
             if(components == null) {
