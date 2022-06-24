@@ -1,0 +1,15 @@
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: hive-metastore-mysql
+  namespace: dataroaster-operator
+spec:
+  repo: https://cloudcheflabs.github.io/mysql-helm-repo/
+  chartName: dataroaster-mysql
+  name: mysql
+  version: v1.0.1
+  namespace: hive-metastore
+  values: |
+    storage:
+      storageClass: oci
+      size: 10Gi

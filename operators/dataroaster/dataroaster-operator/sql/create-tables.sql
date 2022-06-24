@@ -34,6 +34,15 @@ ALTER TABLE `dataroaster`.`user_token`
         FOREIGN KEY (`user`) REFERENCES `dataroaster`.`users` (`user`);
 
 
+-- data platform components.
+create table if not exists dataroaster.components
+(
+    `comp_name`  varchar(100) NOT NULL,
+    PRIMARY KEY (`comp_name`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+
 -- custom resource
 create table if not exists dataroaster.custom_resource
 (
@@ -42,6 +51,11 @@ create table if not exists dataroaster.custom_resource
     `name`  varchar(100) NOT NULL,
     `namespace`  varchar(100) NOT NULL,
     `yaml` text NOT NULL,
+    `comp_name`  varchar(100) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+
+ALTER TABLE `dataroaster`.`custom_resource`
+    ADD CONSTRAINT `custom_resource_components`
+        FOREIGN KEY (`comp_name`) REFERENCES `dataroaster`.`components` (`comp_name`);

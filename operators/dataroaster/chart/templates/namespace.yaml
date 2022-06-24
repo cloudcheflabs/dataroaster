@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{ .Values.dependency.trinoOperator.namespace }}
+  name: {{ .Values.dependency.trino.namespace }}
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{ .Values.dependency.sparkOperator.namespace }}
+  name: {{ .Values.dependency.spark.namespace }}

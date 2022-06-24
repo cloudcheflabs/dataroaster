@@ -1,5 +1,5 @@
 serviceAccount: dataroaster-operator
-image: cloudcheflabs/dataroaster-operator:3.3.0
+image: cloudcheflabs/dataroaster-operator:4.1.0
 imagePullPolicy: Always
 replicas: 1
 resources:
@@ -32,7 +32,7 @@ hibernate:
 
 # dependency
 dependency:
-  trinoOperator:
+  trino:
     namespace: trino-operator
-  sparkOperator:
+  spark:
     namespace: spark-operator

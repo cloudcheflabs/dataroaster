@@ -9,7 +9,6 @@ import com.cloudcheflabs.dataroaster.operators.dataroaster.domain.model.Users;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.util.BCryptUtils;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.util.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.catalina.User;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.slf4j.Logger;

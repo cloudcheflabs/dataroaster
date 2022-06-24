@@ -27,6 +27,11 @@ spec:
       {{- end }}
       hostNetwork: {{ .Values.hostNetwork }}
       serviceAccountName: {{ .Values.serviceAccount }}
+      initContainers:
+        - name: init-create-schema
+          image: {{ .Values.image }}
+          command: [ "./create-db-schema.sh" ]
+          args: [ "-U" ,"root" , "-P", "{{ .Values.dataroastermysql.rootPassword }}", "-S", "/opt/dataroaster-operator/create-tables.sql" ]
       containers:
         - name: dataroaster-operator
           image: {{ .Values.image }}
