@@ -23,10 +23,9 @@ public class DBSchemaCreator {
     private static KubernetesClient kubernetesClient;
 
     public static void main(String[] args) {
-        String host = args[0];
-        String user = args[1];
-        String password = args[2];
-        String sqlPath = args[3];
+        String user = args[0];
+        String password = args[1];
+        String sqlPath = args[2];
 
         System.out.printf("args: [%s]\n", JsonUtils.toJson(Arrays.asList(args)));
 
