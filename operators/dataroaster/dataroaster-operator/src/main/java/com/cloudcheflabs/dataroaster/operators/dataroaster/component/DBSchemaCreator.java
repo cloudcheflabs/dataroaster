@@ -103,7 +103,7 @@ public class DBSchemaCreator {
         String[] pathTokens = sqlPath.split("/");
         String fileName = pathTokens[pathTokens.length - 1];
 
-        String targetFileName = "/" + fileName;
+        String targetFileName = "/tmp/" + fileName;
 
         // file upload to mysql pod.
         System.out.printf("file [" + sqlPath + "] uploading to mysql pod....\n");
@@ -125,13 +125,13 @@ public class DBSchemaCreator {
         System.out.printf("run-script.sh: %s\n", com.cloudcheflabs.dataroaster.common.util.FileUtils.fileToString(runShellPath, false));
 
         // upload run script.
-        String scriptTargetFile = "/run-script.sh";
+        String scriptTargetFile = "/tmp/run-script.sh";
         kubernetesClient.pods().inNamespace(namespace)
                 .withName(podName)
                 .file(scriptTargetFile)
                 .upload(Paths.get(runShellPath));
 
-        String chmod = execCommandOnPod(podName, namespace, Arrays.asList("chmod", "+x", "/run-script.sh").toArray(new String[0]));
+        String chmod = execCommandOnPod(podName, namespace, Arrays.asList("chmod", "+x", scriptTargetFile).toArray(new String[0]));
         System.out.println(chmod);
 
         String cmdOutput = execCommandOnPod(podName, namespace, scriptTargetFile);
