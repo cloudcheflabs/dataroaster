@@ -12,6 +12,8 @@ import okhttp3.Response;
 import org.springframework.context.ApplicationContext;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +98,15 @@ public class DBSchemaCreator {
 
         System.out.printf("ready to run sql script...\n");
 
+
         final String podName = mysqlPod.getMetadata().getName();
+
+        // file upload to mysql pod.
+        System.out.printf("file [" + sqlPath + "] uploading to mysql pod....\n");
+        kubernetesClient.pods().inNamespace(namespace)
+                .withName(podName)
+                .file(sqlPath)
+                .upload(Paths.get(sqlPath));
 
         StringBuffer cmd = new StringBuffer();
         cmd.append("mysql").append(" -u ").append(user).append(" -p").append(password).append(" < ").append(sqlPath);
