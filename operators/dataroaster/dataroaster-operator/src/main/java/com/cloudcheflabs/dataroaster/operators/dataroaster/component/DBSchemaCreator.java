@@ -100,19 +100,20 @@ public class DBSchemaCreator {
 
 
         final String podName = mysqlPod.getMetadata().getName();
+        String[] pathTokens = sqlPath.split("/");
+        String fileName = pathTokens[pathTokens.length - 1];
+
+        String targetFileName = "/tmp/" + fileName;
 
         // file upload to mysql pod.
         System.out.printf("file [" + sqlPath + "] uploading to mysql pod....\n");
         kubernetesClient.pods().inNamespace(namespace)
                 .withName(podName)
-                .dir("/tmp")
+                .file(targetFileName)
                 .upload(Paths.get(sqlPath));
 
-        String[] pathTokens = sqlPath.split("/");
-        String fileName = pathTokens[pathTokens.length - 1];
-
         StringBuffer cmd = new StringBuffer();
-        cmd.append("mysql").append(" -u ").append(user).append(" -p").append(password).append(" < ").append("/tmp/" + fileName);
+        cmd.append("mysql").append(" -u ").append(user).append(" -p").append(password).append(" < ").append(targetFileName);
 
         String cmdOutput = execCommandOnPod(podName, namespace, cmd.toString().split(" "));
         System.out.println(cmdOutput);
