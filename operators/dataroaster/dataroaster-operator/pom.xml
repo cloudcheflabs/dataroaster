@@ -280,8 +280,8 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.15</version>
-		</dependency>${commons-codec.version}
+			<version>${commons-codec.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>
