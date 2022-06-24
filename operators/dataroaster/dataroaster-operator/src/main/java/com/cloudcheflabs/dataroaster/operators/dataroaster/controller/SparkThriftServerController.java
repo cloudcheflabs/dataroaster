@@ -169,7 +169,7 @@ public class SparkThriftServerController {
             for(String pvcName : pvcList) {
                 kv = new HashMap<>();
                 kv.put("pvcName", pvcName);
-                kv.put("pvcSize", pvcSize);
+                kv.put("size", pvcSize);
                 kv.put("namespace", targetNamespace);
                 String pvcString =
                         TemplateUtils.replace("/templates/spark-thrift-server/spark-thrift-server-pvc.yaml", true, kv);
