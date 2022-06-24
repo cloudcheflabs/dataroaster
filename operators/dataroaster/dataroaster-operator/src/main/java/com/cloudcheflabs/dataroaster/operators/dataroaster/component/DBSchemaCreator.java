@@ -2,6 +2,7 @@ package com.cloudcheflabs.dataroaster.operators.dataroaster.component;
 
 
 import com.cloudcheflabs.dataroaster.common.util.FileUtils;
+import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.util.TempFileUtils;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +25,8 @@ public class DBSchemaCreator {
         String user = args[1];
         String password = args[2];
         String sqlPath = args[3];
+
+        LOG.info("args: [{}]", JsonUtils.toJson(Arrays.asList(args)));
 
         // application context.
         ApplicationContext applicationContext = SpringContextSingleton.getInstance();
