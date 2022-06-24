@@ -14,9 +14,6 @@ RUN yum repolist enabled | grep "mysql.*"
 # install mysql client.
 RUN yum install mysql-community-client -y;
 
-# just run mysql client.
-RUN mysql
-
 
 # install jdk.
 
