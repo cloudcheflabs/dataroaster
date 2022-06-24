@@ -222,7 +222,7 @@ spec:
           secretKeyRef:
             name: s3-secret
             key: secretKey
-      endpoint: "https://cnobgk2u8blu.compat.objectstorage.ap-seoul-1.oraclecloud.com"
+      endpoint: "https://any-endpoint"
     hive:
       metastoreUris:
         - "thrift://metastore.hive-metastore.svc:9083"
