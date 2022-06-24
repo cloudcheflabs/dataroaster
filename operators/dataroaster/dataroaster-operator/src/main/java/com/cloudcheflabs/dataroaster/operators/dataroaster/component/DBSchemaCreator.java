@@ -6,15 +6,25 @@ import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.operators.dataroaster.util.TempFileUtils;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.ExecListener;
+import io.fabric8.kubernetes.client.dsl.ExecWatch;
+import okhttp3.Response;
 import org.springframework.context.ApplicationContext;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class DBSchemaCreator {
 
     public static final String DEFAULT_DATAROASTER_NAMESPACE = "dataroaster-operator";
+
+    private static KubernetesClient kubernetesClient;
 
     public static void main(String[] args) {
         String host = args[0];
@@ -28,13 +38,14 @@ public class DBSchemaCreator {
         ApplicationContext applicationContext = SpringContextSingleton.getInstance();
 
         // kubernetes client.
-        KubernetesClient kubernetesClient = applicationContext.getBean(KubernetesClient.class);
+        kubernetesClient = applicationContext.getBean(KubernetesClient.class);
 
         int MAX_COUNT = 20;
         int count = 0;
         String namespace = getNamespace();
         System.out.printf("namespace: [%s]\n", namespace);
         boolean running = true;
+        Pod mysqlPod = null;
         // watch mysql pod if it has the status of RUNNING.
         while (running) {
             PodList podList = kubernetesClient.pods().inNamespace(namespace).list();
@@ -59,6 +70,7 @@ public class DBSchemaCreator {
                                 ContainerStateRunning containerStateRunning = state.getRunning();
                                 if(containerStateRunning != null) {
                                     System.out.printf("mysql has running status now.\n");
+                                    mysqlPod = pod;
                                     running = false;
                                     break;
                                 }
@@ -83,31 +95,75 @@ public class DBSchemaCreator {
         }
 
         System.out.printf("ready to run sql script...\n");
-        runSqlScript(host, user, password, sqlPath);
-    }
 
-    private static void runSqlScript(String host, String user, String password, String sqlPath) {
-        // run command to create db schema.
-        String tempDirectory = TempFileUtils.createTempDirectory();
-        String runShell = "run-mysql-query.sh";
-        String runShellPath = tempDirectory + "/" + runShell;
+        final String podName = mysqlPod.getMetadata().getName();
 
-        // mysql -h localhost -u root -pmysqlpass123 < /opt/dataroaster-operator/create-tables.sql
         StringBuffer cmd = new StringBuffer();
-        cmd.append("mysql -h ").append(host).append(" -u ").append(user).append(" -p").append(password).append(" < ").append(sqlPath);
+        cmd.append("mysql").append(" -u ").append(user).append(" -p").append(password).append(" < ").append(sqlPath);
 
-        // create run helm shell.
-        FileUtils.stringToFile(cmd.toString(), runShellPath, true);
-        System.out.printf("run-mysql-query.sh: \n%s\n", FileUtils.fileToString(runShellPath, false));
-
-        // run helm shell.
-        DBSchemaProcessExecutor processExecutor = new DBSchemaProcessExecutor();
-        processExecutor.doExec(runShellPath);
-
-        TempFileUtils.deleteDirectory(tempDirectory);
+        String cmdOutput = execCommandOnPod(podName, namespace, cmd.toString().split(" "));
+        System.out.println(cmdOutput);
     }
 
-    public static String getNamespace() {
+    public static String execCommandOnPod(String podName, String namespace, String... cmd) {
+        Pod pod = kubernetesClient.pods().inNamespace(namespace).withName(podName).get();
+        System.out.printf("Running command: [%s] on pod [%s] in namespace [%s]%n",
+                Arrays.toString(cmd), pod.getMetadata().getName(), namespace);
+
+        CompletableFuture<String> data = new CompletableFuture<>();
+        try (ExecWatch execWatch = execCmd(pod, data, cmd)) {
+            return data.get(30, TimeUnit.SECONDS);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (TimeoutException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    private static ExecWatch execCmd(Pod pod, CompletableFuture<String> data, String... command) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        return kubernetesClient.pods()
+                .inNamespace(pod.getMetadata().getNamespace())
+                .withName(pod.getMetadata().getName())
+                .writingOutput(baos)
+                .writingError(baos)
+                .usingListener(new SimpleListener(data, baos))
+                .exec(command);
+    }
+
+    static class SimpleListener implements ExecListener {
+
+        private CompletableFuture<String> data;
+        private ByteArrayOutputStream baos;
+
+        public SimpleListener(CompletableFuture<String> data, ByteArrayOutputStream baos) {
+            this.data = data;
+            this.baos = baos;
+        }
+
+
+        @Override
+        public void onOpen(Response response) {
+            System.out.println("Reading data... ");
+        }
+
+        @Override
+        public void onFailure(Throwable t, Response failureResponse) {
+            System.err.println(t.getMessage());
+            data.completeExceptionally(t);
+        }
+
+        @Override
+        public void onClose(int code, String reason) {
+            System.out.println("Exit with: " + code + " and with reason: " + reason);
+            data.complete(baos.toString());
+        }
+    }
+
+    private static String getNamespace() {
         try {
             String namespaceFile = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
             return FileUtils.fileToString(namespaceFile, false);
