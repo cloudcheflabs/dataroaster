@@ -132,6 +132,7 @@ public class DBSchemaCreator {
 
         TempFileUtils.deleteDirectory(tempDirectory);
 
+        System.out.println("time to exit...");
         System.exit(0);
     }
 
