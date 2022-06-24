@@ -77,7 +77,7 @@ public class HiveMetastoreController {
 
             // create mysql custom resource.
             Map<String, Object> kv = new HashMap<>();
-            kv.put("namespace", hiveMetastoreCustomResource.getNamespace());
+            kv.put("namespace", CustomResourceUtils.getTargetNamespace(hiveMetastoreCustomResource.getYaml()));
             kv.put("storageClass", mysqlStorageClass);
             kv.put("size", mysqlStorageSize);
             

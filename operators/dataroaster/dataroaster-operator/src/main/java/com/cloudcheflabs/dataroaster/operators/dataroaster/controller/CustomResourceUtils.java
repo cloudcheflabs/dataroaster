@@ -44,4 +44,24 @@ public class CustomResourceUtils {
 
         return customResource;
     }
+
+
+    public static String getTargetNamespace(String yamlContents) {
+
+        InputStream inputStream = new ByteArrayInputStream(yamlContents.getBytes());
+        Yaml yaml = new Yaml();
+        Map<String, Object> map = yaml.load(inputStream);
+        LOG.debug(JsonWriter.formatJson(JsonUtils.toJson(new ObjectMapper(), map)));
+
+        String kind = (String) map.get("kind");
+        Map<String, Object> specMap = (Map<String, Object>) map.get("spec");
+        if(kind.equals("HelmChart") || kind.equals("TrinoCluster")) {
+            return (String) specMap.get("namespace");
+        } else if(kind.equals("SparkApplication")) {
+            Map<String, Object> coreMap = (Map<String, Object>) specMap.get("core");
+            return (String) coreMap.get("namespace");
+        } else {
+            throw new RuntimeException("Not Supported Custom Resource: \n" + yamlContents);
+        }
+    }
 }
