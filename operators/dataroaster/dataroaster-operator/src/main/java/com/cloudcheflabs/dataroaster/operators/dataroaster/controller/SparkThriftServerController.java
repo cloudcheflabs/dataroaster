@@ -134,7 +134,7 @@ public class SparkThriftServerController {
 
             // create service account.
             String serviceAccount = targetNamespace;
-            kubernetesClient.serviceAccounts().createOrReplace(new ServiceAccountBuilder().withNewMetadata().withName(serviceAccount).endMetadata().build());
+            kubernetesClient.serviceAccounts().inNamespace(targetNamespace).createOrReplace(new ServiceAccountBuilder().withNewMetadata().withName(serviceAccount).endMetadata().build());
             LOG.info("serviceAccount [{}] created...", serviceAccount);
 
 
@@ -180,7 +180,6 @@ public class SparkThriftServerController {
 
             // create spark thrift server.
             k8sResourceService.createCustomResource(sparkThriftServerCustomResource);
-            LOG.info("spark thrift server installed...");
 
             // check spark thrift server is running status.
             ContainerStatusChecker.checkContainerStatus(kubernetesClient,
@@ -189,6 +188,7 @@ public class SparkThriftServerController {
                     "spark-role",
                     "executor",
                     120);
+            LOG.info("spark thrift server installed...");
 
             // create spark thrift server service.
             kv = new HashMap<>();
