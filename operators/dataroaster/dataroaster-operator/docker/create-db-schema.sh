@@ -16,13 +16,13 @@ do
                 S) SQL_PATH=${OPTARG};;
          esac
 done
-echo "HOST: HOST";
-echo "USER: USER";
-echo "PASSWORD: PASSWORD";
-echo "SQL_PATH: SQL_PATH";
+echo "HOST: $HOST";
+echo "USER: $USER";
+echo "PASSWORD: $PASSWORD";
+echo "SQL_PATH: $SQL_PATH";
 
 
 # create db schema.
 java \
 -cp dataroaster-operator-*.jar \
-com.cloudcheflabs.dataroaster.operators.dataroaster.component.DBSchemaCreator ${URL} ${USER} ${PASSWORD} ${SQL_PATH}
+com.cloudcheflabs.dataroaster.operators.dataroaster.component.DBSchemaCreator ${HOST} ${USER} ${PASSWORD} ${SQL_PATH}
