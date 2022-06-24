@@ -82,6 +82,9 @@
 
 		<!-- commons codec -->
 		<commons-codec.version>1.15</commons-codec.version>
+
+		<!-- mybatis -->
+		<mybatis.version>3.4.5</mybatis.version>
 	</properties>
 
 	<dependencies>
@@ -89,6 +92,11 @@
 			<groupId>com.cloudcheflabs.dataroaster</groupId>
 			<artifactId>common</artifactId>
 			<version>4.1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>${mybatis.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.trino</groupId>
