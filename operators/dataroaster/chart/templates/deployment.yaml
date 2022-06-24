@@ -31,7 +31,7 @@ spec:
         - name: init-create-schema
           image: { { .Values.image } }
           command: [ "./create-db-schema.sh" ]
-          args: [ "mysql-service.{{ .Release.Namespace }}.svc" ,"root" , "{{ .Values.'dataroaster-mysql'.rootPassword }}", "/opt/dataroaster-operator/create-tables.sql" ]
+          args: [ "mysql-service.{{ .Release.Namespace }}.svc" ,"root" , "{{ .Values.dataroaster\-mysql.rootPassword }}", "/opt/dataroaster-operator/create-tables.sql" ]
       containers:
         - name: dataroaster-operator
           image: {{ .Values.image }}
