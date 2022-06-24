@@ -23,11 +23,5 @@ echo "SQL_PATH: $SQL_PATH";
 # create db schema.
 java \
 -cp dataroaster-operator-*.jar \
-com.cloudcheflabs.dataroaster.operators.dataroaster.component.DBSchemaCreator ${USER} ${PASSWORD} ${SQL_PATH}
-
-
-
-java \
--cp dataroaster-operator-*.jar \
 -Ddataroaster.createDBSchema=true \
 org.springframework.boot.loader.PropertiesLauncher ${USER} ${PASSWORD} ${SQL_PATH}
