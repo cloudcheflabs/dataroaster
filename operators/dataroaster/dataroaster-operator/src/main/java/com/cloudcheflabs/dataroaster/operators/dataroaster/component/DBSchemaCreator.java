@@ -11,16 +11,10 @@ import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import okhttp3.Response;
 import org.springframework.context.ApplicationContext;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class DBSchemaCreator {
 
@@ -131,72 +125,45 @@ public class DBSchemaCreator {
                 .file(scriptTargetFile)
                 .upload(Paths.get(runShellPath));
 
-        String chmod = execCommandOnPod(podName, namespace, Arrays.asList("chmod", "+x", scriptTargetFile).toArray(new String[0]));
-        System.out.println(chmod);
 
-        String cmdOutput = execCommandOnPod(podName, namespace, scriptTargetFile);
-        System.out.println(cmdOutput);
+        ExecWatch watch = newExecWatch(kubernetesClient, namespace, podName, "chmod +x /tmp/*.sh");
+
+        ExecWatch watch2 = newExecWatch(kubernetesClient, namespace, podName, scriptTargetFile);
 
         TempFileUtils.deleteDirectory(tempDirectory);
-    }
 
-    public static String execCommandOnPod(String podName, String namespace, String... cmd) {
-        Pod pod = kubernetesClient.pods().inNamespace(namespace).withName(podName).get();
-        System.out.printf("Running command: [%s] on pod [%s] in namespace [%s]%n",
-                Arrays.toString(cmd), pod.getMetadata().getName(), namespace);
-
-        CompletableFuture<String> data = new CompletableFuture<>();
-        try (ExecWatch execWatch = execCmd(pod, data, cmd)) {
-            return data.get(30, TimeUnit.SECONDS);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 
-    private static ExecWatch execCmd(Pod pod, CompletableFuture<String> data, String... command) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        return kubernetesClient.pods()
-                .inNamespace(pod.getMetadata().getNamespace())
-                .withName(pod.getMetadata().getName())
-                .writingOutput(baos)
-                .writingError(baos)
-                .usingListener(new SimpleListener(data, baos))
-                .exec(command);
+    private static ExecWatch newExecWatch(KubernetesClient client, String namespace, String podName, String cmd) {
+        return client.pods().inNamespace(namespace).withName(podName)
+                .writingOutput(System.out)
+                .writingError(System.err)
+                .withTTY()
+                .usingListener(new SimpleListener())
+                .exec("sh", "-c", cmd);
     }
 
-    static class SimpleListener implements ExecListener {
-
-        private CompletableFuture<String> data;
-        private ByteArrayOutputStream baos;
-
-        public SimpleListener(CompletableFuture<String> data, ByteArrayOutputStream baos) {
-            this.data = data;
-            this.baos = baos;
-        }
+    private static class SimpleListener implements ExecListener {
 
 
         @Override
         public void onOpen(Response response) {
-            System.out.println("Reading data... ");
+
         }
 
         @Override
         public void onFailure(Throwable t, Response failureResponse) {
-            System.err.println(t.getMessage());
-            data.completeExceptionally(t);
+            System.err.println("shell barfed");
         }
 
         @Override
         public void onClose(int code, String reason) {
-            System.out.println("Exit with: " + code + " and with reason: " + reason);
-            data.complete(baos.toString());
+            System.out.println("The shell will now close.");
         }
     }
+
+
 
     private static String getNamespace() {
         try {
