@@ -7,7 +7,7 @@ DataRoaster is open source data platform running on Kubernetes.
 
 DataRoaster has a simple architecture. There are several operators in DataRoaster to install data platform components easily.
 * `DataRoaster Operator` handles rest requests to create custom resources.
-* After creating custom resources, `Helm Operator` and other operators will be notified and create data platform components like spark thrift server, trino cluster, etc.
+* After creating custom resources, `Helm Operator` and other operators will be notified and create data platform components like hive metastore, spark thrift server, trino cluster, etc.
 
 
 ## Install DataRoaster
