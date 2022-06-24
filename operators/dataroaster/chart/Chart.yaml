@@ -1,6 +1,6 @@
 apiVersion: v2
 name: dataroaster-operator
-version: v2.0.1
+version: v2.0.2
 appVersion: 4.1.0
 description: dataroaster operator
 

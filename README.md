@@ -20,7 +20,7 @@ helm install \
 dataroaster-operator \
 --create-namespace \
 --namespace dataroaster-operator \
---version v2.0.0 \
+--version v2.0.1 \
 --set dataroastermysql.storage.storageClass=oci \
 dataroaster-operator/dataroaster-operator;
 ```
