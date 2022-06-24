@@ -131,6 +131,8 @@ public class DBSchemaCreator {
         }
 
         TempFileUtils.deleteDirectory(tempDirectory);
+
+        System.exit(0);
     }
 
 
