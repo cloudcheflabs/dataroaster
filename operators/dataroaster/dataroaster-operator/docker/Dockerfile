@@ -5,16 +5,6 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 RUN yum install -y tzdata openssl curl ca-certificates fontconfig gzip tar \
     && yum update -y; yum clean all
 
-# install mysql repo.
-ADD mysql-community.repo /etc/yum.repos.d
-
-# check mysql yum repo.
-RUN yum repolist enabled | grep "mysql.*"
-
-# install mysql client.
-RUN yum install mysql-community-client -y;
-
-
 # install jdk.
 
 RUN set -eux; \
