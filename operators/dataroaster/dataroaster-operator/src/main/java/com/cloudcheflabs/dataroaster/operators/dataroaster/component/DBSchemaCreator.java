@@ -131,7 +131,7 @@ public class DBSchemaCreator {
                 .file(scriptTargetFile)
                 .upload(Paths.get(runShellPath));
 
-        String chmod = execCommandOnPod(podName, namespace, Arrays.asList("chmod +x /tmp/*.sh").toArray(new String[0]));
+        String chmod = execCommandOnPod(podName, namespace, Arrays.asList("chmod", "+x", "/tmp/*.sh").toArray(new String[0]));
         System.out.println(chmod);
 
         String cmdOutput = execCommandOnPod(podName, namespace, scriptTargetFile);
