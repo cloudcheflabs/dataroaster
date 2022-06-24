@@ -90,9 +90,6 @@ public class DBSchemaCreator {
             }
         }
 
-        System.out.printf("ready to run sql script...\n");
-
-
         final String podName = mysqlPod.getMetadata().getName();
         String[] pathTokens = sqlPath.split("/");
         String fileName = pathTokens[pathTokens.length - 1];
@@ -120,14 +117,15 @@ public class DBSchemaCreator {
 
         // upload run script.
         String scriptTargetFile = "/tmp/run-script.sh";
+        System.out.printf("file [" + scriptTargetFile + "] uploading to mysql pod....\n");
         kubernetesClient.pods().inNamespace(namespace)
                 .withName(podName)
                 .file(scriptTargetFile)
                 .upload(Paths.get(runShellPath));
-
-
         try {
+            // add permission to shell.
             ExecWatch watch = newExecWatch(kubernetesClient, namespace, podName, "chmod +x /tmp/*.sh");
+            // run shell file.
             ExecWatch watch2 = newExecWatch(kubernetesClient, namespace, podName, scriptTargetFile);
         } catch (Exception e) {
             e.printStackTrace();
