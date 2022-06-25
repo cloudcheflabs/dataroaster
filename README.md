@@ -48,7 +48,7 @@ kubectl port-forward svc/dataroaster-operator-service 8089 -n dataroaster-operat
 ```
 
 ## REST API
-To access DataRoaster with REST, ee [DataRoaster REST API](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/dataroaster) for more details.
+To access DataRoaster with REST, see [DataRoaster REST API](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/dataroaster) for more details.
 
 
 
