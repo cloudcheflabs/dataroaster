@@ -54,7 +54,7 @@ public class KafkaController {
     KubernetesClient kubernetesClient;
 
 
-    @PostMapping("/v1/jupyterhub/create")
+    @PostMapping("/v1/kafka/create")
     public String create(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
 
@@ -83,7 +83,7 @@ public class KafkaController {
 
 
 
-    @DeleteMapping("/v1/jupyterhub/delete")
+    @DeleteMapping("/v1/kafka/delete")
     public String delete(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
             Components components = componentsService.findOne(COMPONENT_KAFKA);
@@ -109,7 +109,7 @@ public class KafkaController {
         });
     }
 
-    @GetMapping("/v1/jupyterhub/list")
+    @GetMapping("/v1/kafka/list")
     public String list(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
             List<Map<String, Object>> mapList = new ArrayList<>();
