@@ -7,7 +7,17 @@ DataRoaster is open source data platform running on Kubernetes.
 
 DataRoaster has a simple architecture. There are several operators in DataRoaster to install data platform components easily.
 * `DataRoaster Operator` handles rest requests to create custom resources.
-* After creating custom resources, `Helm Operator` and other operators will be notified and create data platform components like hive metastore, spark thrift server, trino cluster, etc.
+* After creating custom resources, `Helm Operator` and other operators will be notified and create data platform components.
+
+## Data Platform Components supported by DataRoaster
+
+Components supported by DataRoaster:
+* Hive Metastore: standard data catalog in data lakehouses.
+* Spark Thrift Server: hive server compatible interface through which hive queries will be executed on spark.
+* Trino: popular query engine in data lakehouses.
+* Redash: popular BI tool.
+* Jupyterhub: multi-user version of jupyter notebook.
+* Kafka: popular event streaming platform.
 
 
 ## Install DataRoaster
@@ -20,8 +30,8 @@ helm install \
 dataroaster-operator \
 --create-namespace \
 --namespace dataroaster-operator \
---version v2.0.0 \
---set image=cloudcheflabs/dataroaster-operator:4.1.0 \
+--version v3.0.0 \
+--set image=cloudcheflabs/dataroaster-operator:4.2.0 \
 --set dataroastermysql.storage.storageClass=oci \
 dataroaster-operator/dataroaster-operator;
 ```

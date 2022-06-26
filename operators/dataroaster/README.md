@@ -439,3 +439,187 @@ Parameters: NONE
 curl -XDELETE -H "Authorization: Bearer $ACCESS_TOKEN" \
 http://localhost:8089/v1/trino/delete ;
 ```
+
+
+
+
+## Redash
+
+### Create
+Parameters:
+* `yaml`:  base64 encoded string of redash custom resource yaml file.
+
+
+```
+cat <<EOF > redash.yaml
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: redash
+  namespace: dataroaster-operator
+spec:
+  repo: https://cloudcheflabs.github.io/redash-helm-repo/
+  chartName: dataroasterredash
+  name: redash
+  version: v2.0.0
+  namespace: redash
+  values: |
+    storage:
+      storageClass: oci
+      size: 2
+    service:
+      type: LoadBalancer
+EOF
+```
+
+
+```
+curl -XPOST -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/redash/create \
+-d  "yaml=$(base64 -w 0 ./redash.yaml)";
+```
+
+
+
+### List
+Parameters: NONE
+
+```
+curl -XGET -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/redash/list ;
+```
+
+
+### Delete
+Parameters: NONE
+
+```
+curl -XDELETE -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/redash/delete ;
+```
+
+
+
+## Jupyterhub
+
+### Create
+Parameters:
+* `yaml`:  base64 encoded string of jupyterhub custom resource yaml file.
+
+
+```
+cat <<EOF > jupyterhub.yaml
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: jupyterhub
+  namespace: dataroaster-operator
+spec:
+  repo: https://charts.bitnami.com/bitnami
+  chartName: jupyterhub
+  name: jupyterhub
+  version: 1.3.6
+  namespace: jupyterhub
+  values: |
+    hub:
+      service:
+        type: LoadBalancer
+    singleuser:
+      image:
+        registry: docker.io
+        repository: cloudcheflabs/dataroaster-bitnami-jupyter
+        tag: 1.5.0
+        pullPolicy: Always
+      persistence:
+        storageClass: oci
+        size: 15Gi
+EOF
+```
+
+
+```
+curl -XPOST -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/jupyterhub/create \
+-d  "yaml=$(base64 -w 0 ./jupyterhub.yaml)";
+```
+
+
+
+### List
+Parameters: NONE
+
+```
+curl -XGET -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/jupyterhub/list ;
+```
+
+
+### Delete
+Parameters: NONE
+
+```
+curl -XDELETE -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/jupyterhub/delete ;
+```
+
+
+
+## Kafka
+
+### Create
+Parameters:
+* `yaml`:  base64 encoded string of kafka custom resource yaml file.
+
+
+```
+cat <<EOF > kafka.yaml
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: kafka
+  namespace: dataroaster-operator
+spec:
+  repo: https://charts.bitnami.com/bitnami
+  chartName: kafka
+  name: kafka
+  version: 18.0.0
+  namespace: kafka
+  values: |
+    replicaCount: 3
+    persistence:
+      enabled: true
+      size: 8Gi
+      storageClass: oci
+    zookeeper:
+      replicaCount: 3
+      persistence:
+        enabled: true
+        storageClass: oci
+EOF
+```
+
+
+```
+curl -XPOST -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/kafka/create \
+-d  "yaml=$(base64 -w 0 ./kafka.yaml)";
+```
+
+
+
+### List
+Parameters: NONE
+
+```
+curl -XGET -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/kafka/list ;
+```
+
+
+### Delete
+Parameters: NONE
+
+```
+curl -XDELETE -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/kafka/delete ;
+```
