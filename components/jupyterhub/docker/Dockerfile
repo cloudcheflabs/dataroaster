@@ -1,4 +1,4 @@
-FROM docker.io/bitnami/jupyter-base-notebook:1.5.0-debian-11-r3
+FROM docker.io/bitnami/jupyter-base-notebook:1.5.0-debian-11-r8
 
 USER 0
 RUN apt --allow-unauthenticated -o Acquire::Check-Valid-Until=false update && \
