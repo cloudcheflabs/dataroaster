@@ -17,7 +17,7 @@ metadata:
   name: redash
   namespace: {{ .Values.namespace }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.service.type }}
   ports:
     - port: 5000
       targetPort: redash

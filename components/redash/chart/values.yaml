@@ -3,3 +3,5 @@ image: redash/redash:10.0.0-beta.b49597
 storage:
   storageClass: standard
   size: 2
+service:
+  type: ClusterIP
