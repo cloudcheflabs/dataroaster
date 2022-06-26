@@ -1,0 +1,17 @@
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: redash
+  namespace: dataroaster-operator
+spec:
+  repo: https://cloudcheflabs.github.io/redash-helm-repo/
+  chartName: dataroasterredash
+  name: redash
+  version: v2.0.0
+  namespace: redash
+  values: |
+    storage:
+      storageClass: oci
+      size: 2
+    service:
+      type: LoadBalancer

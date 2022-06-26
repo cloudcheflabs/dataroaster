@@ -1,16 +1,22 @@
-FROM jupyterhub/k8s-singleuser-sample:1.1.3
+FROM docker.io/bitnami/jupyter-base-notebook:1.5.0-debian-11-r8
 
 USER 0
-RUN apt-get --allow-unauthenticated -o Acquire::Check-Valid-Until=false update && \
-    apt-get install --reinstall build-essential -y && \
-    apt-get install -y apt-utils && \
-    apt-get -y install gcc && \
-    apt-get install libsasl2-2 libsasl2-dev libsasl2-modules -y && \
-    apt-get install -y curl && \
-    apt-get install -y openjdk-8-jdk
+RUN apt --allow-unauthenticated -o Acquire::Check-Valid-Until=false update && \
+    apt install --reinstall build-essential -y && \
+    apt install -y apt-utils && \
+    apt -y install gcc && \
+    apt install libsasl2-2 libsasl2-dev libsasl2-modules -y && \
+    apt install -y curl && \
+    apt install -y openjdk-11-jdk
 
-RUN /opt/conda/bin/pip install 'pyhive[hive]' && \
-    /opt/conda/bin/pip install 'pyhive[trino]'
+# install python.
+RUN apt install python3 python3-pip -y
+
+# print python version
+RUN python --version
+
+RUN pip install 'pyhive[hive]' && \
+    pip install 'pyhive[trino]'
 
 RUN set -x && \
     export SPARK_BASE=/opt/spark && \
@@ -24,9 +30,8 @@ RUN set -x && \
     rm -rf spark-${SPARK_VERSION}*.tgz && \
     touch /etc/profile.d/spark.sh && \
     echo "export SPARK_HOME=${SPARK_HOME}" >> /etc/profile.d/spark.sh && \
-    echo "export PATH=$PATH:$SPARK_HOME/bin" >> /etc/profile.d/spark.sh && \
-    source /etc/profile
+    echo "export PATH=$PATH:$SPARK_HOME/bin" >> /etc/profile.d/spark.sh
 
 
-USER jovyan
+USER 1001
 WORKDIR $HOME

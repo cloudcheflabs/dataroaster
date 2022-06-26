@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public class TrinoController {
+public class RedashController {
 
-    private static Logger LOG = LoggerFactory.getLogger(TrinoController.class);
+    private static Logger LOG = LoggerFactory.getLogger(RedashController.class);
 
-    public static final String COMPONENT_TRINO = "trino";
+    public static final String COMPONENT_REDASH = "redash";
 
 
     private ObjectMapper mapper = new ObjectMapper();
@@ -54,7 +54,7 @@ public class TrinoController {
     KubernetesClient kubernetesClient;
 
 
-    @PostMapping("/v1/trino/create")
+    @PostMapping("/v1/redash/create")
     public String create(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
 
@@ -64,17 +64,17 @@ public class TrinoController {
             String decodedYaml = Base64Utils.decodeBase64(yaml);
             LOG.info("decodedYaml: {}", decodedYaml);
 
-            Components components = componentsService.findOne(COMPONENT_TRINO);
+            Components components = componentsService.findOne(COMPONENT_REDASH);
             if(components == null) {
                 components = new Components();
-                components.setCompName(COMPONENT_TRINO);
+                components.setCompName(COMPONENT_REDASH);
                 componentsService.create(components);
             }
 
-            // create trino custom resource.
-            CustomResource trinoCustomResource = CustomResourceUtils.fromYaml(decodedYaml);
-            trinoCustomResource.setComponents(components);
-            k8sResourceService.createCustomResource(trinoCustomResource);
+            // create redash custom resource.
+            CustomResource redashCustomResource = CustomResourceUtils.fromYaml(decodedYaml);
+            redashCustomResource.setComponents(components);
+            k8sResourceService.createCustomResource(redashCustomResource);
 
             return ControllerUtils.successMessage();
         });
@@ -83,10 +83,10 @@ public class TrinoController {
 
 
 
-    @DeleteMapping("/v1/trino/delete")
+    @DeleteMapping("/v1/redash/delete")
     public String delete(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
-            Components components = componentsService.findOne(COMPONENT_TRINO);
+            Components components = componentsService.findOne(COMPONENT_REDASH);
             if(components != null) {
                 String targetNamespace = null;
                 for(CustomResource customResource : components.getCustomResourceSet()) {
@@ -109,19 +109,19 @@ public class TrinoController {
         });
     }
 
-    @GetMapping("/v1/trino/list")
+    @GetMapping("/v1/redash/list")
     public String list(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
             List<Map<String, Object>> mapList = new ArrayList<>();
 
-            Components components = componentsService.findOne(COMPONENT_TRINO);
+            Components components = componentsService.findOne(COMPONENT_REDASH);
             if(components != null) {
                 for(CustomResource customResource : components.getCustomResourceSet()) {
                     Map<String, Object> map = new HashMap<>();
                     map.put("kind", customResource.getKind());
                     map.put("name", customResource.getName());
                     map.put("namespace", customResource.getNamespace());
-                    map.put("components", COMPONENT_TRINO);
+                    map.put("components", COMPONENT_REDASH);
 
                     mapList.add(map);
                 }
