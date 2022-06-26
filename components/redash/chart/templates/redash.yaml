@@ -51,7 +51,6 @@ spec:
         image: redis:5.0-alpine
         ports:
         - containerPort: 6379
-        imagePullPolicy: Always
       - name:  postgres
         image: postgres:9.5-alpine
         envFrom:
@@ -70,6 +69,10 @@ spec:
         - name: REDASH_WEB_WORKERS
           value: "4"
         args: ["server"]
+        lifecycle:
+          postStart:
+            exec:
+              command: [ "/bin/sh", "-c", "/app/bin/docker-entrypoint create_db" ]
         ports:
         - containerPort: 5000
           name: redash
