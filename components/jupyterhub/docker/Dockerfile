@@ -35,5 +35,3 @@ RUN set -x && \
 
 USER 1001
 WORKDIR $HOME
-ENTRYPOINT ["tini" "-g" "--"]
-CMD ["jupyterhub-singleuser"]
