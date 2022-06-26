@@ -30,8 +30,7 @@ RUN set -x && \
     rm -rf spark-${SPARK_VERSION}*.tgz && \
     touch /etc/profile.d/spark.sh && \
     echo "export SPARK_HOME=${SPARK_HOME}" >> /etc/profile.d/spark.sh && \
-    echo "export PATH=$PATH:$SPARK_HOME/bin" >> /etc/profile.d/spark.sh && \
-    source /etc/profile
+    echo "export PATH=$PATH:$SPARK_HOME/bin" >> /etc/profile.d/spark.sh
 
 
 USER 1001
