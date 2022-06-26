@@ -7,7 +7,7 @@ RUN apt --allow-unauthenticated -o Acquire::Check-Valid-Until=false update && \
     apt -y install gcc && \
     apt install libsasl2-2 libsasl2-dev libsasl2-modules -y && \
     apt install -y curl && \
-    apt install -y openjdk-8-jdk
+    apt install -y openjdk-11-jdk
 
 # install python.
 RUN apt install python3 python3-pip -y
