@@ -1,0 +1,22 @@
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: kafka
+  namespace: dataroaster-operator
+spec:
+  repo: https://charts.bitnami.com/bitnami
+  chartName: kafka
+  name: kafka
+  version: 18.0.0
+  namespace: kafka
+  values: |
+    replicaCount: 3
+    persistence:
+      enabled: true
+      size: 8Gi
+      storageClass: oci
+    zookeeper:
+      replicaCount: 3
+      persistence:
+        enabled: true
+        storageClass: oci
