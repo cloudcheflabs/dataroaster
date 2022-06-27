@@ -140,6 +140,7 @@ Parameters:
 * `nfs_storage_size`: nfs storage size in Gi.
 * `s3_access_key`: base64 encoded string of s3 access key.
 * `s3_secret_key`: base64 encoded string of s3 secret key.
+* `pvc_size`: spark application pvc size in Gi.
 * `yaml`:  base64 encoded string of spark thrift server custom resource yaml file.
 
 
@@ -622,4 +623,136 @@ Parameters: NONE
 ```
 curl -XDELETE -H "Authorization: Bearer $ACCESS_TOKEN" \
 http://localhost:8089/v1/kafka/delete ;
+```
+
+
+
+## Airflow
+
+### Create
+Parameters:
+* `nfs_storage_class`: storage class for nfs.
+* `nfs_storage_size`: nfs storage size in Gi.
+* `yaml`:  base64 encoded string of spark thrift server custom resource yaml file.
+
+
+```
+cat <<EOF > airflow.yaml
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: airflow
+  namespace: dataroaster-operator
+spec:
+  repo: https://airflow.apache.org
+  chartName: airflow
+  name: airflow
+  version: 1.4.0
+  namespace: airflow
+  values: |
+    defaultAirflowRepository: cloudcheflabs/airflow
+    defaultAirflowTag: "2.2.3-u01"
+    webserver:
+      service:
+        type: LoadBalancer
+    flower:
+      service:
+        type: LoadBalancer
+    ingress:
+      enabled: false
+    workers:
+      replicas: 3
+      persistence:
+        enabled: true
+        size: 3Gi
+        storageClassName: oci
+    redis:
+      enabled: true
+      persistence:
+        enabled: true
+        size: 1Gi
+        storageClassName: oci
+    ports:
+      flowerUI: 5555
+      airflowUI: 8080
+      workerLogs: 8793
+      redisDB: 6379
+      statsdIngest: 9125
+      statsdScrape: 9102
+      pgbouncer: 6543
+      pgbouncerScrape: 9127
+    postgresql:
+      enabled: true
+      persistence:
+        storageClass: oci
+    config:
+      core:
+        remote_logging: 'True'
+      api:
+        auth_backend: airflow.api.auth.backend.deny_all
+      logging:
+        remote_logging: 'True'
+      celery:
+        worker_concurrency: 16
+    extraEnv: |
+      - name: AIRFLOW_CONN_OCI_S3
+        value: "s3://@?host=<endpoint>&aws_access_key_id=<access-key>&aws_secret_access_key=<secret-key>"
+      - name: AIRFLOW__CORE__REMOTE_LOGGING
+        value: 'True'
+      - name: AIRFLOW__CORE__REMOTE_BASE_LOG_FOLDER
+        value: s3://mykidong/airflow/logs
+      - name: AIRFLOW__CORE_REMOTE_LOG_CONN_ID
+        value: oci_s3
+      - name: AIRFLOW__CORE__ENCRYPT_S3_LOGS
+        value: 'False'
+      - name: AIRFLOW__LOGGING__REMOTE_LOGGING
+        value: 'True'
+      - name: AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER
+        value: s3://mykidong/airflow/logs
+      - name: AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID
+        value: oci_s3
+      - name: AIRFLOW__LOGGING__ENCRYPT_S3_LOGS
+        value: 'False'
+    dags:
+      persistence:
+        enabled: true
+        size: 1Gi
+        storageClassName: nfs
+        accessMode: ReadWriteMany
+      gitSync:
+        enabled: false
+    logs:
+      persistence:
+        enabled: true
+        size: 2Gi
+        storageClassName: nfs
+EOF
+```
+
+
+```
+curl -XPOST -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/airflow/create \
+-d  "nfs_storage_class=oci" \
+-d  "nfs_storage_size=10" \
+-d  "yaml=$(base64 -w 0 ./airflow.yaml)";
+```
+
+
+
+### List
+Parameters: NONE
+
+```
+curl -XGET -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/airflow/list ;
+```
+
+
+### Delete
+Parameters: NONE
+
+```
+curl -XDELETE -H "Authorization: Bearer $ACCESS_TOKEN" \
+http://localhost:8089/v1/airflow/delete ;
 ```

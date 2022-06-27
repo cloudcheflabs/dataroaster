@@ -1,0 +1,88 @@
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: airflow
+  namespace: dataroaster-operator
+spec:
+  repo: https://airflow.apache.org
+  chartName: airflow
+  name: airflow
+  version: 1.4.0
+  namespace: airflow
+  values: |
+    defaultAirflowRepository: cloudcheflabs/airflow
+    defaultAirflowTag: "2.2.3-u01"
+    webserver:
+      service:
+        type: LoadBalancer
+    flower:
+      service:
+        type: LoadBalancer
+    ingress:
+      enabled: false
+    workers:
+      replicas: 3
+      persistence:
+        enabled: true
+        size: 3Gi
+        storageClassName: oci
+    redis:
+      enabled: true
+      persistence:
+        enabled: true
+        size: 1Gi
+        storageClassName: oci
+    ports:
+      flowerUI: 5555
+      airflowUI: 8080
+      workerLogs: 8793
+      redisDB: 6379
+      statsdIngest: 9125
+      statsdScrape: 9102
+      pgbouncer: 6543
+      pgbouncerScrape: 9127
+    postgresql:
+      enabled: true
+      persistence:
+        storageClass: oci
+    config:
+      core:
+        remote_logging: 'True'
+      api:
+        auth_backend: airflow.api.auth.backend.deny_all
+      logging:
+        remote_logging: 'True'
+      celery:
+        worker_concurrency: 16
+    extraEnv: |
+      - name: AIRFLOW_CONN_OCI_S3
+        value: "s3://@?host=https://cnobgk2u8blu.compat.objectstorage.ap-seoul-1.oraclecloud.com&aws_access_key_id=009f4bb208fa0d2cb33c91eafc91159850abb24d&aws_secret_access_key=1xW+ZECv/GjsGOSdb/m3EOqgCw5w0mU9XTaY9GHBCYg="
+      - name: AIRFLOW__CORE__REMOTE_LOGGING
+        value: 'True'
+      - name: AIRFLOW__CORE__REMOTE_BASE_LOG_FOLDER
+        value: s3://mykidong/airflow/logs
+      - name: AIRFLOW__CORE_REMOTE_LOG_CONN_ID
+        value: oci_s3
+      - name: AIRFLOW__CORE__ENCRYPT_S3_LOGS
+        value: 'False'
+      - name: AIRFLOW__LOGGING__REMOTE_LOGGING
+        value: 'True'
+      - name: AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER
+        value: s3://mykidong/airflow/logs
+      - name: AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID
+        value: oci_s3
+      - name: AIRFLOW__LOGGING__ENCRYPT_S3_LOGS
+        value: 'False'
+    dags:
+      persistence:
+        enabled: true
+        size: 1Gi
+        storageClassName: nfs
+        accessMode: ReadWriteMany
+      gitSync:
+        enabled: false
+    logs:
+      persistence:
+        enabled: true
+        size: 2Gi
+        storageClassName: nfs
