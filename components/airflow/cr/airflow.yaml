@@ -56,7 +56,7 @@ spec:
         worker_concurrency: 16
     extraEnv: |
       - name: AIRFLOW_CONN_OCI_S3
-        value: "s3://@?host=https://cnobgk2u8blu.compat.objectstorage.ap-seoul-1.oraclecloud.com&aws_access_key_id=009f4bb208fa0d2cb33c91eafc91159850abb24d&aws_secret_access_key=1xW+ZECv/GjsGOSdb/m3EOqgCw5w0mU9XTaY9GHBCYg="
+        value: "s3://@?host=<endpoint>&aws_access_key_id=<acces-key>&aws_secret_access_key=<secret-key>"
       - name: AIRFLOW__CORE__REMOTE_LOGGING
         value: 'True'
       - name: AIRFLOW__CORE__REMOTE_BASE_LOG_FOLDER

@@ -13,6 +13,6 @@ spec:
     image: cloudcheflabs/hivemetastore:v3.0.0
     s3:
       bucket: mykidong
-      accessKey: 771688d08619c77939566af9290a2f1c277a2920
-      secretKey: CXKnO6a5zxMEjozVOk5yv5n58qM0l0FQNVFgNg/aBzY=
-      endpoint: https://cnobgk2u8blu.compat.objectstorage.ap-seoul-1.oraclecloud.com
+      accessKey: <access-key>
+      secretKey: <secret-key>
+      endpoint: <endpoint>
