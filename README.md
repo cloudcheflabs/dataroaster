@@ -18,6 +18,7 @@ Components supported by DataRoaster:
 * Redash: popular BI tool.
 * Jupyterhub: multi-user version of jupyter notebook.
 * Kafka: popular event streaming platform.
+* Airflow: popular workflow.
 
 
 ## Install DataRoaster
