@@ -113,7 +113,7 @@ public class SparkThriftServerController {
             // if nfs is not installed.
             if(!nfsRunning) {
                 String nfsCustomResourceString =
-                        TemplateUtils.replace("/templates/spark-thrift-server/nfs.yaml", true, kv);
+                        TemplateUtils.replace("/templates/nfs/nfs.yaml", true, kv);
                 CustomResource nfsCustomResource = CustomResourceUtils.fromYaml(nfsCustomResourceString);
                 nfsCustomResource.setComponents(nfsComponent);
                 k8sResourceService.createCustomResource(nfsCustomResource);
