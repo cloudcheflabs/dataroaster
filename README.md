@@ -43,8 +43,10 @@ You need to copy the randomly generated admin password which will be used to acc
 
 ```
 kubectl logs -f $(kubectl get pod -l app=dataroaster-operator -o jsonpath="{.items[0].metadata.name}" -n dataroaster-operator) -n dataroaster-operator | grep "randomly generated password for user";
+```
 
-
+Output looks like this.
+```
 ...
 randomly generated password for user 'admin': 9a87f65688a64e999e62c8c308509708
 ...
