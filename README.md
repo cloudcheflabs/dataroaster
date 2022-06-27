@@ -12,13 +12,13 @@ DataRoaster has a simple architecture. There are several operators in DataRoaste
 ## Data Platform Components supported by DataRoaster
 
 Components supported by DataRoaster:
-* Hive Metastore: standard data catalog in data lakehouses.
-* Spark Thrift Server: hive server compatible interface through which hive queries will be executed on spark.
-* Trino: popular query engine in data lakehouses.
-* Redash: popular BI tool.
-* Jupyterhub: multi-user version of jupyter notebook.
-* Kafka: popular event streaming platform.
-* Airflow: popular workflow.
+* `Hive Metastore`: standard data catalog in data lakehouses.
+* `Spark Thrift Server`: hive server compatible interface through which hive queries will be executed on spark.
+* `Trino`: popular query engine in data lakehouses.
+* `Redash`: popular BI tool.
+* `Jupyterhub`: multi-user version of jupyter notebook.
+* `Kafka`: popular event streaming platform.
+* `Airflow`: popular workflow.
 
 
 ## Install DataRoaster
