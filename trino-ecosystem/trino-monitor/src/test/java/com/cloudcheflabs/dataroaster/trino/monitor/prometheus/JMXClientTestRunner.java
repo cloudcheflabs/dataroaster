@@ -37,12 +37,15 @@ public class JMXClientTestRunner {
                         // attribute.
                         String attribute = info.getName();
                         Object attributeValue = client.getAttribute(objectName, attribute);
-                        System.out.printf("\t\t%s=%s\n", attribute, attributeValue);
+                        // in case of composite data.
                         if(attributeValue instanceof CompositeData) {
-                            CompositeData compositeValue = (CompositeData) attributeValue;
-                            for(String compositeKey : compositeValue.getCompositeType().keySet()) {
-                                System.out.printf("\t\t\t%s=%s\n", compositeKey, compositeValue.containsKey(compositeKey));
+                            CompositeData compositeData = (CompositeData) attributeValue;
+                            System.out.printf("\t\t%s\n", attribute);
+                            for(String compositeKey : compositeData.getCompositeType().keySet()) {
+                                System.out.printf("\t\t\t%s=%s\n", compositeKey, compositeData.get(compositeKey));
                             }
+                        } else {
+                            System.out.printf("\t\t%s=%s\n", attribute, attributeValue);
                         }
                     }
                 } catch (Exception e) {
