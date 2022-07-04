@@ -1,18 +1,10 @@
 package com.cloudcheflabs.dataroaster.trino.monitor.jmx;
 
 import com.cedarsoftware.util.io.JsonWriter;
-import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.trino.monitor.util.JmxUtils;
-import com.j256.simplejmx.client.JmxClient;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.management.MBeanAttributeInfo;
-import javax.management.ObjectName;
-import javax.management.openmbean.CompositeData;
-import java.util.Hashtable;
-import java.util.Set;
 
 public class JMXClientTestRunner {
 

@@ -1,8 +1,6 @@
 package com.cloudcheflabs.dataroaster.trino.monitor.util;
 
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
-import com.cloudcheflabs.dataroaster.trino.gateway.TrinoGatewayApplication;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.j256.simplejmx.client.JmxClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
