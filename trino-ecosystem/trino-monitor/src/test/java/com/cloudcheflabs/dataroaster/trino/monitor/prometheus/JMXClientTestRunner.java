@@ -26,7 +26,7 @@ public class JMXClientTestRunner {
             System.out.printf("domain: %s, canonicalName: %s, canonicalKeyPropertyListString: %s, keyPropertyListString: %s\n", domain, canonicalName, canonicalKeyPropertyListString, keyPropertyListString);
         }
 
-        ObjectName objectName = ObjectNameUtil.makeObjectName("trino.execution", "TaskExecutor");
+        ObjectName objectName = ObjectNameUtil.makeObjectName("trino.execution", "QueryExecution");
         MBeanAttributeInfo[] infos = client.getAttributesInfo(objectName);
         for(MBeanAttributeInfo info : infos) {
             String attribute = info.getName();
