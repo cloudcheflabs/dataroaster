@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.ObjectName;
+import java.util.Hashtable;
 import java.util.Set;
 
 public class JMXClientTestRunner {
@@ -19,26 +20,23 @@ public class JMXClientTestRunner {
         JmxClient client = new JmxClient(host, Integer.valueOf(port));
         Set<ObjectName> names = client.getBeanNames();
         for (ObjectName name : names) {
+            // domain.
             String domain = name.getDomain();
-            String canonicalName = name.getCanonicalName();
-            String canonicalKeyPropertyListString = name.getCanonicalKeyPropertyListString();
-            String keyPropertyListString = name.getKeyPropertyListString();
-            System.out.printf("domain: %s, canonicalName: %s, canonicalKeyPropertyListString: %s, keyPropertyListString: %s\n", domain, canonicalName, canonicalKeyPropertyListString, keyPropertyListString);
-        }
-
-        ObjectName objectName = ObjectNameUtil.makeObjectName("trino.execution", "QueryExecution");
-        MBeanAttributeInfo[] infos = client.getAttributesInfo(objectName);
-        for(MBeanAttributeInfo info : infos) {
-            String attribute = info.getName();
-            // "Executor.ActiveCount" attribute.
-            if(attribute.equals("Executor.ActiveCount")) {
-                Object value = client.getAttribute(objectName, attribute);
-                System.out.printf("attribute: %s, value: %s\n", attribute, JsonUtils.toJson(value));
+            System.out.println(domain);
+            Hashtable<String, String> kv = name.getKeyPropertyList();
+            for(String key : kv.keySet()) {
+                // key properties.
+                String value = kv.get(key);
+                System.out.printf("\t%s=%s\n", key, value);
+                ObjectName objectName = ObjectNameUtil.makeObjectName(domain, value);
+                MBeanAttributeInfo[] infos = client.getAttributesInfo(objectName);
+                for(MBeanAttributeInfo info : infos) {
+                    // attribute.
+                    String attribute = info.getName();
+                    Object attributeValue = client.getAttribute(objectName, attribute);
+                    System.out.printf("\t\t%s=%s\n", attribute, attributeValue);
+                }
             }
-
-            // print all attribute value anyway.
-            Object value = client.getAttribute(objectName, attribute);
-            System.out.printf("attribute: %s, value: %s\n", attribute, JsonUtils.toJson(value));
         }
     }
 }
