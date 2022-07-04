@@ -16,6 +16,7 @@
         <module>operators/spark/spark-operator</module>
         <module>operators/trino/trino-operator</module>
         <module>trino-ecosystem/trino-gateway</module>
+        <module>trino-ecosystem/trino-monitor</module>
     </modules>
     <build>
         <pluginManagement>
