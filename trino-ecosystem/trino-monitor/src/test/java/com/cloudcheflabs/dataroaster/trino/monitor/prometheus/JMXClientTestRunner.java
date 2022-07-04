@@ -38,7 +38,7 @@ public class JMXClientTestRunner {
                         Object attributeValue = client.getAttribute(objectName, attribute);
                         System.out.printf("\t\t%s=%s\n", attribute, attributeValue);
                     }
-                } catch (JMException e) {
+                } catch (Exception e) {
                     //System.err.println(e.getMessage());
                 }
             }
