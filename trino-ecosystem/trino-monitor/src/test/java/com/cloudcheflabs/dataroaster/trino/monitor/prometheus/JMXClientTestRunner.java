@@ -32,13 +32,13 @@ public class JMXClientTestRunner {
             String attribute = info.getName();
             // "Executor.ActiveCount" attribute.
             if(attribute.equals("Executor.ActiveCount")) {
-                Object obj = client.getAttribute(objectName, attribute);
-                System.out.printf("attribute: %s, obj: %s\n", attribute, JsonUtils.toJson(obj));
+                Object value = client.getAttribute(objectName, attribute);
+                System.out.printf("attribute: %s, value: %s\n", attribute, JsonUtils.toJson(value));
             }
 
             // print all attribute value anyway.
-            Object obj = client.getAttribute(objectName, attribute);
-            System.out.printf("attribute: %s, obj: %s\n", attribute, JsonUtils.toJson(obj));
+            Object value = client.getAttribute(objectName, attribute);
+            System.out.printf("attribute: %s, value: %s\n", attribute, JsonUtils.toJson(value));
         }
     }
 }
