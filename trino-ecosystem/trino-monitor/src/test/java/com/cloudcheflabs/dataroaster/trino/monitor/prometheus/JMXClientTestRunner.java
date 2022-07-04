@@ -1,6 +1,7 @@
 package com.cloudcheflabs.dataroaster.trino.monitor.prometheus;
 
 import com.j256.simplejmx.client.JmxClient;
+import com.j256.simplejmx.common.ObjectNameUtil;
 import org.junit.Test;
 
 import javax.management.ObjectName;
@@ -19,7 +20,11 @@ public class JMXClientTestRunner {
             String domain = name.getDomain();
             String canonicalName = name.getCanonicalName();
             String canonicalKeyPropertyListString = name.getCanonicalKeyPropertyListString();
-            System.out.printf("domain: %s, canonicalName: %s, canonicalKeyPropertyListString: %s\n", domain, canonicalName, canonicalKeyPropertyListString);
+            String keyPropertyListString = name.getKeyPropertyListString();
+            System.out.printf("domain: %s, canonicalName: %s, canonicalKeyPropertyListString: %s, keyPropertyListString: %s\n", domain, canonicalName, canonicalKeyPropertyListString, keyPropertyListString);
         }
+
+        ObjectName objectName = ObjectNameUtil.makeObjectName("trino.execution.executor", "TaskExecutor");
+        //client.getAt
     }
 }
