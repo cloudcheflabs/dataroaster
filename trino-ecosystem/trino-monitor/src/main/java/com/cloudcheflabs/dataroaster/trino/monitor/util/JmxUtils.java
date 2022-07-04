@@ -112,7 +112,7 @@ public class JmxUtils {
     }
 
 
-    public static String listAllMBeanValues(String host, String port) {
+    public static List<Map<String, Object>> listAllMBeanValues(String host, String port) {
         List<Map<String, Object>> list = new ArrayList<>();
         try {
             JmxClient client = new JmxClient(host, Integer.valueOf(port));
@@ -129,9 +129,7 @@ public class JmxUtils {
                     // key properties.
                     String value = kv.get(key);
                     Map<String, Object> keyPropMap = new HashMap<>();
-                    keyPropMap.put("key", key);
-                    keyPropMap.put("property", value);
-
+                    keyPropMap.put(key, value);
                     ObjectName objectName = new ObjectName(domain + ":" + key + "=" + value);
                     try {
                         MBeanAttributeInfo[] infos = client.getAttributesInfo(objectName);
@@ -151,16 +149,13 @@ public class JmxUtils {
                                 CompositeData compositeData = (CompositeData) attributeValue;
                                 for (String compositeKey : compositeData.getCompositeType().keySet()) {
                                     Map<String, Object> compositeMap = new HashMap<>();
-                                    compositeMap.put("compositeKey", compositeKey);
-                                    compositeMap.put("compositeValue", compositeData.get(compositeKey));
+                                    compositeMap.put(compositeKey, compositeData.get(compositeKey));
                                     compositeList.add(compositeMap);
                                 }
 
-                                attributeMap.put("attribute", attribute);
-                                attributeMap.put("attributeValue", compositeList);
+                                attributeMap.put(attribute, compositeList);
                             } else {
-                                attributeMap.put("attribute", attribute);
-                                attributeMap.put("attributeValue", attributeValue);
+                                attributeMap.put(attribute, attributeValue);
                             }
                             attributeList.add(attributeMap);
                         }
@@ -170,12 +165,17 @@ public class JmxUtils {
                     }
                     keyPropList.add(keyPropMap);
                 }
-                domainMap.put("keyPropertyList", keyPropList);
+                domainMap.put("keyProperties", keyPropList);
                 list.add(domainMap);
             }
-            return JsonUtils.toJson(list);
+            return list;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    public static String listAllMBeanValuesInJson(String host, String port) {
+        return JsonUtils.toJson(listAllMBeanValues(host, port));
     }
 }

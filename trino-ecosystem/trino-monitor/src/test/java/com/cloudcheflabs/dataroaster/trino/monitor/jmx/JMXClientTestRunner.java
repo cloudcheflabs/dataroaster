@@ -24,8 +24,8 @@ public class JMXClientTestRunner {
         String host = System.getProperty("host", "localhost");
         String port = System.getProperty("port", "9080");
 
-        String json = JmxUtils.listAllMBeanValues(host, port);
-        LOG.info("mbean values in json: \n{}", JsonWriter.formatJson(JmxUtils.listAllMBeanValues(host, port)));
+        String json = JmxUtils.listAllMBeanValuesInJson(host, port);
+        LOG.info("mbean values in json: \n{}", JsonWriter.formatJson(json);
     }
 
     @Test
