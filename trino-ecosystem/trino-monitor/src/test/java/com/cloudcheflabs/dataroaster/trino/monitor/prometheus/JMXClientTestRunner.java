@@ -1,9 +1,11 @@
 package com.cloudcheflabs.dataroaster.trino.monitor.prometheus;
 
+import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.j256.simplejmx.client.JmxClient;
 import com.j256.simplejmx.common.ObjectNameUtil;
 import org.junit.Test;
 
+import javax.management.MBeanAttributeInfo;
 import javax.management.ObjectName;
 import java.util.Set;
 
@@ -24,7 +26,12 @@ public class JMXClientTestRunner {
             System.out.printf("domain: %s, canonicalName: %s, canonicalKeyPropertyListString: %s, keyPropertyListString: %s\n", domain, canonicalName, canonicalKeyPropertyListString, keyPropertyListString);
         }
 
-        ObjectName objectName = ObjectNameUtil.makeObjectName("trino.execution.executor", "TaskExecutor");
-        //client.getAt
+        ObjectName objectName = ObjectNameUtil.makeObjectName("trino.execution", "TaskExecutor");
+        MBeanAttributeInfo[] infos = client.getAttributesInfo(objectName);
+        for(MBeanAttributeInfo info : infos) {
+            String attribute = info.getName();
+            Object obj = client.getAttribute(objectName, attribute);
+            System.out.printf("obj: %s\n", JsonUtils.toJson(obj));
+        }
     }
 }
