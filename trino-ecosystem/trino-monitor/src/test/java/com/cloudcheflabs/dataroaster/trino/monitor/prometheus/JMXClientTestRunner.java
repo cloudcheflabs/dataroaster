@@ -30,8 +30,11 @@ public class JMXClientTestRunner {
         MBeanAttributeInfo[] infos = client.getAttributesInfo(objectName);
         for(MBeanAttributeInfo info : infos) {
             String attribute = info.getName();
-            Object obj = client.getAttribute(objectName, attribute);
-            System.out.printf("attribute: %s, obj: %s\n", attribute, JsonUtils.toJson(obj));
+            // "Executor.ActiveCount" attribute.
+            if(attribute.equals("Executor.ActiveCount")) {
+                Object obj = client.getAttribute(objectName, attribute);
+                System.out.printf("attribute: %s, obj: %s\n", attribute, JsonUtils.toJson(obj));
+            }
         }
     }
 }
