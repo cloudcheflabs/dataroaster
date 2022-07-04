@@ -39,7 +39,7 @@ public class JMXClientTestRunner {
                         System.out.printf("\t\t%s=%s\n", attribute, attributeValue);
                     }
                 } catch (JMException e) {
-                    System.err.println(e.getMessage());
+                    //System.err.println(e.getMessage());
                 }
             }
         }
