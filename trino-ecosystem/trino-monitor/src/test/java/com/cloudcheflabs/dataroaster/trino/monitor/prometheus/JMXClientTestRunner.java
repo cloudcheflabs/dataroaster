@@ -8,6 +8,7 @@ import org.junit.Test;
 import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.ObjectName;
+import javax.management.openmbean.CompositeData;
 import java.util.Hashtable;
 import java.util.Set;
 
@@ -37,6 +38,12 @@ public class JMXClientTestRunner {
                         String attribute = info.getName();
                         Object attributeValue = client.getAttribute(objectName, attribute);
                         System.out.printf("\t\t%s=%s\n", attribute, attributeValue);
+                        if(attributeValue instanceof CompositeData) {
+                            CompositeData compositeValue = (CompositeData) attributeValue;
+                            for(String compositeKey : compositeValue.getCompositeType().keySet()) {
+                                System.out.printf("\t\t\t%s=%s\n", compositeKey, compositeValue.containsKey(compositeKey));
+                            }
+                        }
                     }
                 } catch (Exception e) {
                     //System.err.println(e.getMessage());
