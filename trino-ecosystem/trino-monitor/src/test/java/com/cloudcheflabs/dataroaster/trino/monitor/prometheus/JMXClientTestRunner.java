@@ -35,6 +35,10 @@ public class JMXClientTestRunner {
                 Object obj = client.getAttribute(objectName, attribute);
                 System.out.printf("attribute: %s, obj: %s\n", attribute, JsonUtils.toJson(obj));
             }
+
+            // print all attribute value anyway.
+            Object obj = client.getAttribute(objectName, attribute);
+            System.out.printf("attribute: %s, obj: %s\n", attribute, JsonUtils.toJson(obj));
         }
     }
 }
