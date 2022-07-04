@@ -31,7 +31,7 @@ public class JMXClientTestRunner {
         for(MBeanAttributeInfo info : infos) {
             String attribute = info.getName();
             Object obj = client.getAttribute(objectName, attribute);
-            System.out.printf("obj: %s\n", JsonUtils.toJson(obj));
+            System.out.printf("attribute: %s, obj: %s\n", attribute, JsonUtils.toJson(obj));
         }
     }
 }
