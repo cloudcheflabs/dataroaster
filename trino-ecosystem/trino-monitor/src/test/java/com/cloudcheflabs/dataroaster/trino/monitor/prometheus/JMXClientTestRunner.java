@@ -5,6 +5,7 @@ import com.j256.simplejmx.client.JmxClient;
 import com.j256.simplejmx.common.ObjectNameUtil;
 import org.junit.Test;
 
+import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.ObjectName;
 import java.util.Hashtable;
@@ -29,12 +30,16 @@ public class JMXClientTestRunner {
                 String value = kv.get(key);
                 System.out.printf("\t%s=%s\n", key, value);
                 ObjectName objectName = ObjectNameUtil.makeObjectName(domain, value);
-                MBeanAttributeInfo[] infos = client.getAttributesInfo(objectName);
-                for(MBeanAttributeInfo info : infos) {
-                    // attribute.
-                    String attribute = info.getName();
-                    Object attributeValue = client.getAttribute(objectName, attribute);
-                    System.out.printf("\t\t%s=%s\n", attribute, attributeValue);
+                try {
+                    MBeanAttributeInfo[] infos = client.getAttributesInfo(objectName);
+                    for (MBeanAttributeInfo info : infos) {
+                        // attribute.
+                        String attribute = info.getName();
+                        Object attributeValue = client.getAttribute(objectName, attribute);
+                        System.out.printf("\t\t%s=%s\n", attribute, attributeValue);
+                    }
+                } catch (JMException e) {
+                    System.err.println(e.getMessage());
                 }
             }
         }
