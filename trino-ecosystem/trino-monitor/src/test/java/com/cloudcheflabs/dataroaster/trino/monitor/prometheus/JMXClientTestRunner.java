@@ -29,7 +29,7 @@ public class JMXClientTestRunner {
                 // key properties.
                 String value = kv.get(key);
                 System.out.printf("\t%s=%s\n", key, value);
-                ObjectName objectName = ObjectNameUtil.makeObjectName(domain, value);
+                ObjectName objectName = new ObjectName(domain + ":" + key + "=" + value);
                 try {
                     MBeanAttributeInfo[] infos = client.getAttributesInfo(objectName);
                     for (MBeanAttributeInfo info : infos) {
