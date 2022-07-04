@@ -29,9 +29,13 @@ public class JMXClientTestRunner {
     }
 
     @Test
-    public void getValue() throws Exception {
+    public void testGetValue() throws Exception {
         String host = System.getProperty("host", "localhost");
         String port = System.getProperty("port", "9080");
+        String objectName = System.getProperty("objectName");
+        String attribute = System.getProperty("attribute");
+        String compositeKey = System.getProperty("compositeKey");
+
         String maxPoolSize = JmxUtils.getValue(host, port,
                 "trino.execution:name=QueryExecution",
                 "Executor.MaximumPoolSize");
@@ -42,5 +46,20 @@ public class JMXClientTestRunner {
                 "HeapMemoryUsage",
                 "committed");
         LOG.info("java.lang:type=Memory - HeapMemoryUsage - committed: {}", heapMemory);
+    }
+
+    @Test
+    public void getValue() throws Exception {
+        String host = System.getProperty("host", "localhost");
+        String port = System.getProperty("port", "9080");
+        String objectName = System.getProperty("objectName");
+        String attribute = System.getProperty("attribute");
+        String compositeKey = System.getProperty("compositeKey");
+
+        String value = JmxUtils.getValue(host, port,
+                objectName,
+                attribute,
+                compositeKey);
+        LOG.info("{} - {} - {}: {}", objectName, attribute, compositeKey, value);
     }
 }
