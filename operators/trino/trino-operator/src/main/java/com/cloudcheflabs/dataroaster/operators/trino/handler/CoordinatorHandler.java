@@ -302,7 +302,7 @@ public class CoordinatorHandler {
                     .addToLabels("app", "trino-cluster").addToLabels("component", "coordinator")
                     .endMetadata()
                     .withNewSpec()
-                    .withType("None")
+                    .withClusterIP("None")
                     .withPorts(rmiRegistryServicePort)
                     .withSelector(serviceLabelSelectorMap)
                     .endSpec().build();
@@ -328,7 +328,7 @@ public class CoordinatorHandler {
                     .addToLabels("app", "trino-cluster").addToLabels("component", "coordinator")
                     .endMetadata()
                     .withNewSpec()
-                    .withType("None")
+                    .withClusterIP("None")
                     .withPorts(rmiServicePort)
                     .withSelector(serviceLabelSelectorMap)
                     .endSpec().build();
@@ -355,7 +355,7 @@ public class CoordinatorHandler {
                     .addToLabels("app", "trino-cluster").addToLabels("component", "coordinator")
                     .endMetadata()
                     .withNewSpec()
-                    .withType("None")
+                    .withClusterIP("None")
                     .withPorts(jmxExporterServicePort)
                     .withSelector(serviceLabelSelectorMap)
                     .endSpec().build();
