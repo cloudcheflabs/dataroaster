@@ -36,6 +36,7 @@ public class WorkerHandler {
         Image image = spec.getImage();
         PodSecurityContext securityContext = spec.getSecurityContext();
         Worker worker = spec.getWorker();
+        List<Container> initContainers = worker.getInitContainers();
 
         // create namespace.
         Namespace ns = new NamespaceBuilder().withNewMetadata().withName(namespace).endMetadata().build();
@@ -102,6 +103,26 @@ public class WorkerHandler {
                     .withMountPath(path + "/" + confName)
                     .withSubPath(confName).build();
             workerVolumeMounts.add(volumeMount);
+        }
+
+        // if there are init containers.
+        if(initContainers != null && initContainers.size() >0) {
+            for(Container container : initContainers) {
+                for(VolumeMount volumeMount : container.getVolumeMounts()) {
+                    String volumeName = volumeMount.getName();
+                    // create emptyDir volume.
+                    Volume volumeForInitContainers = new VolumeBuilder()
+                            .withName(volumeName)
+                            .withEmptyDir(new EmptyDirVolumeSourceBuilder().build())
+                            .build();
+
+                    // add volume.
+                    workerVolumes.add(volumeForInitContainers);
+
+                    // add volume mount.
+                    workerVolumeMounts.add(volumeMount);
+                }
+            }
         }
 
 
@@ -173,6 +194,7 @@ public class WorkerHandler {
                             .withImagePullSecrets(image.getImagePullSecrets())
                             .withVolumes(workerVolumes)
                             .withContainers(workerContainers)
+                            .withInitContainers(initContainers)
                         .endSpec()
                     .endTemplate()
                 .endSpec();

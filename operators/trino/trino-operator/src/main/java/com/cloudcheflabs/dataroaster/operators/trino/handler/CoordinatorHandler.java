@@ -34,6 +34,7 @@ public class CoordinatorHandler {
         Image image = spec.getImage();
         PodSecurityContext securityContext = spec.getSecurityContext();
         Coordinator coordinator = spec.getCoordinator();
+        List<Container> initContainers = coordinator.getInitContainers();
 
         // create namespace.
         Namespace ns = new NamespaceBuilder().withNewMetadata().withName(namespace).endMetadata().build();
@@ -100,6 +101,26 @@ public class CoordinatorHandler {
                     .withMountPath(path + "/" + confName)
                     .withSubPath(confName).build();
             coordinatorVolumeMounts.add(volumeMount);
+        }
+
+        // if there are init containers.
+        if(initContainers != null && initContainers.size() >0) {
+            for(Container container : initContainers) {
+                for(VolumeMount volumeMount : container.getVolumeMounts()) {
+                    String volumeName = volumeMount.getName();
+                    // create emptyDir volume.
+                    Volume volumeForInitContainers = new VolumeBuilder()
+                            .withName(volumeName)
+                            .withEmptyDir(new EmptyDirVolumeSourceBuilder().build())
+                            .build();
+
+                    // add volume.
+                    coordinatorVolumes.add(volumeForInitContainers);
+
+                    // add volume mount.
+                    coordinatorVolumeMounts.add(volumeMount);
+                }
+            }
         }
 
 
@@ -170,6 +191,7 @@ public class CoordinatorHandler {
                             .withImagePullSecrets(image.getImagePullSecrets())
                             .withVolumes(coordinatorVolumes)
                             .withContainers(coordinatorContainers)
+                            .withInitContainers(initContainers)
                         .endSpec()
                     .endTemplate()
                 .endSpec();
