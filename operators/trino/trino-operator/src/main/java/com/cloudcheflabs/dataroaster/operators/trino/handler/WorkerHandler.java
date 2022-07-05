@@ -62,7 +62,6 @@ public class WorkerHandler {
         Map<String, String> workerConfigMapKV = new HashMap<>();
         List<Config> workerConfigs = worker.getConfigs();
         int workerTrinoPort = -1;
-        int coordinatorTrinoPort = -1;
         int rmiRegistryPort = -1;
         int rmiPort = -1;
         int jmxExporterPort = -1;
@@ -77,7 +76,7 @@ public class WorkerHandler {
                 Properties prop = new Properties();
                 try {
                     prop.load(new ByteArrayInputStream(value.getBytes()));
-                    coordinatorTrinoPort = Integer.valueOf(prop.getProperty("http-server.http.port"));
+                    workerTrinoPort = Integer.valueOf(prop.getProperty("http-server.http.port"));
                     String rmiRegistryPortString = prop.getProperty("jmx.rmiregistry.port");
                     rmiRegistryPort = (rmiRegistryPortString != null) ? Integer.valueOf(rmiRegistryPortString) : -1;
                     LOG.info("rmiRegistryPort: {}", rmiRegistryPort);
@@ -293,7 +292,7 @@ public class WorkerHandler {
         if(rmiRegistryPort > 0) {
             ServicePort rmiRegistryServicePort = new ServicePortBuilder()
                     .withName("rmiregistry")
-                    .withPort(coordinatorTrinoPort)
+                    .withPort(rmiRegistryPort)
                     .withTargetPort(new IntOrString("rmiregistry"))
                     .withProtocol("TCP")
                     .build();
@@ -319,7 +318,7 @@ public class WorkerHandler {
         if(rmiPort > 0) {
             ServicePort rmiServicePort = new ServicePortBuilder()
                     .withName("rmi")
-                    .withPort(coordinatorTrinoPort)
+                    .withPort(rmiPort)
                     .withTargetPort(new IntOrString("rmi"))
                     .withProtocol("TCP")
                     .build();
@@ -346,7 +345,7 @@ public class WorkerHandler {
         if(jmxExporterPort > 0) {
             ServicePort jmxExporterServicePort = new ServicePortBuilder()
                     .withName("jmxexporter")
-                    .withPort(coordinatorTrinoPort)
+                    .withPort(jmxExporterPort)
                     .withTargetPort(new IntOrString("jmxexporter"))
                     .withProtocol("TCP")
                     .build();

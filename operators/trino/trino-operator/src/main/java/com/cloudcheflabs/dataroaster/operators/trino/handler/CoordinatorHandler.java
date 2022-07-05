@@ -290,7 +290,7 @@ public class CoordinatorHandler {
         if(rmiRegistryPort > 0) {
             ServicePort rmiRegistryServicePort = new ServicePortBuilder()
                     .withName("rmiregistry")
-                    .withPort(coordinatorTrinoPort)
+                    .withPort(rmiRegistryPort)
                     .withTargetPort(new IntOrString("rmiregistry"))
                     .withProtocol("TCP")
                     .build();
@@ -316,7 +316,7 @@ public class CoordinatorHandler {
         if(rmiPort > 0) {
             ServicePort rmiServicePort = new ServicePortBuilder()
                     .withName("rmi")
-                    .withPort(coordinatorTrinoPort)
+                    .withPort(rmiPort)
                     .withTargetPort(new IntOrString("rmi"))
                     .withProtocol("TCP")
                     .build();
@@ -343,7 +343,7 @@ public class CoordinatorHandler {
         if(jmxExporterPort > 0) {
             ServicePort jmxExporterServicePort = new ServicePortBuilder()
                     .withName("jmxexporter")
-                    .withPort(coordinatorTrinoPort)
+                    .withPort(jmxExporterPort)
                     .withTargetPort(new IntOrString("jmxexporter"))
                     .withProtocol("TCP")
                     .build();
