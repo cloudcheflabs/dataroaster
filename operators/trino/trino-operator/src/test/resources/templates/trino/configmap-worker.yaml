@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: trino-worker
-  namespace: {{ namespace }}
-  labels:
-    app: trino-cluster
-    component: worker
-data: {{ data }}
