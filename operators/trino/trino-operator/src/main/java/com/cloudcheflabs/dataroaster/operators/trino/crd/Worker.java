@@ -1,6 +1,7 @@
 package com.cloudcheflabs.dataroaster.operators.trino.crd;
 
 import io.fabric8.kubernetes.api.model.Affinity;
+import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.Toleration;
 
 import java.util.List;
@@ -13,7 +14,17 @@ public class Worker {
     private Map<String, String> nodeSelector;
     private Affinity affinity;
     private List<Toleration> tolerations;
+
+    private List<Container> initContainers;
     private List<Config> configs;
+
+    public List<Container> getInitContainers() {
+        return initContainers;
+    }
+
+    public void setInitContainers(List<Container> initContainers) {
+        this.initContainers = initContainers;
+    }
 
     public int getReplicas() {
         return replicas;

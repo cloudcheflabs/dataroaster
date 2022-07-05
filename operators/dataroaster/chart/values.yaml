@@ -1,5 +1,5 @@
 serviceAccount: dataroaster-operator
-image: cloudcheflabs/dataroaster-operator:{{ .Chart.appVersion }}
+image: cloudcheflabs/dataroaster-operator:4.3.0
 imagePullPolicy: Always
 replicas: 1
 resources:
