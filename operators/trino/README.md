@@ -16,7 +16,7 @@ helm install \
 trino-operator \
 --create-namespace \
 --namespace trino-operator \
---version v1.0.0 \
+--version v2.0.1 \
 dataroaster-trino-operator/dataroaster-trino-operator;
 ```
 
