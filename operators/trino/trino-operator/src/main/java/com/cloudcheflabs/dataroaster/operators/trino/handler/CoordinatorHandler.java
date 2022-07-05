@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.cloudcheflabs.dataroaster.operators.trino.config.TrinoConfiguration.*;
 
@@ -59,6 +60,9 @@ public class CoordinatorHandler {
         Map<String, String> coordinatorConfigMapKV = new HashMap<>();
         List<Config> coordinatorConfigs = coordinator.getConfigs();
         int coordinatorTrinoPort = -1;
+        int rmiRegistryPort = -1;
+        int rmiPort = -1;
+        int jmxExporterPort = -1;
         for(Config config : coordinatorConfigs) {
             String name = config.getName();
             String value = config.getValue();
@@ -71,8 +75,26 @@ public class CoordinatorHandler {
                 try {
                     prop.load(new ByteArrayInputStream(value.getBytes()));
                     coordinatorTrinoPort = Integer.valueOf(prop.getProperty("http-server.http.port"));
+                    String rmiRegistryPortString = prop.getProperty("jmx.rmiregistry.port");
+                    rmiRegistryPort = (rmiRegistryPortString != null) ? Integer.valueOf(rmiRegistryPortString) : -1;
+                    LOG.info("rmiRegistryPort: {}", rmiRegistryPort);
+                    String rmiPortString = prop.getProperty("jmx.rmiserver.port");
+                    rmiPort = (rmiPortString != null) ? Integer.valueOf(rmiPortString) : -1;
+                    LOG.info("rmiPort: {}", rmiPort);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
+                }
+            } else if(name.equals("jvm.config")) {
+                // get jmx export port number from the string line like '-javaagent:/path/jmx_prometheus_javaagent-0.17.0.jar=9090:/path/config.yaml'.
+                for(String s : value.lines().collect(Collectors.toList())) {
+                    if(s.contains("-javaagent")) {
+                        String[] lineTokens = s.split("=");
+                        if(lineTokens.length == 2) {
+                            String portPart = lineTokens[1];
+                            jmxExporterPort = Integer.valueOf(portPart.split(":")[0]);
+                            LOG.info("jmxExporterPort: {}", jmxExporterPort);
+                        }
+                    }
                 }
             }
         }
@@ -145,11 +167,45 @@ public class CoordinatorHandler {
             }
         }
 
+        List<ContainerPort> containerPorts = new ArrayList<>();
+
         // coordinator container ports.
         ContainerPort coordinatorContainerPort = new ContainerPortBuilder()
                 .withName("http")
                 .withContainerPort(coordinatorTrinoPort)
                 .withProtocol("TCP").build();
+        containerPorts.add(coordinatorContainerPort);
+
+        // add rmiregistry port.
+        if(rmiRegistryPort > 0) {
+            ContainerPort rmiRegistryContainerPort = new ContainerPortBuilder()
+                    .withName("rmiregistry")
+                    .withContainerPort(rmiRegistryPort)
+                    .withProtocol("TCP").build();
+            containerPorts.add(rmiRegistryContainerPort);
+        }
+
+        // add rmi port.
+        if(rmiPort > 0) {
+            ContainerPort rmiContainerPort = new ContainerPortBuilder()
+                    .withName("rmi")
+                    .withContainerPort(rmiPort)
+                    .withProtocol("TCP").build();
+            containerPorts.add(rmiContainerPort);
+        }
+
+
+        // add prometheus jmx exporter port.
+        if(jmxExporterPort > 0) {
+            ContainerPort jmxExporterContainerPort = new ContainerPortBuilder()
+                    .withName("jmxexporter")
+                    .withContainerPort(jmxExporterPort)
+                    .withProtocol("TCP").build();
+            containerPorts.add(jmxExporterContainerPort);
+        }
+
+
+
 
         // coordinator containers.
         List<Container> coordinatorContainers = new ArrayList<>();
@@ -162,7 +218,7 @@ public class CoordinatorHandler {
                 .withLimits(coordinatorResourcesLimitsMap)
                 .endResources()
                 .withVolumeMounts(coordinatorVolumeMounts)
-                .withPorts(coordinatorContainerPort)
+                .withPorts(containerPorts)
                 .build();
         coordinatorContainers.add(coordinatorContainer);
 
@@ -207,6 +263,7 @@ public class CoordinatorHandler {
                 .withTargetPort(new IntOrString("http"))
                 .withProtocol("TCP")
                 .build();
+
         Map<String, String> serviceLabelSelectorMap = new HashMap<>();
         serviceLabelSelectorMap.put("app", "trino-cluster");
         serviceLabelSelectorMap.put("component", "coordinator");
@@ -226,6 +283,87 @@ public class CoordinatorHandler {
         // create coordinator service.
         Service retService = client.services().inNamespace(namespace).createOrReplace(coordinatorService);
         LOG.info("coordinator service: \n{}", YamlUtils.objectToYaml(retService));
+
+
+        // create jmx related headless services.
+        // create rmiregistry service.
+        if(rmiRegistryPort > 0) {
+            ServicePort rmiRegistryServicePort = new ServicePortBuilder()
+                    .withName("rmiregistry")
+                    .withPort(coordinatorTrinoPort)
+                    .withTargetPort(new IntOrString("rmiregistry"))
+                    .withProtocol("TCP")
+                    .build();
+
+            Service rmiRegistryService = new ServiceBuilder()
+                    .withNewMetadata()
+                    .withName("trino-coordinator-rmiregistry-service")
+                    .withNamespace(namespace)
+                    .addToLabels("app", "trino-cluster").addToLabels("component", "coordinator")
+                    .endMetadata()
+                    .withNewSpec()
+                    .withType("None")
+                    .withPorts(rmiRegistryServicePort)
+                    .withSelector(serviceLabelSelectorMap)
+                    .endSpec().build();
+
+            // create coordinator rmiregistry service.
+            retService = client.services().inNamespace(namespace).createOrReplace(rmiRegistryService);
+            LOG.info("coordinator rmiregistry service: \n{}", YamlUtils.objectToYaml(retService));
+        }
+
+        // create rmi service.
+        if(rmiPort > 0) {
+            ServicePort rmiServicePort = new ServicePortBuilder()
+                    .withName("rmi")
+                    .withPort(coordinatorTrinoPort)
+                    .withTargetPort(new IntOrString("rmi"))
+                    .withProtocol("TCP")
+                    .build();
+
+            Service rmiService = new ServiceBuilder()
+                    .withNewMetadata()
+                    .withName("trino-coordinator-rmi-service")
+                    .withNamespace(namespace)
+                    .addToLabels("app", "trino-cluster").addToLabels("component", "coordinator")
+                    .endMetadata()
+                    .withNewSpec()
+                    .withType("None")
+                    .withPorts(rmiServicePort)
+                    .withSelector(serviceLabelSelectorMap)
+                    .endSpec().build();
+
+            // create coordinator rmi service.
+            retService = client.services().inNamespace(namespace).createOrReplace(rmiService);
+            LOG.info("coordinator rmi service: \n{}", YamlUtils.objectToYaml(retService));
+        }
+
+
+        // create prometheus jmx exporter service.
+        if(jmxExporterPort > 0) {
+            ServicePort jmxExporterServicePort = new ServicePortBuilder()
+                    .withName("jmxexporter")
+                    .withPort(coordinatorTrinoPort)
+                    .withTargetPort(new IntOrString("jmxexporter"))
+                    .withProtocol("TCP")
+                    .build();
+
+            Service jmxExporterService = new ServiceBuilder()
+                    .withNewMetadata()
+                    .withName("trino-coordinator-jmxexporter-service")
+                    .withNamespace(namespace)
+                    .addToLabels("app", "trino-cluster").addToLabels("component", "coordinator")
+                    .endMetadata()
+                    .withNewSpec()
+                    .withType("None")
+                    .withPorts(jmxExporterServicePort)
+                    .withSelector(serviceLabelSelectorMap)
+                    .endSpec().build();
+
+            // create coordinator jmxexporter service.
+            retService = client.services().inNamespace(namespace).createOrReplace(jmxExporterService);
+            LOG.info("coordinator jmxexporter service: \n{}", YamlUtils.objectToYaml(retService));
+        }
     }
 
     public void delete(TrinoCluster trinoCluster) {
