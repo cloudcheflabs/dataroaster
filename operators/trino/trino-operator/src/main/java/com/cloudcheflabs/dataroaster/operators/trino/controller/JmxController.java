@@ -104,6 +104,7 @@ public class JmxController implements InitializingBean {
     public String listMBeans(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_USER, context, () -> {
             String namespace = params.get("namespace");
+            LOG.info("namespace: {}", namespace);
             String clusterName = params.get("cluster_name");
             LOG.info("clusterName: {}", clusterName);
 
