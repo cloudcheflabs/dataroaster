@@ -105,6 +105,7 @@ public class JmxController implements InitializingBean {
         return ControllerUtils.doProcess(Roles.ROLE_USER, context, () -> {
             String namespace = params.get("namespace");
             String clusterName = params.get("cluster_name");
+            LOG.info("clusterName", clusterName);
 
             List<Map<String, Object>> mapList = new ArrayList<>();
 
