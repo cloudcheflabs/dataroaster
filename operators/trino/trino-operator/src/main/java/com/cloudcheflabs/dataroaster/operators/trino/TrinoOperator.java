@@ -4,24 +4,28 @@ import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
 import com.cloudcheflabs.dataroaster.operators.trino.handler.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-@Component
-public class TrinoOperator {
+public class TrinoOperator implements InitializingBean {
     private static Logger LOG = LoggerFactory.getLogger(TrinoOperator.class);
 
-    @Autowired
     private ActionHandler<TrinoCluster> actionHandler;
 
-    @Autowired
     private TrinoClusterClient trinoClusterClient;
 
-    public TrinoOperator() {
+    @Override
+    public void afterPropertiesSet() throws Exception {
         run();
+    }
+
+    public TrinoOperator(TrinoClusterClient trinoClusterClient, ActionHandler<TrinoCluster> actionHandler) {
+        this.trinoClusterClient = trinoClusterClient;
+        this.actionHandler = actionHandler;
     }
 
     private void run() {
