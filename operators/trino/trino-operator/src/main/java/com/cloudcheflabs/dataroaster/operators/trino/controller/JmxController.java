@@ -168,18 +168,13 @@ public class JmxController implements InitializingBean {
             LOG.info("clusterName: {}", clusterName);
 
             String objectName = System.getProperty("object_name");
-            objectName = Base64Utils.decodeBase64(objectName);
             LOG.info("objectName: {}", objectName);
 
             String attribute = System.getProperty("attribute");
-            attribute = Base64Utils.decodeBase64(attribute);
             LOG.info("attribute: {}", attribute);
 
             // optional.
             String compositeKey = System.getProperty("composite_key");
-            if(compositeKey != null) {
-                compositeKey = Base64Utils.decodeBase64(compositeKey);
-            }
             LOG.info("compositeKey: {}", compositeKey);
 
             List<Map<String, Object>> mapList = new ArrayList<>();
