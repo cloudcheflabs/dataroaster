@@ -260,6 +260,11 @@ helm uninstall trino-operator -n trino-operator;
 
 This JMX REST API is used to access mbeans exposed by trino coordinator and workers.
 
+To test apis, port-forward trino operator service.
+```
+kubectl port-forward svc/trino-operator-service 8092 -n trino-operator;
+```
+
 
 ### List Trino Clusters
 Parameters:
