@@ -23,16 +23,14 @@ public class TrinoClusterWatchRunnable implements Runnable{
 
     @Override
     public void run() {
-        while(true) {
-            try {
-                final CountDownLatch countDownLatch = new CountDownLatch(1);
-                trinoClusterClientMixedOperation.watch(new TrinoClusterWatcher(queue, countDownLatch));
-                LOG.info("Watch trino clusters...");
-                countDownLatch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                LOG.error("watch error", e);
-            }
+        try {
+            final CountDownLatch countDownLatch = new CountDownLatch(1);
+            trinoClusterClientMixedOperation.watch(new TrinoClusterWatcher(queue, countDownLatch, this));
+            LOG.info("Watch trino clusters...");
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            LOG.error("watch error", e);
         }
     }
 }
