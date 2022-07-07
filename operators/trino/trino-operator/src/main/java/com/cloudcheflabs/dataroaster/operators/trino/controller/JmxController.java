@@ -54,6 +54,7 @@ public class JmxController implements InitializingBean {
     public String listClusters(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_USER, context, () -> {
             String namespace = params.get("namespace");
+            LOG.info("namespace: {}", namespace);
 
             List<Map<String, Object>> mapList = new ArrayList<>();
 
