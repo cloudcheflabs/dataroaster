@@ -167,14 +167,14 @@ public class JmxController implements InitializingBean {
             String clusterName = params.get("cluster_name");
             LOG.info("clusterName: {}", clusterName);
 
-            String objectName = System.getProperty("object_name");
+            String objectName = params.get("object_name");
             LOG.info("objectName: {}", objectName);
 
-            String attribute = System.getProperty("attribute");
+            String attribute = params.get("attribute");
             LOG.info("attribute: {}", attribute);
 
             // optional.
-            String compositeKey = System.getProperty("composite_key");
+            String compositeKey = params.get("composite_key");
             LOG.info("compositeKey: {}", compositeKey);
 
             List<Map<String, Object>> mapList = new ArrayList<>();
