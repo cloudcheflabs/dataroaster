@@ -12,16 +12,25 @@ RUN set -eux; \
     yum install java-11-openjdk java-11-openjdk-devel -y;
 
 
-# install TRINO operator.
+# install trino operator.
 ENV TRINO_OPERATOR_HOME /opt/trino-operator
 ENV TRINO_OPERATOR_USER trino
 
 RUN useradd -ms /bin/bash -d ${TRINO_OPERATOR_HOME} ${TRINO_OPERATOR_USER}
 
+# make conf directory.
+RUN mkdir -p ${TRINO_OPERATOR_HOME}/conf
 
-# add TRINO operator jar.
+# add trino operator jar.
 ARG TRINO_OPERATOR_JAR
 ADD ${TRINO_OPERATOR_JAR} ${TRINO_OPERATOR_HOME}
+
+# add spring boot configurations.
+ARG SPRING_BOOT_APPLICATION_PROPERTY
+ADD ${SPRING_BOOT_APPLICATION_PROPERTY} ${TRINO_OPERATOR_HOME}/conf
+
+ARG SPRING_BOOT_APPLICATION_PROD
+ADD ${SPRING_BOOT_APPLICATION_PROD} ${TRINO_OPERATOR_HOME}/conf
 
 # add trino run shell.
 ADD run-trino-operator.sh ${TRINO_OPERATOR_HOME}

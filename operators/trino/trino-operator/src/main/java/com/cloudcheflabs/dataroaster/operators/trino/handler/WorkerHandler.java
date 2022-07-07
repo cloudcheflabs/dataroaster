@@ -299,7 +299,7 @@ public class WorkerHandler {
 
             Service rmiRegistryService = new ServiceBuilder()
                     .withNewMetadata()
-                    .withName("trino-worker-rmiregistry-service")
+                    .withName(WORKER_RMI_REGISTRY_SERVICE)
                     .withNamespace(namespace)
                     .addToLabels("app", "trino-cluster").addToLabels("component", "worker")
                     .endMetadata()
@@ -352,7 +352,7 @@ public class WorkerHandler {
 
             Service jmxExporterService = new ServiceBuilder()
                     .withNewMetadata()
-                    .withName("trino-worker-jmxexporter-service")
+                    .withName(WORKER_JMX_EXPORTER_SERVICE)
                     .withNamespace(namespace)
                     .addToLabels("app", "trino-cluster").addToLabels("component", "worker")
                     .endMetadata()

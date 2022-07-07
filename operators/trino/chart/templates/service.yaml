@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino-operator-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: trino-operator
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.trino.operator.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: trino-operator

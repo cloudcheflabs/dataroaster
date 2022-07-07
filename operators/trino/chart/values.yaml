@@ -1,6 +1,6 @@
 namespace: trino-operator
 serviceAccount: trino-operator
-image: cloudcheflabs/trino-operator:v2.0.0
+image: cloudcheflabs/trino-operator:v3.0.0
 imagePullPolicy: Always
 resources:
   requests:
@@ -15,3 +15,6 @@ affinity: null
 tolerations: null
 nodeSelector: null
 hostNetwork: false
+trino:
+  operator:
+    port: 8092

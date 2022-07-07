@@ -36,3 +36,7 @@ spec:
           {{- toYaml $.Values.resources | nindent 12 }}
           command:
             - "./run-trino-operator.sh"
+          ports:
+            - name: http
+              containerPort: {{ .Values.trino.operator.port }}
+              protocol: TCP

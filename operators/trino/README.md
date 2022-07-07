@@ -16,7 +16,7 @@ helm install \
 trino-operator \
 --create-namespace \
 --namespace trino-operator \
---version v2.0.1 \
+--version v2.0.2 \
 dataroaster-trino-operator/dataroaster-trino-operator;
 ```
 
@@ -253,4 +253,70 @@ kubectl delete -f src/test/resources/cr/trino-cluster-etl.yaml;
 Uninstall trino operator.
 ```
 helm uninstall trino-operator -n trino-operator;
+```
+
+
+## JMX REST API
+
+This JMX REST API is used to access mbeans exposed by trino coordinator and workers.
+
+
+### List Trino Clusters
+Parameters:
+* `namespace`: namespace where trino cluster custom resources exists.
+
+
+```
+curl -G \
+http://localhost:8092/v1/cluster/list_clusters \
+-d "namespace=trino-operator" \
+;
+```
+
+
+
+### List MBeans
+Parameters:
+* `namespace`: namespace where trino cluster custom resources exists.
+* `cluster_name`: trino custer name.
+
+
+```
+curl -G \
+http://localhost:8092/v1/jmx/list_mbeans \
+-d "namespace=trino-operator" \
+-d "cluster_name=trino-cluster-etl" \
+;
+```
+
+
+### Get MBean Value
+Parameters:
+* `namespace`: namespace where trino cluster custom resources exists.
+* `cluster_name`: trino custer name.
+* `object_name`: mbean object name.
+* `attribute`: mbean attribute.
+* `composite_key`: composite key if attribute value is the type of composite data.
+
+
+
+```
+curl -G \
+http://localhost:8092/v1/jmx/get_value \
+--data-urlencode "namespace=trino-operator" \
+--data-urlencode "cluster_name=trino-cluster-etl" \
+--data-urlencode "object_name=trino.execution:name=QueryExecution" \
+--data-urlencode "attribute=Executor.MaximumPoolSize" \
+;
+```
+
+```
+curl -G \
+http://localhost:8092/v1/jmx/get_value \
+--data-urlencode "namespace=trino-operator" \
+--data-urlencode "cluster_name=trino-cluster-etl" \
+--data-urlencode "object_name=java.lang:type=Memory" \
+--data-urlencode "attribute=HeapMemoryUsage" \
+--data-urlencode "composite_key=committed" \
+;
 ```

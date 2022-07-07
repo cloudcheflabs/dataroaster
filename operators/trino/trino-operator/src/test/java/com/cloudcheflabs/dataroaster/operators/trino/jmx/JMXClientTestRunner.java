@@ -1,7 +1,7 @@
-package com.cloudcheflabs.dataroaster.trino.monitor.jmx;
+package com.cloudcheflabs.dataroaster.operators.trino.jmx;
 
 import com.cedarsoftware.util.io.JsonWriter;
-import com.cloudcheflabs.dataroaster.trino.monitor.util.JmxUtils;
+import com.cloudcheflabs.dataroaster.operators.trino.util.JmxUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.cloudcheflabs.dataroaster.trino.monitor.util;
+package com.cloudcheflabs.dataroaster.operators.trino.util;
 
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.j256.simplejmx.client.JmxClient;

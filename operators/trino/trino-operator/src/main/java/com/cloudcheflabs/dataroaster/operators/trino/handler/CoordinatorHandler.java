@@ -297,7 +297,7 @@ public class CoordinatorHandler {
 
             Service rmiRegistryService = new ServiceBuilder()
                     .withNewMetadata()
-                    .withName("trino-coordinator-rmiregistry-service")
+                    .withName(COORDINATOR_RMI_REGISTRY_SERVICE)
                     .withNamespace(namespace)
                     .addToLabels("app", "trino-cluster").addToLabels("component", "coordinator")
                     .endMetadata()
@@ -350,7 +350,7 @@ public class CoordinatorHandler {
 
             Service jmxExporterService = new ServiceBuilder()
                     .withNewMetadata()
-                    .withName("trino-coordinator-jmxexporter-service")
+                    .withName(COORDINATOR_JMX_EXPORTER_SERVICE)
                     .withNamespace(namespace)
                     .addToLabels("app", "trino-cluster").addToLabels("component", "coordinator")
                     .endMetadata()

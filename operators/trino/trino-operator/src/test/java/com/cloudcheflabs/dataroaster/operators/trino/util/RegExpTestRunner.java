@@ -1,6 +1,5 @@
 package com.cloudcheflabs.dataroaster.operators.trino.util;
 
-import com.cloudcheflabs.dataroaster.operators.trino.handler.CoordinatorWorkerHandlerTestRunner;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
