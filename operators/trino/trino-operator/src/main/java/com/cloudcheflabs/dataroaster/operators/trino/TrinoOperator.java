@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class TrinoOperator implements InitializingBean {
+public class TrinoOperator implements Runnable, InitializingBean {
     private static Logger LOG = LoggerFactory.getLogger(TrinoOperator.class);
 
     private ActionHandler<TrinoCluster> actionHandler;
@@ -20,7 +20,8 @@ public class TrinoOperator implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        run();
+        Thread t = new Thread(this);
+        t.start();
     }
 
     public TrinoOperator(TrinoClusterClient trinoClusterClient, ActionHandler<TrinoCluster> actionHandler) {
@@ -28,7 +29,8 @@ public class TrinoOperator implements InitializingBean {
         this.actionHandler = actionHandler;
     }
 
-    private void run() {
+    @Override
+    public void run() {
 
         // queue for trino cluster action events.
         BlockingQueue<TrinoClusterActionEvent> queue = new LinkedBlockingQueue<>(10);
