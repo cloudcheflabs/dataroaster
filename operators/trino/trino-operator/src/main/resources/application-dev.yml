@@ -1,0 +1,6 @@
+# spring boot server
+server:
+  port: 8092
+  servlet:
+    context-path: /
+

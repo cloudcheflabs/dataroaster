@@ -1,19 +1,21 @@
 package com.cloudcheflabs.dataroaster.operators.trino.handler;
 
-import com.cloudcheflabs.dataroaster.operators.trino.config.SpringContextSingleton;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TrinoClusterActionHandler implements ActionHandler<TrinoCluster> {
 
     private static Logger LOG = LoggerFactory.getLogger(TrinoClusterActionHandler.class);
 
 
+    @Autowired
     private TrinoClusterClient trinoClusterClient;
 
     public TrinoClusterActionHandler() {
-        trinoClusterClient = SpringContextSingleton.getInstance().getBean(TrinoClusterClient.class);
     }
 
 

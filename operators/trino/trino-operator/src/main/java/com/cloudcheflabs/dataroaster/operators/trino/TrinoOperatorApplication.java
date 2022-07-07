@@ -1,4 +1,4 @@
-package com.cloudcheflabs.dataroaster.trino.monitor;
+package com.cloudcheflabs.dataroaster.operators.trino;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +13,12 @@ import java.util.Arrays;
 
 
 @SpringBootApplication(exclude = HibernateJpaAutoConfiguration.class)
-public class TrinoMonitorApplication {
+public class TrinoOperatorApplication {
 
-	private static Logger LOG = LoggerFactory.getLogger(TrinoMonitorApplication.class);
+	private static Logger LOG = LoggerFactory.getLogger(TrinoOperatorApplication.class);
 
 	public static void main(String[] args) {
-		SpringApplication.run(TrinoMonitorApplication.class, args);
+		SpringApplication.run(TrinoOperatorApplication.class, args);
 	}
 
 	@Bean
