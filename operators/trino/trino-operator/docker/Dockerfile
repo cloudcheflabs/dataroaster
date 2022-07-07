@@ -21,9 +21,16 @@ RUN useradd -ms /bin/bash -d ${TRINO_OPERATOR_HOME} ${TRINO_OPERATOR_USER}
 # make conf directory.
 RUN mkdir -p ${TRINO_OPERATOR_HOME}/conf
 
-# add TRINO operator jar.
+# add trino operator jar.
 ARG TRINO_OPERATOR_JAR
 ADD ${TRINO_OPERATOR_JAR} ${TRINO_OPERATOR_HOME}
+
+# add spring boot configurations.
+ARG SPRING_BOOT_APPLICATION_PROPERTY
+ADD ${SPRING_BOOT_APPLICATION_PROPERTY} ${TRINO_OPERATOR_HOME}/conf
+
+ARG SPRING_BOOT_APPLICATION_PROD
+ADD ${SPRING_BOOT_APPLICATION_PROD} ${TRINO_OPERATOR_HOME}/conf
 
 # add trino run shell.
 ADD run-trino-operator.sh ${TRINO_OPERATOR_HOME}
