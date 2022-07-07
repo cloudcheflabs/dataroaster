@@ -38,5 +38,5 @@ spec:
             - "./run-trino-operator.sh"
           ports:
             - name: http
-              containerPort: { { .Values.trino.operator.port } }
+              containerPort: {{ .Values.trino.operator.port }}
               protocol: TCP
