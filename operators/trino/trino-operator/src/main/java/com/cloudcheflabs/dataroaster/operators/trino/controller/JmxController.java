@@ -3,6 +3,7 @@ package com.cloudcheflabs.dataroaster.operators.trino.controller;
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
 import com.cloudcheflabs.dataroaster.operators.trino.domain.Roles;
+import com.cloudcheflabs.dataroaster.operators.trino.util.Base64Utils;
 import com.cloudcheflabs.dataroaster.operators.trino.util.JmxUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.EndpointAddress;
@@ -165,12 +166,20 @@ public class JmxController implements InitializingBean {
             LOG.info("namespace: {}", namespace);
             String clusterName = params.get("cluster_name");
             LOG.info("clusterName: {}", clusterName);
+
             String objectName = System.getProperty("object_name");
+            objectName = Base64Utils.decodeBase64(objectName);
             LOG.info("objectName: {}", objectName);
+
             String attribute = System.getProperty("attribute");
+            attribute = Base64Utils.decodeBase64(attribute);
             LOG.info("attribute: {}", attribute);
+
             // optional.
             String compositeKey = System.getProperty("composite_key");
+            if(compositeKey != null) {
+                compositeKey = Base64Utils.decodeBase64(compositeKey);
+            }
             LOG.info("compositeKey: {}", compositeKey);
 
             List<Map<String, Object>> mapList = new ArrayList<>();
