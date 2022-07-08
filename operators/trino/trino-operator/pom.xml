@@ -8,7 +8,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>trino-operator</artifactId>
-	<version>4.6.0</version>
+	<version>4.7.0-SNAPSHOT</version>
 	<name>Trino Operator</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,7 +40,7 @@
 		<dependency>
 			<groupId>com.cloudcheflabs.dataroaster</groupId>
 			<artifactId>common</artifactId>
-			<version>4.6.0</version>
+			<version>4.7.0-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>

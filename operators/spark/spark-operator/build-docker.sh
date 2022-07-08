@@ -2,7 +2,7 @@
 
 export SPARK_VERSION=3.0.3;
 export SPARK_OPERATOR_VERSION=latest
-export SPARK_OPERATOR_FAT_JAR_VERSION=4.6.0
+export SPARK_OPERATOR_FAT_JAR_VERSION=4.7.0-SNAPSHOT
 for i in "$@"
 do
 case $i in

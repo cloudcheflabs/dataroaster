@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cloudcheflabs.dataroaster</groupId>
 	<artifactId>trino-gateway</artifactId>
-	<version>4.6.0</version>
+	<version>4.7.0-SNAPSHOT</version>
 	<name>Trino Gateway</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -85,7 +85,7 @@
 		<dependency>
 			<groupId>com.cloudcheflabs.dataroaster</groupId>
 			<artifactId>common</artifactId>
-			<version>4.6.0</version>
+			<version>4.7.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
