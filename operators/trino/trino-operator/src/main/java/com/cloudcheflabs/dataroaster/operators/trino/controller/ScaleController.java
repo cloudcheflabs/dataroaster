@@ -63,7 +63,7 @@ public class ScaleController implements InitializingBean {
                 String clusterName = trinoCluster.getMetadata().getName();
                 String clusterNamespace = trinoCluster.getSpec().getNamespace();
                 Deployment workerDeployment = client.apps().deployments().inNamespace(clusterNamespace).withName(DEFAULT_WORKER_DEPLOYMENT).get();
-                LOG.info("workerDeployment: \n{}", YamlUtils.objectToYaml(workerDeployment));
+                //LOG.info("workerDeployment: \n{}", YamlUtils.objectToYaml(workerDeployment));
                 int replicas = 0;
                 if(workerDeployment != null) {
                     replicas = workerDeployment.getSpec().getReplicas();
@@ -93,12 +93,9 @@ public class ScaleController implements InitializingBean {
             LOG.info("replicas: {}", replicas);
 
             TrinoCluster trinoCluster = trinoClusterClient.inNamespace(namespace).withName(clusterName).get();
-            String clusterNamespace= trinoCluster.getSpec().getNamespace();
-            Deployment workerDeployment = client.apps().deployments().inNamespace(clusterNamespace).withName(DEFAULT_WORKER_DEPLOYMENT).get();
-            workerDeployment.getSpec().setReplicas(Integer.valueOf(replicas));
-
-            // scale worker count with update deployment.
-            client.apps().deployments().inNamespace(clusterNamespace).withName(DEFAULT_WORKER_DEPLOYMENT).createOrReplace(workerDeployment);
+            trinoCluster.getSpec().getWorker().setReplicas(Integer.valueOf(replicas));
+            // scale worker count with update trino cluster custom resource.
+            trinoClusterClient.inNamespace(namespace).withName(clusterName).createOrReplace(trinoCluster);
 
             return ControllerUtils.successMessage();
         });

@@ -30,6 +30,11 @@ public class TrinoClusterActionHandler implements ActionHandler<TrinoCluster> {
     }
 
     @Override
+    public void update(TrinoCluster trinoCluster) {
+        create(trinoCluster);
+    }
+
+    @Override
     public void destroy(TrinoCluster trinoCluster) {
         // delete coordinator.
         CoordinatorHandler coordinatorHandler = new CoordinatorHandler(trinoClusterClient.getClient());
