@@ -3,8 +3,6 @@ package com.cloudcheflabs.dataroaster.operators.trino.handler;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 public class TrinoClusterActionHandler implements ActionHandler<TrinoCluster> {
 
@@ -29,6 +27,11 @@ public class TrinoClusterActionHandler implements ActionHandler<TrinoCluster> {
         workerHandler.create(trinoCluster);
         LOG.info("worker created...");
 
+    }
+
+    @Override
+    public void update(TrinoCluster trinoCluster) {
+        create(trinoCluster);
     }
 
     @Override
