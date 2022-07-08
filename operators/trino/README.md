@@ -392,3 +392,73 @@ http://localhost:8092/v1/jmx/get_value \
 --data-urlencode "composite_key=committed" \
 ;
 ```
+
+
+## Scale Worker REST API
+
+This is used to scale workers.
+
+### List Worker Count
+
+Parameters:
+* `namespace`: namespace where trino cluster custom resources exists.
+
+
+```
+curl -G \
+http://localhost:8092/v1/scale/list_worker_count \
+--data-urlencode "namespace=trino-operator" \
+;
+```
+
+### Scale out Workers
+Parameters:
+* `namespace`: namespace where trino cluster custom resources exists.
+* `cluster_name`: trino custer name.
+* `replicas`: replica count of workers in this trino cluster.
+
+
+```
+curl -XPUT \
+http://localhost:8092/v1/scale/scale_workers \
+--data-urlencode "namespace=trino-operator" \
+--data-urlencode "cluster_name=trino-cluster-etl" \
+--data-urlencode "replicas=4" \
+;
+```
+
+
+### List HPA
+
+Parameters:
+* `namespace`: namespace where trino cluster custom resources exists.
+
+
+```
+curl -G \
+http://localhost:8092/v1/scale/list_hpa \
+--data-urlencode "namespace=trino-operator" \
+;
+```
+
+
+### Update HPA
+Parameters:
+* `namespace`: namespace where trino cluster custom resources exists.
+* `cluster_name`: trino custer name.
+* `min_replicas`: min. replicas of workers.
+* `max_replicas`: max. replicas of workers.
+
+
+```
+curl -XPUT \
+http://localhost:8092/v1/scale/scale_hpa \
+--data-urlencode "namespace=trino-operator" \
+--data-urlencode "cluster_name=trino-cluster-etl" \
+--data-urlencode "min_replicas=3" \
+--data-urlencode "max_replicas=6" \
+;
+```
+
+
+
