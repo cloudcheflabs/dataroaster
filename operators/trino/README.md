@@ -255,6 +255,73 @@ Uninstall trino operator.
 helm uninstall trino-operator -n trino-operator;
 ```
 
+## Example: Create Trino Cluster with the support of Trino Monitoring using JMX and Prometheus JMX Exporter
+
+There is [another example](https://github.com/cloudcheflabs/dataroaster/blob/master/operators/trino/trino-operator/src/test/resources/cr/trino-cluster-etl-jmx.yaml) 
+to create trino cluster with the support of trino monitoring using jmx and prometheus jmx exporter.
+After installing this trino cluster, several headless services will be created to expose jmx metrics from trino coordinator and workers.
+
+Let's see the endpoints of these services.
+
+```
+NAME                                    ENDPOINTS                           AGE
+trino-coordinator-jmxexporter-service   10.244.0.15:9090                    161m
+trino-coordinator-rmi-service           10.244.0.15:9081                    161m
+trino-coordinator-rmiregistry-service   10.244.0.15:9080                    161m
+trino-worker-jmxexporter-service        10.244.0.16:9090,10.244.1.10:9090   161m
+trino-worker-rmi-service                10.244.0.16:9081,10.244.1.10:9081   161m
+trino-worker-rmiregistry-service        10.244.0.16:9080,10.244.1.10:9080   161m
+```
+
+To access mbeans exposed by coordinator pod, the endpoint of `trino-coordinator-rmiregistry-service` will be used, 
+and for worker pods, the endpoints of `trino-worker-rmiregistry-service` will be used for the jmx clients to get mbeans exposed by coordinator and workers.
+
+
+There are the endpoints of prometheus jmx exporter to integrate jmx metrics with prometheus. The endpoints of `trino-coordinator-jmxexporter-service` for coordinator and 
+`trino-worker-jmxexporter-service` for workers will be used by prometheus. With adding these endpoints addresses to scrape configs in prometheus configuration, 
+all the jmx metrics exposed by prometheus jmx exporter embedded in coordinator and workers will be collected to prometheus.
+
+To demonstrate the prometheus integration, install prometheus like this.
+
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+
+helm install \
+prometheus \
+--create-namespace \
+--namespace prometheus \
+--version 15.10.2 \
+--set alertmanager.persistentVolume.storageClass=oci \
+--set server.persistentVolume.storageClass=oci \
+--set pushgateway.persistentVolume.storageClass=oci \
+prometheus-community/prometheus;
+```
+All the `*.storageClass` need to be changed to suit your kubernetees cluster, 
+and configure prometheus configmap with adding the jmx exporter endpoints to scrape configs.
+
+```
+kubectl edit cm prometheus-server -n prometheus;
+...
+	scrape_configs:
+    - job_name: trino-coordinator
+      static_configs:
+      - targets:
+        - trino-coordinator-jmxexporter-service.trino-cluster-etl.svc:9090
+    - job_name: trino-worker-0
+      static_configs:
+      - targets:
+        - 10.244.0.16:9090
+    - job_name: trino-worker-1
+      static_configs:
+      - targets:
+        - 10.244.1.10:9090
+...
+```
+
+
+
 
 ## JMX REST API
 
