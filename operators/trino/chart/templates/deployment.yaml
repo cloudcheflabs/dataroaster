@@ -38,5 +38,16 @@ spec:
             - "./run-trino-operator.sh"
           ports:
             - name: http
-              containerPort: {{ .Values.trino.operator.port }}
+              containerPort: {{ .Values.server.port }}
               protocol: TCP
+          volumeMounts:
+            - name: trino-operator-volume
+              mountPath: /opt/trino-operator/conf/application.properties
+              subPath: application.properties
+            - name: trino-operator-volume
+              mountPath: /opt/trino-operator/conf/application-prod.yml
+              subPath: application-prod.yml
+      volumes:
+        - name: trino-operator-volume
+          configMap:
+            name: trino-operator

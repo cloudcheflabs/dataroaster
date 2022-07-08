@@ -15,6 +15,5 @@ affinity: null
 tolerations: null
 nodeSelector: null
 hostNetwork: false
-trino:
-  operator:
+server:
     port: 8092

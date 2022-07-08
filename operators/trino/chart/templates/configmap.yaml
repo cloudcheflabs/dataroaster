@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trino-operator
+  labels:
+    app: trino-operator
+data:
+  application.properties: |
+    spring.profiles.active=@api.spring.profiles.active@
+  application-prod.yml: |
+    # spring boot server
+    server:
+      port: {{ .Values.server.port }}
+      servlet:
+        context-path: /
