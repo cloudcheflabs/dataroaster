@@ -13,7 +13,7 @@ dependencies:
     repository: https://cloudcheflabs.github.io/helm-operator-helm-repo/
 
   - name: dataroastertrinooperator
-    version: v2.0.2
+    version: v2.1.1
     repository: https://cloudcheflabs.github.io/trino-helm-repo/
 
   - name: dataroastersparkoperator
