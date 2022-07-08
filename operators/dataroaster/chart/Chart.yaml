@@ -1,6 +1,6 @@
 apiVersion: v2
 name: dataroaster-operator
-version: v3.0.4
+version: v3.0.5
 appVersion: 4.3.0
 description: dataroaster operator
 
@@ -13,7 +13,7 @@ dependencies:
     repository: https://cloudcheflabs.github.io/helm-operator-helm-repo/
 
   - name: dataroastertrinooperator
-    version: v2.1.2
+    version: v2.1.3
     repository: https://cloudcheflabs.github.io/trino-helm-repo/
 
   - name: dataroastersparkoperator
