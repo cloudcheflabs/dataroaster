@@ -1,6 +1,7 @@
 package com.cloudcheflabs.dataroaster.operators.trino.controller;
 
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
+import com.cloudcheflabs.dataroaster.operators.trino.crd.Autoscaler;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
 import com.cloudcheflabs.dataroaster.operators.trino.domain.Roles;
 import com.cloudcheflabs.dataroaster.operators.trino.util.YamlUtils;
@@ -95,6 +96,61 @@ public class ScaleController implements InitializingBean {
             TrinoCluster trinoCluster = trinoClusterClient.inNamespace(namespace).withName(clusterName).get();
             trinoCluster.getSpec().getWorker().setReplicas(Integer.valueOf(replicas));
             // scale worker count with update trino cluster custom resource.
+            trinoClusterClient.inNamespace(namespace).withName(clusterName).createOrReplace(trinoCluster);
+
+            return ControllerUtils.successMessage();
+        });
+    }
+
+
+    @GetMapping("/v1/scale/list_hpa")
+    public String listHpa(@RequestParam Map<String, String> params) {
+        return ControllerUtils.doProcess(Roles.ROLE_USER, context, () -> {
+            String namespace = params.get("namespace");
+            LOG.info("namespace: {}", namespace);
+
+            List<Map<String, Object>> mapList = new ArrayList<>();
+
+            KubernetesResourceList<TrinoCluster> resourceList = trinoClusterClient.inNamespace(namespace).list();
+            List<TrinoCluster> trinoClusters = resourceList.getItems();
+            for(TrinoCluster trinoCluster : trinoClusters) {
+                String clusterName = trinoCluster.getMetadata().getName();
+                String clusterNamespace = trinoCluster.getSpec().getNamespace();
+
+                Autoscaler autoscaler = trinoCluster.getSpec().getWorker().getAutoscaler();
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("clusterName", clusterName);
+                map.put("clusterNamespace", clusterNamespace);
+                map.put("minReplicas", autoscaler.getMinReplicas());
+                map.put("maxReplicas", autoscaler.getMaxReplicas());
+
+                mapList.add(map);
+            }
+
+            return JsonUtils.toJson(mapper, mapList);
+        });
+    }
+
+
+    @PutMapping("/v1/scale/scale_hpa")
+    public String scaleHpa(@RequestParam Map<String, String> params) {
+        return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
+            String namespace = params.get("namespace");
+            LOG.info("namespace: {}", namespace);
+            String clusterName = params.get("cluster_name");
+            LOG.info("clusterName: {}", clusterName);
+
+            String minReplicas = params.get("min_replicas");
+            String maxReplicas = params.get("max_replicas");
+
+            TrinoCluster trinoCluster = trinoClusterClient.inNamespace(namespace).withName(clusterName).get();
+            Autoscaler autoscaler = trinoCluster.getSpec().getWorker().getAutoscaler();
+            autoscaler.setMinReplicas(Integer.valueOf(minReplicas));
+            autoscaler.setMaxReplicas(Integer.valueOf(maxReplicas));
+            trinoCluster.getSpec().getWorker().setAutoscaler(autoscaler);
+
+            // update trino cluster custom resource.
             trinoClusterClient.inNamespace(namespace).withName(clusterName).createOrReplace(trinoCluster);
 
             return ControllerUtils.successMessage();
