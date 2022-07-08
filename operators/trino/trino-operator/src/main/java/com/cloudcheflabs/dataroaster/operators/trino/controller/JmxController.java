@@ -3,7 +3,6 @@ package com.cloudcheflabs.dataroaster.operators.trino.controller;
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
 import com.cloudcheflabs.dataroaster.operators.trino.domain.Roles;
-import com.cloudcheflabs.dataroaster.operators.trino.util.Base64Utils;
 import com.cloudcheflabs.dataroaster.operators.trino.util.JmxUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.EndpointAddress;
