@@ -90,8 +90,7 @@ public class ScaleController implements InitializingBean {
             LOG.info("clusterName: {}", clusterName);
 
             String replicas = params.get("replicas");
-
-            List<Map<String, Object>> mapList = new ArrayList<>();
+            LOG.info("replicas: {}", replicas);
 
             TrinoCluster trinoCluster = trinoClusterClient.inNamespace(namespace).withName(clusterName).get();
             String clusterNamespace= trinoCluster.getSpec().getNamespace();
@@ -101,7 +100,7 @@ public class ScaleController implements InitializingBean {
             // scale worker count with update deployment.
             client.apps().deployments().inNamespace(clusterNamespace).withName(DEFAULT_WORKER_DEPLOYMENT).createOrReplace(workerDeployment);
 
-            return JsonUtils.toJson(mapper, mapList);
+            return ControllerUtils.successMessage();
         });
     }
 }
