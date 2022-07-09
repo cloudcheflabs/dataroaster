@@ -76,6 +76,12 @@
 
 		<!-- java.xml.bind module -->
 		<xml-bind.version>2.3.2</xml-bind.version>
+
+		<!-- commons-compress -->
+		<commons-compress.version>1.21</commons-compress.version>
+
+		<!-- commons codec -->
+		<commons-codec.version>1.15</commons-codec.version>
 	</properties>
 
 	<dependencies>
@@ -265,6 +271,16 @@
 			<groupId>org.glassfish.jaxb</groupId>
 			<artifactId>jaxb-runtime</artifactId>
 			<version>${xml-bind.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>${commons-compress.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>${commons-codec.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
