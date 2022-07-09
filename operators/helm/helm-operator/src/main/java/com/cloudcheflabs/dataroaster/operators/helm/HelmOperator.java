@@ -5,7 +5,6 @@ import com.cloudcheflabs.dataroaster.common.util.TemplateUtils;
 import com.cloudcheflabs.dataroaster.operators.helm.config.SpringContextSingleton;
 import com.cloudcheflabs.dataroaster.operators.helm.crd.HelmChart;
 import com.cloudcheflabs.dataroaster.operators.helm.handler.*;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

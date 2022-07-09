@@ -4,7 +4,6 @@ import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.Autoscaler;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
 import com.cloudcheflabs.dataroaster.operators.trino.domain.Roles;
-import com.cloudcheflabs.dataroaster.operators.trino.util.YamlUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.api.model.apps.Deployment;

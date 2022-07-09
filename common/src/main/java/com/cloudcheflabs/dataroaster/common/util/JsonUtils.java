@@ -1,6 +1,5 @@
 package com.cloudcheflabs.dataroaster.common.util;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;

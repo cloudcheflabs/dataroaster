@@ -1,7 +1,6 @@
 package com.cloudcheflabs.dataroaster.operators.trino.controller;
 
 import com.cloudcheflabs.dataroaster.operators.trino.component.SimpleHttpClient;
-import com.cloudcheflabs.dataroaster.operators.trino.handler.CoordinatorWorkerHandlerTestRunner;
 import okhttp3.*;
 import org.junit.Assert;
 import org.junit.BeforeClass;

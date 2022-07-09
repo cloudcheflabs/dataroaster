@@ -15,6 +15,7 @@
         <module>operators/helm/helm-operator</module>
         <module>operators/spark/spark-operator</module>
         <module>operators/trino/trino-operator</module>
+        <module>trino-ecosystem/trino-controller</module>
         <module>trino-ecosystem/trino-gateway</module>
     </modules>
     <build>

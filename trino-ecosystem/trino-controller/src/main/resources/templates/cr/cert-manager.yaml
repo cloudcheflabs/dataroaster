@@ -1,0 +1,13 @@
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: cert-manager
+  namespace: {{ customResourceNamespace }}
+spec:
+  repo: https://charts.jetstack.io
+  chartName: cert-manager
+  name: cert-manager
+  version: v1.5.3
+  namespace: cert-manager
+  values: |
+    installCRDs: true

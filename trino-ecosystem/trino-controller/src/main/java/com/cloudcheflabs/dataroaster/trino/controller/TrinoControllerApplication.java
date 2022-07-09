@@ -1,6 +1,5 @@
-package com.cloudcheflabs.dataroaster.trino.gateway;
+package com.cloudcheflabs.dataroaster.trino.controller;
 
-import com.cloudcheflabs.dataroaster.trino.gateway.component.DBSchemaCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -14,21 +13,12 @@ import java.util.Arrays;
 
 
 @SpringBootApplication(exclude = HibernateJpaAutoConfiguration.class)
-public class TrinoGatewayApplication {
+public class TrinoControllerApplication {
 
-	private static Logger LOG = LoggerFactory.getLogger(TrinoGatewayApplication.class);
-
-
-
-	public static final String PROPERTY_CREATE_DB_SCHAMA = "trino.gateway.createDBSchema";
+	private static Logger LOG = LoggerFactory.getLogger(TrinoControllerApplication.class);
 
 	public static void main(String[] args) {
-		String createDBSchema = System.getProperty(PROPERTY_CREATE_DB_SCHAMA);
-		if(createDBSchema != null) {
-			DBSchemaCreator.main(args);
-		} else {
-			SpringApplication.run(TrinoGatewayApplication.class, args);
-		}
+		SpringApplication.run(TrinoControllerApplication.class, args);
 	}
 
 	@Bean

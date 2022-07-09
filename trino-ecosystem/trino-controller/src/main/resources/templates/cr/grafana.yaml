@@ -1,0 +1,15 @@
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: grafana
+  namespace: {{ customResourceNamespace }}
+spec:
+  repo: https://grafana.github.io/helm-charts
+  chartName: grafana
+  name: grafana
+  version: 6.32.1
+  namespace: grafana
+  values: |
+    persistence:
+      enabled: true
+      storageClassName: {{ storageClass }}

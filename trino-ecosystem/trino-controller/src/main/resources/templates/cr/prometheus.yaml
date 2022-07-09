@@ -1,0 +1,21 @@
+apiVersion: "helm-operator.cloudchef-labs.com/v1beta1"
+kind: HelmChart
+metadata:
+  name: prometheus
+  namespace: {{ customResourceNamespace }}
+spec:
+  repo: https://prometheus-community.github.io/helm-charts
+  chartName: prometheus
+  name: prometheus
+  version: 15.10.2
+  namespace: prometheus
+  values: |
+    alertmanager:
+      persistentVolume:
+        storageClass: {{ storageClass }}
+    server:
+      persistentVolume:
+        storageClass: {{ storageClass }}
+    pushgateway:
+      persistentVolume:
+        storageClass: {{ storageClass }}

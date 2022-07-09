@@ -1,6 +1,11 @@
 
 apiVersion: v2
 name: dataroaster-trino-gateway
-version: v1.0.3
-appVersion: v1.0.1
+version: v1.1.0
+appVersion: v2.0.0
 description: dataroaster trino gateway
+
+dependencies:
+  - name: dataroastermysql
+    version: v1.0.2
+    repository: https://cloudcheflabs.github.io/mysql-helm-repo/

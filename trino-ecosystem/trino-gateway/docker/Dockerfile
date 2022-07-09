@@ -23,11 +23,16 @@ RUN useradd -ms /bin/bash -d ${TRINO_GATEWAY_HOME} ${TRINO_GATEWAY_USER}
 ARG TRINO_GATEWAY_JAR
 ADD ${TRINO_GATEWAY_JAR} ${TRINO_GATEWAY_HOME}
 
+# add db schema sql.
+ARG DB_SCHEMA
+ADD ${DB_SCHEMA} ${TRINO_GATEWAY_HOME}
+
 # make conf directory.
 RUN mkdir -p ${TRINO_GATEWAY_HOME}/conf
 
 # add trino run shell.
 ADD run-trino-gateway.sh ${TRINO_GATEWAY_HOME}
+ADD create-db-schema.sh ${TRINO_GATEWAY_HOME}
 
 # add permissions.
 RUN chmod +x ${TRINO_GATEWAY_HOME}/*.sh
