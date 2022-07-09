@@ -69,31 +69,6 @@ kubectl apply -f prod-issuer.yaml;
 ```
 
 
-
-### Install MySQL Server
-
-```
-helm repo add dataroaster-trino-gateway-mysql https://cloudcheflabs.github.io/mysql-helm-repo/
-helm repo update
-
-
-helm install \
-mysql \
---create-namespace \
---namespace trino-gateway \
---version v1.0.0 \
---set storage.storageClass=oci \
-dataroaster-trino-gateway-mysql/dataroaster-trino-gateway-mysql;
-```
-The storage class `storage.storageClass` needs to be changed.
-
-To create db schema for trino gateway, download db schema file of [create-tables.sql](https://github.com/cloudcheflabs/dataroaster/tree/master/trino-ecosystem/trino-gateway/sql/create-tables.sql), and run this.
-
-```
-kubectl exec -it mysql-statefulset-0 -n trino-gateway -- mysql -u root -pmysqlpass123 < ./create-tables.sql;
-```
-
-
 ### Add ingress host names to public dns server
 You can add the following entries to dns.
 ```
@@ -114,12 +89,14 @@ helm install \
 trino-gateway \
 --create-namespace \
 --namespace trino-gateway \
---version v1.0.3 \
+--version v1.1.0 \
+--set dataroastermysql.storage.storageClass=oci \
 --set ingress.proxyHostName=trino-gateway-proxy-test.cloudchef-labs.com \
 --set ingress.restHostName=trino-gateway-rest-test.cloudchef-labs.com \
 dataroaster-trino-gateway/dataroaster-trino-gateway;
 ```
-`ingress.proxyHostName` and `ingress.restHostName` need to be replaced with the registered host names to dns above.
+* `dataroastermysql.storage.storageClass` which is the storage class for the dependency mysql needs to be changed to suit to your kubernetes cluster.
+* `ingress.proxyHostName` and `ingress.restHostName` need to be replaced with the registered host names to dns above.
  
 Now, make sure certificates have been created successfully.
 ```
