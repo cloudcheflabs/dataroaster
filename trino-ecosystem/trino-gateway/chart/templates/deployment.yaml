@@ -30,7 +30,7 @@ spec:
       serviceAccountName: {{ .Values.serviceAccount }}
       initContainers:
         - name: init-create-schema
-          image: { { .Values.image } }
+          image: {{ .Values.image }}
           command: [ "./create-db-schema.sh" ]
           args: [ "-U" ,"root" , "-P", "{{ .Values.dataroastermysql.rootPassword }}", "-S", "/opt/trino-gateway/create-tables.sql" ]
       containers:
