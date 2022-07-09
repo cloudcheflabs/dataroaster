@@ -45,9 +45,6 @@
 		<!-- ehcache -->
 		<ehcache.version>2.10.6</ehcache.version>
 
-		<!-- okhttp -->
-		<okhttp.version>3.10.0</okhttp.version>
-
 		<!-- persistence -->
 		<hibernate.version>5.2.10.Final</hibernate.version>
 		<mysql-connector-java.version>5.1.40</mysql-connector-java.version>
@@ -86,12 +83,6 @@
 			<groupId>com.cloudcheflabs.dataroaster</groupId>
 			<artifactId>common</artifactId>
 			<version>4.7.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>logging-interceptor</artifactId>
-			<version>${okhttp3.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.trino</groupId>
@@ -209,11 +200,6 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>${okhttp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
