@@ -52,6 +52,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
   private ClusterGroupService clusterGroupService;
 
   @Autowired
+  @Qualifier("trinoResponseCacheDao")
   private CacheDao<TrinoResponse> trinoResponseCacheDao;
 
   private boolean authenticationNecessary;
