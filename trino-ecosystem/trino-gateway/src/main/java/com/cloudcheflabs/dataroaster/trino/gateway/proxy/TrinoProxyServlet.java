@@ -253,7 +253,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
       length = buffer.length;
       // set new content length.
-      //response.setHeader("Content-Length", String.valueOf(newBufferSize));
+      response.setHeader("Content-Length", String.valueOf(length));
     }
 
 
