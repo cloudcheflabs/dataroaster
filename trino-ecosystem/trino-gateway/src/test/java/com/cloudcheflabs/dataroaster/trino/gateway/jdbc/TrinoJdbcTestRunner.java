@@ -15,7 +15,7 @@ public class TrinoJdbcTestRunner {
     public void connect() throws Exception {
         String host = System.getProperty("host", "trino-gateway-proxy-test.cloudchef-labs.com");
         LOG.info("host: [{}]", host);
-        String port = System.getProperty("host", "443");
+        String port = System.getProperty("port", "443");
         LOG.info("port: [{}]", port);
         boolean auth = Boolean.valueOf(System.getProperty("auth", "true"));
         LOG.info("auth: [{}]", auth);
