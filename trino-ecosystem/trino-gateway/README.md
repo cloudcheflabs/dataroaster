@@ -89,14 +89,17 @@ helm install \
 trino-gateway \
 --create-namespace \
 --namespace trino-gateway \
---version v1.1.0 \
---set dataroastermysql.storage.storageClass=oci \
+--version v1.2.0 \
 --set ingress.proxyHostName=trino-gateway-proxy-test.cloudchef-labs.com \
 --set ingress.restHostName=trino-gateway-rest-test.cloudchef-labs.com \
+--set dataroastermysql.storage.storageClass=oci \
+--set redis.global.storageClass=oci \
+--set redis.replica.replicaCount=1 \
 dataroaster-trino-gateway/dataroaster-trino-gateway;
 ```
-* `dataroastermysql.storage.storageClass` which is the storage class for the dependency mysql needs to be changed to suit to your kubernetes cluster.
 * `ingress.proxyHostName` and `ingress.restHostName` need to be replaced with the registered host names to dns above.
+* `dataroastermysql.storage.storageClass` which is the storage class for the dependency mysql needs to be changed to suit to your kubernetes cluster.
+* `redis.global.storageClass` and `redis.replica.replicaCount` are the dependency redis storage class and replica count individually.
  
 Now, make sure certificates have been created successfully.
 ```
@@ -279,113 +282,6 @@ kubectl apply -f cluster-3.yaml;
 Now three trino clusters have been created.
 
 
-## Create Ingresses for trino cluster coordinator services
-
-### Add ingress host names to public dns server
-
-```
-trino-cluster-etl-test.cloudchef-labs.com ---> 146.56.150.205
-trino-cluster-etl-2-test.cloudchef-labs.com ---> 146.56.150.205
-trino-cluster-etl-3-test.cloudchef-labs.com ---> 146.56.150.205
-```
-
-These host names will be used when trino cluster ingresses are created.
-
-### Create Trino Cluster Ingresses
-
-We are going to create three ingresses for the trino cluster coordinator services created before.
-
-
-```
-cat <<EOF > trino-cluster-etl-ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-  name: trino-cluster-etl-ingress
-  namespace: trino-cluster-etl
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: trino-cluster-etl-test.cloudchef-labs.com
-    http:
-      paths:
-      - backend:
-          service:
-            name: trino-coordinator-service
-            port:
-              number: 8080
-        path: /
-        pathType: ImplementationSpecific
-  tls:
-  - hosts:
-    - trino-cluster-etl-test.cloudchef-labs.com
-    secretName: trino-cluster-etl-test.cloudchef-labs.com-tls
-EOF
-
-cat <<EOF > trino-cluster-etl-2-ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-  name: trino-cluster-etl-ingress
-  namespace: trino-cluster-etl-2
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: trino-cluster-etl-2-test.cloudchef-labs.com
-    http:
-      paths:
-      - backend:
-          service:
-            name: trino-coordinator-service
-            port:
-              number: 8080
-        path: /
-        pathType: ImplementationSpecific
-  tls:
-  - hosts:
-    - trino-cluster-etl-2-test.cloudchef-labs.com
-    secretName: trino-cluster-etl-2-test.cloudchef-labs.com-tls
-EOF
-
-
-cat <<EOF > trino-cluster-etl-3-ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-  name: trino-cluster-etl-ingress
-  namespace: trino-cluster-etl-3
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: trino-cluster-etl-3-test.cloudchef-labs.com
-    http:
-      paths:
-      - backend:
-          service:
-            name: trino-coordinator-service
-            port:
-              number: 8080
-        path: /
-        pathType: ImplementationSpecific
-  tls:
-  - hosts:
-    - trino-cluster-etl-3-test.cloudchef-labs.com
-    secretName: trino-cluster-etl-3-test.cloudchef-labs.com-tls
-EOF
-
-kubectl apply -f trino-cluster-etl-ingress.yaml;
-kubectl apply -f trino-cluster-etl-2-ingress.yaml;
-kubectl apply -f trino-cluster-etl-3-ingress.yaml;
-```
 
 ## Register trino clusters to trino gateway
 
@@ -409,6 +305,7 @@ https://trino-gateway-rest-test.cloudchef-labs.com/v1/users/create \
 ```
 
 ### Register trino clusters
+We need register three trino coordinator services.
 
 ```
 # register cluster 1.
@@ -416,7 +313,7 @@ curl -XPOST \
 https://trino-gateway-rest-test.cloudchef-labs.com/v1/cluster/create \
 -d  "cluster_name=etl-trino-cluster-1" \
 -d  "cluster_type=etl" \
--d  "url=https://trino-cluster-etl-test.cloudchef-labs.com" \
+-d  "url=http://trino-coordinator-service.trino-cluster-etl.svc:8080" \
 -d  "activated=true" \
 -d  "group_name=etl_group";
 
@@ -425,7 +322,7 @@ curl -XPOST \
 https://trino-gateway-rest-test.cloudchef-labs.com/v1/cluster/create \
 -d  "cluster_name=etl-trino-cluster-2" \
 -d  "cluster_type=etl" \
--d  "url=https://trino-cluster-etl-2-test.cloudchef-labs.com" \
+-d  "url=http://trino-coordinator-service.trino-cluster-etl-2.svc:8080" \
 -d  "activated=true" \
 -d  "group_name=etl_group";
 
@@ -435,12 +332,12 @@ curl -XPOST \
 https://trino-gateway-rest-test.cloudchef-labs.com/v1/cluster/create \
 -d  "cluster_name=etl-trino-cluster-3" \
 -d  "cluster_type=etl" \
--d  "url=https://trino-cluster-etl-3-test.cloudchef-labs.com" \
--d  "activated=true" \
--d  "group_name=etl_group";
+-d  "url=http://trino-coordinator-service.trino-cluster-etl-3.svc:8080" \
 -d  "activated=true" \
 -d  "group_name=etl_group";
 ```
+
+
 
 ## Run queries with client
 
