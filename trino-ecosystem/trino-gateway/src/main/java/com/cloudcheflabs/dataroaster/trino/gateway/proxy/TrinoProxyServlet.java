@@ -10,6 +10,7 @@ import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Users;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.BCryptUtils;
+import com.cloudcheflabs.dataroaster.trino.gateway.util.GzipUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.RandomUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -218,24 +219,23 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
       LOG.info("header [{}]: [{}]", header, response.getHeader(header));
     }
 
+    LOG.info("buffer size: {}", buffer.length);
+    LOG.info("offset: {}", offset);
+    LOG.info("length: {}", length);
+
     String contentLength = response.getHeader("Content-Length");
     LOG.info("contentLength: {}", contentLength);
 
     String contentEncoding = response.getHeader("Content-Encoding");
     LOG.info("contentEncoding: {}", contentEncoding);
+
+    String jsonResponse = null;
     if(contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
-
+      jsonResponse = GzipUtils.decompressGzip(buffer);
+    } else {
+      jsonResponse = new String(buffer);
     }
-
-
-    String jsonResponse = new String(buffer);
-
-    LOG.info("onResponseContent buffer: {}", jsonResponse);
-
-
-    LOG.info("buffer size: {}", buffer.length);
-    LOG.info("offset: {}", offset);
-    LOG.info("length: {}", length);
+    LOG.info("jsonResponse: {}", jsonResponse);
 
     // save response to cache.
     Map<String, Object> responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
@@ -255,7 +255,6 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
     // change nextUri.
     if(nextUri != null) {
-
       // TODO: replace it with real trino gateway host name.
       String newNextUri = replaceUri(nextUri, "http://localhost:18080");
       String newInfoUri = replaceUri(infoUri, "http://localhost:18080");
@@ -263,14 +262,19 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
       responseMap.put("infoUri", newInfoUri);
       String newJsonReponse = JsonUtils.toJson(responseMap);
       LOG.info("newJsonReponse: {}", newJsonReponse);
-      buffer = newJsonReponse.getBytes();
+
+      // gzip compressed json.
+      if(contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
+        buffer = GzipUtils.compressStringInGzip(newJsonReponse);
+      } else {
+        buffer = newJsonReponse.getBytes();
+      }
 
       length = buffer.length;
       LOG.info("new length: {}", length);
       // set new content length.
       response.setHeader("Content-Length", String.valueOf(length));
     }
-
 
     super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
   }
