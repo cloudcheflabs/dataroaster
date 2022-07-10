@@ -65,14 +65,20 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
   }
 
   private String getQueryId(String uri) {
-    if(uri.contains("/v1/statement/executing/")) {
-      uri = uri.replaceAll("/v1/statement/executing/", "");
+    List<String> uriPrefixList = Arrays.asList(
+            "/v1/statement/queued/",
+            "/v1/statement/executing/"
+    );
 
-      String[] tokens = uri.split("/");
-      return tokens[0];
-    } else {
-      return null;
+    for(String uriPrefix : uriPrefixList) {
+      if (uri.contains(uriPrefix)) {
+        uri = uri.replaceAll(uriPrefix, "");
+
+        String[] tokens = uri.split("/");
+        return tokens[0];
+      }
     }
+    return null;
   }
 
   @Override
