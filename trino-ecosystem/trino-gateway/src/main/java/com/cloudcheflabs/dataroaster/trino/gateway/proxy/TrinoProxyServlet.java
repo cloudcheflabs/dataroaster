@@ -52,8 +52,8 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
   private ClusterGroupService clusterGroupService;
 
   @Autowired
-  @Qualifier("trinoResponseCacheServiceImpl")
-  private CacheService<TrinoResponse> trinoResponseCacheService;
+  @Qualifier("trinoResponseRedisCache")
+  private CacheService<TrinoResponse> trinoResponseRedisCache;
 
   private boolean authenticationNecessary;
 
@@ -100,7 +100,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     String queryId = getQueryId(request.getRequestURI());
     LOG.info("queryId: {}", queryId);
     if(queryId != null) {
-      TrinoResponse trinoResponse = trinoResponseCacheService.get(queryId, TrinoResponse.class);
+      TrinoResponse trinoResponse = trinoResponseRedisCache.get(queryId, TrinoResponse.class);
       if(trinoResponse != null) {
         String target = trinoResponse.getNextUri();
         if (target != null) {
@@ -246,7 +246,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     trinoResponse.setNextUri(nextUri);
     trinoResponse.setInfoUri(infoUri);
 
-    trinoResponseCacheService.set(id, trinoResponse);
+    trinoResponseRedisCache.set(id, trinoResponse);
 
     // change nextUri.
     if(nextUri != null) {

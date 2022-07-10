@@ -19,7 +19,6 @@ import java.util.Properties;
 @EnableTransactionManagement
 @ComponentScan({ "com.cloudcheflabs.dataroaster.trino.gateway.api.dao",
                  "com.cloudcheflabs.dataroaster.trino.gateway.dao.hibernate",
-                 "com.cloudcheflabs.dataroaster.trino.gateway.dao.redis",
                  "com.cloudcheflabs.dataroaster.trino.gateway.api.service",
                  "com.cloudcheflabs.dataroaster.trino.gateway.service",
                  "com.cloudcheflabs.dataroaster.trino.gateway.domain.model"})
