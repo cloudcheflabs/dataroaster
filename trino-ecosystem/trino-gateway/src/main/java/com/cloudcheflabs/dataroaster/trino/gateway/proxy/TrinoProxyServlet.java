@@ -215,12 +215,14 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
     String jsonResponse = new String(buffer);
 
-    if(LOG.isInfoEnabled()) {
-      LOG.info("onResponseContent buffer: {}", jsonResponse);
-      for (String header : response.getHeaderNames()) {
-        LOG.info("header [{}]: [{}]", header, response.getHeader(header));
-      }
+    LOG.info("onResponseContent buffer: {}", jsonResponse);
+    for (String header : response.getHeaderNames()) {
+      LOG.info("header [{}]: [{}]", header, response.getHeader(header));
     }
+
+    LOG.info("buffer size: {}", buffer.length);
+    LOG.info("offset: {}", offset);
+    LOG.info("length: {}", length);
 
     // save response to cache.
     Map<String, Object> responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
@@ -249,9 +251,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
       LOG.info("newJsonReponse: {}", newJsonReponse);
       buffer = newJsonReponse.getBytes();
 
-      int newBufferSize = buffer.length;
+      length = buffer.length;
       // set new content length.
-      response.setHeader("Content-Length", String.valueOf(newBufferSize));
+      //response.setHeader("Content-Length", String.valueOf(newBufferSize));
     }
 
 
