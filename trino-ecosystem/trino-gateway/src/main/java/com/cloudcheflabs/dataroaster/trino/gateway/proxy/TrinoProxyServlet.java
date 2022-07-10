@@ -1,11 +1,12 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 
-import com.cedarsoftware.util.io.JsonWriter;
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
+import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.CacheDao;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.UsersService;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.BasicAuthentication;
+import com.cloudcheflabs.dataroaster.trino.gateway.domain.TrinoResponse;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Users;
@@ -27,7 +28,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.util.*;
 
 @Component
@@ -50,6 +50,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
   @Autowired
   @Qualifier("clusterGroupServiceImpl")
   private ClusterGroupService clusterGroupService;
+
+  @Autowired
+  private CacheDao<TrinoResponse> trinoResponseCacheDao;
 
   private boolean authenticationNecessary;
 
@@ -96,7 +99,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     String queryId = getQueryId(request.getRequestURI());
     LOG.info("queryId: {}", queryId);
     if(queryId != null) {
-      TrinoResponse trinoResponse = (trinoReponseCache.containsKey(queryId)) ? trinoReponseCache.get(queryId) : null;
+      TrinoResponse trinoResponse = trinoResponseCacheDao.get(queryId, TrinoResponse.class);
       if(trinoResponse != null) {
         String target = trinoResponse.getNextUri();
         if (target != null) {
@@ -187,40 +190,6 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
   }
 
 
-  // TODO: this is just temp cache.
-  public Map<String, TrinoResponse> trinoReponseCache = new HashMap<>();
-
-  public static class TrinoResponse implements Serializable {
-    private String id;
-    private String nextUri;
-
-    private String infoUri;
-
-    public String getInfoUri() {
-      return infoUri;
-    }
-
-    public void setInfoUri(String infoUri) {
-      this.infoUri = infoUri;
-    }
-
-    public String getId() {
-      return id;
-    }
-
-    public void setId(String id) {
-      this.id = id;
-    }
-
-    public String getNextUri() {
-      return nextUri;
-    }
-
-    public void setNextUri(String nextUri) {
-      this.nextUri = nextUri;
-    }
-  }
-
   @Override
   protected void onResponseContent(HttpServletRequest request,
                                    HttpServletResponse response,
@@ -275,8 +244,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     trinoResponse.setId(id);
     trinoResponse.setNextUri(nextUri);
     trinoResponse.setInfoUri(infoUri);
-    trinoReponseCache.put(id, trinoResponse);
-
+    trinoResponseCacheDao.set(id, trinoResponse);
     // change nextUri.
     if(nextUri != null) {
       // TODO: replace it with real trino gateway host name.

@@ -30,3 +30,7 @@ hibernate:
   dialect: org.hibernate.dialect.MySQL5Dialect
   show_sql: false
   globally_quoted_identifiers: true
+# redis
+redis:
+  host: localhost
+  port: 6379

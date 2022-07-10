@@ -1,15 +1,16 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.redis;
 
-import com.cloudcheflabs.dataroaster.trino.gateway.proxy.TrinoProxyServlet;
+import com.cloudcheflabs.dataroaster.trino.gateway.domain.TrinoResponse;
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import redis.clients.jedis.exceptions.JedisConnectionException;
-import redis.clients.jedis.exceptions.JedisException;
-import redis.clients.jedis.*;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
+import redis.clients.jedis.DefaultJedisClientConfig;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisClientConfig;
+import redis.clients.jedis.JedisSharding;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,7 +24,7 @@ public class RedisTestRunner {
     @Before
     public void setup() {
         kryo = new Kryo();
-        kryo.register(TrinoProxyServlet.TrinoResponse.class);
+        kryo.register(TrinoResponse.class);
     }
 
     @Test
@@ -40,7 +41,7 @@ public class RedisTestRunner {
         JedisSharding jedis = new JedisSharding(shards, clientConfig);
 
 
-        TrinoProxyServlet.TrinoResponse trinoResponse = new TrinoProxyServlet.TrinoResponse();
+        TrinoResponse trinoResponse = new TrinoResponse();
         trinoResponse.setId("any-id");
         trinoResponse.setNextUri("any-next-uri");
         trinoResponse.setInfoUri("any-info-uri");
@@ -48,8 +49,8 @@ public class RedisTestRunner {
         // set trino response object.
         jedis.set(trinoResponse.getId().getBytes(), serialize(trinoResponse));
 
-        TrinoProxyServlet.TrinoResponse ret =
-                deserialize(jedis.get(trinoResponse.getId().getBytes()), TrinoProxyServlet.TrinoResponse.class);
+        TrinoResponse ret =
+                deserialize(jedis.get(trinoResponse.getId().getBytes()), TrinoResponse.class);
         Assert.assertEquals(trinoResponse.getNextUri(), ret.getNextUri());
         Assert.assertEquals(trinoResponse.getInfoUri(), ret.getInfoUri());
     }
