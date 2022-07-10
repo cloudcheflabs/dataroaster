@@ -216,7 +216,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     String jsonResponse = new String(buffer);
 
     if(LOG.isInfoEnabled()) {
-      LOG.info("onResponseContent buffer: ", jsonResponse);
+      LOG.info("onResponseContent buffer: {}", jsonResponse);
       for (String header : response.getHeaderNames()) {
         LOG.info("header [{}]: [{}]", header, response.getHeader(header));
       }
@@ -235,6 +235,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     TrinoResponse trinoResponse = new TrinoResponse();
     trinoResponse.setId(id);
     trinoResponse.setNextUri(nextUri);
+    trinoResponse.setInfoUri(infoUri);
     trinoReponseCache.put(id, trinoResponse);
 
     // change nextUri.
@@ -245,7 +246,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
       responseMap.put("nextUri", newNextUri);
       responseMap.put("infoUri", newInfoUri);
       String newJsonReponse = JsonUtils.toJson(responseMap);
-      LOG.info("newJsonReponse: ", newJsonReponse);
+      LOG.info("newJsonReponse: {}", newJsonReponse);
       buffer = newJsonReponse.getBytes();
     }
 
