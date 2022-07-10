@@ -213,12 +213,25 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                                    int length,
                                    Callback callback) {
 
-    String jsonResponse = new String(buffer);
-
-    LOG.info("onResponseContent buffer: {}", jsonResponse);
+    // print header.
     for (String header : response.getHeaderNames()) {
       LOG.info("header [{}]: [{}]", header, response.getHeader(header));
     }
+
+    String contentLength = response.getHeader("Content-Length");
+    LOG.info("contentLength: {}", contentLength);
+
+    String contentEncoding = response.getHeader("Content-Encoding");
+    LOG.info("contentEncoding: {}", contentEncoding);
+    if(contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
+
+    }
+
+
+    String jsonResponse = new String(buffer);
+
+    LOG.info("onResponseContent buffer: {}", jsonResponse);
+
 
     LOG.info("buffer size: {}", buffer.length);
     LOG.info("offset: {}", offset);
