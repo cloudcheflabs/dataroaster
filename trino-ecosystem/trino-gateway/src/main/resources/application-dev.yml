@@ -14,6 +14,10 @@ trino:
       keystorePass: changeit
       trustStorePath: /home/opc/.keystore
       trustStorePass: changeit
+    threadPool:
+      maxThreads: 100
+      minThreads: 10
+      idleTimeout: 120
 # jdbc
 jdbc:
   driverClassName: com.mysql.jdbc.Driver
