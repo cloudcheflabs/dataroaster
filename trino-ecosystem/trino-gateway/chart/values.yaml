@@ -55,3 +55,8 @@ jdbc:
 hibernate:
   show_sql: false
   globally_quoted_identifiers: true
+
+# redis
+redis:
+  host: redis-master.trino-gateway.svc
+  port: 6379

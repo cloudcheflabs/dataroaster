@@ -40,3 +40,7 @@ data:
       dialect: org.hibernate.dialect.MySQL5Dialect
       show_sql: {{ .Values.hibernate.show_sql }}  
       globally_quoted_identifiers: {{ .Values.hibernate.globally_quoted_identifiers }}  
+    # redis
+    redis:
+      host: {{ .Values.redis.host }}
+      port: {{ .Values.redis.port }}
