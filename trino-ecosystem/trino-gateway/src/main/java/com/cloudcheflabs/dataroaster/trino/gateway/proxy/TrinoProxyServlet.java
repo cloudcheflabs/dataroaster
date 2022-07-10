@@ -2,7 +2,6 @@ package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
-import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.CacheDao;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.CacheService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.UsersService;

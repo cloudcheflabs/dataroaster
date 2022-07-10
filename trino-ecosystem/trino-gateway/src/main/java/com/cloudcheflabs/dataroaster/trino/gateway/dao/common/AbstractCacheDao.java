@@ -5,12 +5,10 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.JedisSharding;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-@Transactional
 public abstract class AbstractCacheDao<T> implements CacheDao<T> {
 
     protected static Kryo kryo;

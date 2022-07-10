@@ -1,9 +1,6 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.config;
 
 import com.cloudcheflabs.dataroaster.common.util.FileUtils;
-import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.CacheDao;
-import com.cloudcheflabs.dataroaster.trino.gateway.dao.redis.RedisTrinoResponseCacheDao;
-import com.cloudcheflabs.dataroaster.trino.gateway.domain.TrinoResponse;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.Base64Utils;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.ContainerStatusChecker;
 import io.fabric8.kubernetes.api.model.Secret;
