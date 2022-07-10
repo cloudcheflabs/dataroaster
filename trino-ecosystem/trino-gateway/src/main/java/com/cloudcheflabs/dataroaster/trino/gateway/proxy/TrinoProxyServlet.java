@@ -1,6 +1,8 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 
+import com.cedarsoftware.util.io.JsonWriter;
+import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.UsersService;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.BasicAuthentication;
@@ -9,6 +11,7 @@ import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Users;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.BCryptUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.RandomUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.client.api.Request;
@@ -23,9 +26,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
 
 @Component
 public class TrinoProxyServlet extends ProxyServlet.Transparent implements InitializingBean {
@@ -152,6 +154,31 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     }
   }
 
+
+  // TODO: this is just temp cache.
+  public Map<String, TrinoResponse> trinoReponseCache = new HashMap<>();
+
+  private static class TrinoResponse implements Serializable {
+    private String id;
+    private String nextUri;
+
+    public String getId() {
+      return id;
+    }
+
+    public void setId(String id) {
+      this.id = id;
+    }
+
+    public String getNextUri() {
+      return nextUri;
+    }
+
+    public void setNextUri(String nextUri) {
+      this.nextUri = nextUri;
+    }
+  }
+
   @Override
   protected void onResponseContent(HttpServletRequest request,
                                    HttpServletResponse response,
@@ -161,13 +188,32 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                                    int length,
                                    Callback callback) {
 
+    String jsonResponse = new String(buffer);
 
     if(LOG.isInfoEnabled()) {
-      LOG.info("onResponseContent buffer: [{}]", new String(buffer));
+      LOG.info("onResponseContent buffer: \n", JsonWriter.formatJson(jsonResponse));
       for (String header : response.getHeaderNames()) {
         LOG.info("header [{}]: [{}]", header, response.getHeader(header));
       }
     }
+
+    // save response to cache.
+    Map<String, Object> responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
+    String id = (String) responseMap.get("id");
+    LOG.info("id: {}", id);
+    String nextUri = (responseMap.containsKey("nextUri")) ? (String) responseMap.get("nextUri") : null;
+    LOG.info("nextUri: {}", nextUri);
+
+    TrinoResponse trinoResponse = new TrinoResponse();
+    trinoResponse.setId(id);
+    trinoResponse.setNextUri(nextUri);
+    trinoReponseCache.put(id, trinoResponse);
+
+    // change nextUri.
+    if(nextUri != null) {
+      //nextUri.
+    }
+
 
     super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
   }
