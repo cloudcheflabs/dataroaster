@@ -7,13 +7,18 @@ server:
 trino:
   proxy:
     port: 18080
-    authentication: true
+    authentication: false
     tls:
-      enabled: true
+      enabled: false
       keystorePath: /home/opc/keystore.jks
       keystorePass: changeit
       trustStorePath: /home/opc/.keystore
       trustStorePass: changeit
+    threadPool:
+      maxThreads: 100
+      minThreads: 10
+      idleTimeout: 120
+    publicEndpoint: "https://trino-gateway-proxy-test.cloudchef-labs.com"
 # jdbc
 jdbc:
   driverClassName: com.mysql.jdbc.Driver
@@ -26,3 +31,7 @@ hibernate:
   dialect: org.hibernate.dialect.MySQL5Dialect
   show_sql: false
   globally_quoted_identifiers: true
+# redis
+redis:
+  host: localhost
+  port: 6379

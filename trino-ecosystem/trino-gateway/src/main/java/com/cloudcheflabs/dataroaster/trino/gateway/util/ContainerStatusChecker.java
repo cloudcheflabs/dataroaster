@@ -1,4 +1,4 @@
-package com.cloudcheflabs.dataroaster.operators.dataroaster.controller;
+package com.cloudcheflabs.dataroaster.trino.gateway.util;
 
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import io.fabric8.kubernetes.api.model.*;

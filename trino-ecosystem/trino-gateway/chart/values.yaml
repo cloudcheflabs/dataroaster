@@ -1,7 +1,8 @@
 namespace: trino-gateway
 serviceAccount: trino-gateway
-image: cloudcheflabs/trino-gateway:v2.0.0
+image: cloudcheflabs/trino-gateway:v2.1.0
 imagePullPolicy: Always
+replicas: 1
 resources:
   requests:
     cpu: 200m
@@ -40,6 +41,11 @@ trino:
       keystorePass: changeit
       trustStorePath: /home/opc/.keystore
       trustStorePass: changeit
+    threadPool:
+      maxThreads: 100
+      minThreads: 10
+      idleTimeout: 120
+    publicEndpoint: "https://trino-gateway-proxy-test.cloudchef-labs.com"
 # jdbc
 jdbc:
   url: jdbc:mysql://mysql-service.trino-gateway.svc:3306/trino_proxy?useSSL=false
@@ -50,3 +56,8 @@ jdbc:
 hibernate:
   show_sql: false
   globally_quoted_identifiers: true
+
+# redis connection
+redisConnection:
+  host: trino-gateway-redis-master.trino-gateway.svc
+  port: 6379

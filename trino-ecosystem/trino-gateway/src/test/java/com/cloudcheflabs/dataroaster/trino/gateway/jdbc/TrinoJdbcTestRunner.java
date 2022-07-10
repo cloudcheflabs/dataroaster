@@ -13,12 +13,14 @@ public class TrinoJdbcTestRunner {
 
     @Test
     public void connect() throws Exception {
-        String host = System.getProperty("host", "trino-gateway-proxy-test.cloudchef-labs.com:443");
+        String host = System.getProperty("host", "trino-gateway-proxy-test.cloudchef-labs.com");
         LOG.info("host: [{}]", host);
+        String port = System.getProperty("port", "443");
+        LOG.info("port: [{}]", port);
         boolean auth = Boolean.valueOf(System.getProperty("auth", "true"));
         LOG.info("auth: [{}]", auth);
 
-        String url = "jdbc:trino://" + host + "/tpch/tiny";
+        String url = "jdbc:trino://" + host + ":" + port + "/tpch/tiny";
         Properties properties = new Properties();
         properties.setProperty("user", "trino");
         if(auth) {

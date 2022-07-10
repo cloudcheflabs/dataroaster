@@ -25,6 +25,11 @@ data:
           keystorePass: {{ .Values.trino.proxy.tls.keystorePass }}
           trustStorePath: {{ .Values.trino.proxy.tls.trustStorePath }}
           trustStorePass: {{ .Values.trino.proxy.tls.trustStorePass }}
+        threadPool:
+          maxThreads: {{ .Values.trino.proxy.threadPool.maxThreads }}
+          minThreads: {{ .Values.trino.proxy.threadPool.minThreads }}
+          idleTimeout: {{ .Values.trino.proxy.threadPool.idleTimeout }}
+        publicEndpoint: {{ .Values.trino.proxy.publicEndpoint }}
     # jdbc
     jdbc:
       driverClassName: com.mysql.jdbc.Driver
@@ -36,3 +41,7 @@ data:
       dialect: org.hibernate.dialect.MySQL5Dialect
       show_sql: {{ .Values.hibernate.show_sql }}  
       globally_quoted_identifiers: {{ .Values.hibernate.globally_quoted_identifiers }}  
+    # redis
+    redis:
+      host: {{ .Values.redisConnection.host }}
+      port: {{ .Values.redisConnection.port }}

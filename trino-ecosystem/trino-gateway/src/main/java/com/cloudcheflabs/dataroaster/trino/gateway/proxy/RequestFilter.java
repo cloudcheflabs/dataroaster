@@ -63,7 +63,7 @@ public class RequestFilter implements jakarta.servlet.Filter {
       }
 
       String body = requestWrapper.getBody();
-      if(LOG.isDebugEnabled()) LOG.debug("body: [{}]", body);
+      LOG.debug("body: [{}]", body);
     }
 
     HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper((HttpServletResponse) response);

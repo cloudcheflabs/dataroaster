@@ -8,6 +8,7 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -41,6 +42,10 @@ public class TrinoProxy implements InitializingBean, DisposableBean {
 
     private String trustStorePass;
 
+    private String maxThreads;
+    private String minThreads;
+    private String idleTimeout;
+
     @Autowired
     private TrinoProxyServlet trinoProxyServlet;
 
@@ -58,13 +63,20 @@ public class TrinoProxy implements InitializingBean, DisposableBean {
         trustStorePath = env.getProperty("trino.proxy.tls.trustStorePath");
         trustStorePass = env.getProperty("trino.proxy.tls.trustStorePass");
 
+        maxThreads = env.getProperty("trino.proxy.threadPool.maxThreads");
+        minThreads = env.getProperty("trino.proxy.threadPool.minThreads");
+        idleTimeout = env.getProperty("trino.proxy.threadPool.idleTimeout");
+
         setup();
         startServer();
     }
 
 
     private void setup() {
-        server = new Server();
+        QueuedThreadPool threadPool =
+                new QueuedThreadPool(Integer.valueOf(maxThreads), Integer.valueOf(minThreads), Integer.valueOf(idleTimeout));
+        server = new Server(threadPool);
+
         server.setStopAtShutdown(true);
         ServerConnector connector = null;
 
