@@ -24,4 +24,14 @@ public class StringUtilsTestRunner {
         System.out.println(hostName + sb.toString());
 
     }
+
+    @Test
+    public void getQueryId() throws Exception {
+        String uri = "/v1/statement/executing/20220710_072650_00018_532z5/y1edf3c39ee4dffe419f0c4cb2b9b86544b8e24d8/0";
+
+        uri = uri.replaceAll("/v1/statement/executing/", "");
+
+        String[] tokens = uri.split("/");
+        System.out.println("query id: [" + tokens[0] + "]");
+    }
 }
