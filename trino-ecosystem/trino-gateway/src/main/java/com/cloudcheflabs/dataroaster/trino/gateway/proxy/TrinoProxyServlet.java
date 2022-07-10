@@ -5,6 +5,7 @@ import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.CacheDao;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.UsersService;
+import com.cloudcheflabs.dataroaster.trino.gateway.dao.redis.RedisCacheDao;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.BasicAuthentication;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.TrinoResponse;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
@@ -53,7 +54,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
   @Autowired
   @Qualifier("trinoResponseCacheDao")
-  private CacheDao<TrinoResponse> trinoResponseCacheDao;
+  private RedisCacheDao<TrinoResponse> trinoResponseCacheDao;
 
   private boolean authenticationNecessary;
 
