@@ -81,12 +81,10 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
       TrinoResponse trinoResponse = (trinoReponseCache.containsKey(trinoTxId)) ? trinoReponseCache.get(trinoTxId) : null;
       if(trinoResponse != null) {
         String target = trinoResponse.getNextUri();
-        if(target != null) {
+        if (target != null) {
           LOG.info("source: [{}], target: [{}]", source, target);
           return target;
         }
-      } else {
-        throw new RuntimeException("nextUri not found in cache for tx id [" + trinoTxId + "]");
       }
     }
 
