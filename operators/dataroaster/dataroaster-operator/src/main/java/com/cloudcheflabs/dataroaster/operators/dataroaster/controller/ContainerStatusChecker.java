@@ -25,7 +25,7 @@ public class ContainerStatusChecker {
             PodList podList = kubernetesClient.pods().inNamespace(namespace).list();
             for(Pod pod : podList.getItems()) {
                 ObjectMeta metadata = pod.getMetadata();
-                LOG.info("metadata: [{}]", JsonUtils.toJson(metadata));
+                //LOG.info("metadata: [{}]", JsonUtils.toJson(metadata));
                 Map<String, String> labels = metadata.getLabels();
                 LOG.info("labels: [{}]", JsonUtils.toJson(labels));
                 for(String key : labels.keySet()) {

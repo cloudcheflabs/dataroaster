@@ -42,14 +42,15 @@ public class RedisConfigurer {
         String namespace = getNamespace();
 
         // check if redis is running now.
+        String componentName = (namespace.equals("redis")) ? "redis-master-0" : namespace + "-" + "redis-master-0";
         ContainerStatusChecker.checkContainerStatus(kubernetesClient,
-                "redis-master-0",
+                componentName,
                 namespace,
                 "app.kubernetes.io/component",
                "master",
                 20);
 
-        String secretName = "redis";
+        String secretName = (namespace.equals("redis")) ? "redis" : namespace + "-" + "redis";
         Resource<Secret> secret = kubernetesClient.secrets().inNamespace(namespace).withName(secretName);
         Map<String, String> data = secret.get().getData();
         String base64EncodedPassword = data.get("redis-password");
