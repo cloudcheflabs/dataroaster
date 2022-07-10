@@ -177,6 +177,16 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     private String id;
     private String nextUri;
 
+    private String infoUri;
+
+    public String getInfoUri() {
+      return infoUri;
+    }
+
+    public void setInfoUri(String infoUri) {
+      this.infoUri = infoUri;
+    }
+
     public String getId() {
       return id;
     }
@@ -206,7 +216,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     String jsonResponse = new String(buffer);
 
     if(LOG.isInfoEnabled()) {
-      LOG.info("onResponseContent buffer: \n", JsonWriter.formatJson(jsonResponse));
+      LOG.info("onResponseContent buffer: ", jsonResponse);
       for (String header : response.getHeaderNames()) {
         LOG.info("header [{}]: [{}]", header, response.getHeader(header));
       }
@@ -219,6 +229,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     String nextUri = (responseMap.containsKey("nextUri")) ? (String) responseMap.get("nextUri") : null;
     LOG.info("nextUri: {}", nextUri);
 
+    String infoUri = (responseMap.containsKey("infoUri")) ? (String) responseMap.get("infoUri") : null;
+    LOG.info("infoUri: {}", infoUri);
+
     TrinoResponse trinoResponse = new TrinoResponse();
     trinoResponse.setId(id);
     trinoResponse.setNextUri(nextUri);
@@ -226,28 +239,34 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
     // change nextUri.
     if(nextUri != null) {
-     String hostName = "https://trino-gateway-proxy-test.cloudchef-labs.com";
 
-
-      String[] tokens = nextUri.split("/");
-
-      int count = 0;
-      StringBuffer sb = new StringBuffer();
-      for(String token : tokens) {
-        if(count > 2) {
-          sb.append("/").append(token);
-        }
-        count++;
-      }
-
-      String newNextUri = hostName + sb.toString();
+      String newNextUri = replaceUri(nextUri);
+      String newInfoUri = replaceUri(infoUri);
       responseMap.put("nextUri", newNextUri);
+      responseMap.put("infoUri", newInfoUri);
       String newJsonReponse = JsonUtils.toJson(responseMap);
-      LOG.info("newJsonReponse: \n", JsonWriter.formatJson(newJsonReponse));
+      LOG.info("newJsonReponse: ", newJsonReponse);
       buffer = newJsonReponse.getBytes();
     }
 
 
     super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
+  }
+
+  private String replaceUri(String uri) {
+    String hostName = "https://trino-gateway-proxy-test.cloudchef-labs.com";
+
+
+    String[] tokens = uri.split("/");
+
+    int count = 0;
+    StringBuffer sb = new StringBuffer();
+    for(String token : tokens) {
+      if(count > 2) {
+        sb.append("/").append(token);
+      }
+      count++;
+    }
+    return hostName + sb.toString();
   }
 }
