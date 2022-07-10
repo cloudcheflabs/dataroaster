@@ -45,6 +45,7 @@ trino:
       maxThreads: 100
       minThreads: 10
       idleTimeout: 120
+    publicEndpoint: "https://trino-gateway-proxy-test.cloudchef-labs.com"
 # jdbc
 jdbc:
   url: jdbc:mysql://mysql-service.trino-gateway.svc:3306/trino_proxy?useSSL=false

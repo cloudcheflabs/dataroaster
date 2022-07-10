@@ -14,6 +14,7 @@ import com.cloudcheflabs.dataroaster.trino.gateway.util.BCryptUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.GzipUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.RandomUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.client.api.Request;
@@ -55,12 +56,18 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
   @Qualifier("trinoResponseRedisCache")
   private CacheService<TrinoResponse> trinoResponseRedisCache;
 
+  @Autowired
+  private KubernetesClient kubernetesClient;
+
   private boolean authenticationNecessary;
+  private String publicEndpoint;
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    authenticationNecessary = Boolean.valueOf(env.getProperty("trino.proxy.!authentication"));
+    authenticationNecessary = Boolean.valueOf(env.getProperty("trino.proxy.authentication"));
     LOG.info("authenticationNecessary: [{}]", authenticationNecessary);
+    publicEndpoint = env.getProperty("trino.proxy.publicEndpoint");
+    LOG.info("publicEndpoint: [{}]", publicEndpoint);
   }
 
   @Override
@@ -250,9 +257,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
     // change nextUri.
     if(nextUri != null) {
-      // TODO: replace it with real trino gateway host name.
-      String newNextUri = replaceUri(nextUri, "http://localhost:18080");
-      String newInfoUri = replaceUri(infoUri, "http://localhost:18080");
+      // replace the backend trino hostname with proxy public endpoint.
+      String newNextUri = replaceUri(nextUri, publicEndpoint);
+      String newInfoUri = replaceUri(infoUri, publicEndpoint);
       responseMap.put("nextUri", newNextUri);
       responseMap.put("infoUri", newInfoUri);
       String newJsonReponse = JsonUtils.toJson(responseMap);
@@ -274,6 +281,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
     super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
   }
+
 
   private String replaceUri(String uri, String hostName) {
     String[] tokens = uri.split("/");

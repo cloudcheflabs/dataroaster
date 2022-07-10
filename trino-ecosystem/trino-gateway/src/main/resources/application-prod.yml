@@ -18,6 +18,7 @@ trino:
       maxThreads: 100
       minThreads: 10
       idleTimeout: 120
+    publicEndpoint: "https://trino-gateway-proxy-test.cloudchef-labs.com"
 # jdbc
 jdbc:
   driverClassName: com.mysql.jdbc.Driver

@@ -62,7 +62,7 @@ public class RedisConfigurer {
         return jedis;
     }
 
-    private static String getNamespace() {
+    public static String getNamespace() {
         try {
             String namespaceFile = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
             return FileUtils.fileToString(namespaceFile, false);
