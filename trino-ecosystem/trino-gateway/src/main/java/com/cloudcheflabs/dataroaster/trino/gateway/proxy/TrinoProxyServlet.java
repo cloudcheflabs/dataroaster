@@ -78,12 +78,13 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     String trinoTxId = request.getHeader("X-Trino-Transaction-Id");
     LOG.info("trinoTxId: {}", trinoTxId);
     if(trinoTxId != null) {
-      TrinoResponse trinoResponse = trinoReponseCache.get(trinoTxId);
+      TrinoResponse trinoResponse = (trinoReponseCache.containsKey(trinoTxId)) ? trinoReponseCache.get(trinoTxId) : null;
       if(trinoResponse != null) {
         String target = trinoResponse.getNextUri();
-        LOG.info("source: [{}], target: [{}]", source, target);
-
-        return target;
+        if(target != null) {
+          LOG.info("source: [{}], target: [{}]", source, target);
+          return target;
+        }
       } else {
         throw new RuntimeException("nextUri not found in cache for tx id [" + trinoTxId + "]");
       }
