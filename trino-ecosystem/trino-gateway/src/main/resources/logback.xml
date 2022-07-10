@@ -31,7 +31,7 @@
                 </timeBasedFileNamingAndTriggeringPolicy>
             </rollingPolicy>
         </appender>
-        <root level="dev">
+        <root level="debug">
             <appender-ref ref="RollingFile" />
             <appender-ref ref="Console" />
         </root>

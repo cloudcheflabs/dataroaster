@@ -162,10 +162,10 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                                    Callback callback) {
 
 
-    if(LOG.isDebugEnabled()) {
-      LOG.debug("onResponseContent buffer: [{}]", new String(buffer));
+    if(LOG.isInfoEnabled()) {
+      LOG.info("onResponseContent buffer: [{}]", new String(buffer));
       for (String header : response.getHeaderNames()) {
-        LOG.debug("header [{}]: [{}]", header, response.getHeader(header));
+        LOG.info("header [{}]: [{}]", header, response.getHeader(header));
       }
     }
 
