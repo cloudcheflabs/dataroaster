@@ -243,8 +243,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     // change nextUri.
     if(nextUri != null) {
 
-      String newNextUri = replaceUri(nextUri);
-      String newInfoUri = replaceUri(infoUri);
+      // TODO: replace it with real trino gateway host name.
+      String newNextUri = replaceUri(nextUri, "http://localhost:18080");
+      String newInfoUri = replaceUri(infoUri, "http://localhost:18080");
       responseMap.put("nextUri", newNextUri);
       responseMap.put("infoUri", newInfoUri);
       String newJsonReponse = JsonUtils.toJson(responseMap);
@@ -261,10 +262,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
   }
 
-  private String replaceUri(String uri) {
-    String hostName = "https://trino-gateway-proxy-test.cloudchef-labs.com";
-
-
+  private String replaceUri(String uri, String hostName) {
     String[] tokens = uri.split("/");
 
     int count = 0;
