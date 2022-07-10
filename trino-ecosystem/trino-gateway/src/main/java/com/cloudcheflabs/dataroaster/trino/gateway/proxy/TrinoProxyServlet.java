@@ -54,7 +54,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
   @Autowired
   @Qualifier("trinoResponseCacheDao")
-  private CacheDao trinoResponseCacheDao;
+  private CacheDao<TrinoResponse> trinoResponseCacheDao;
 
   private boolean authenticationNecessary;
 
