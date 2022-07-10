@@ -82,6 +82,9 @@
 
 		<!-- commons codec -->
 		<commons-codec.version>1.15</commons-codec.version>
+
+		<!-- jedis -->
+		<jedis.version>4.2.0</jedis.version>
 	</properties>
 
 	<dependencies>
@@ -281,6 +284,11 @@
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>${commons-codec.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>${jedis.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
