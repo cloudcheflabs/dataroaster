@@ -74,6 +74,22 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                     + request.getRequestURI()
                     + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
 
+
+    String trinoTxId = request.getHeader("X-Trino-Transaction-Id");
+    LOG.info("trinoTxId: {}", trinoTxId);
+    if(trinoTxId != null) {
+      TrinoResponse trinoResponse = trinoReponseCache.get(trinoTxId);
+      if(trinoResponse != null) {
+        String target = trinoResponse.getNextUri();
+        LOG.info("source: [{}], target: [{}]", source, target);
+
+        return target;
+      } else {
+        throw new RuntimeException("nextUri not found in cache for tx id [" + trinoTxId + "]");
+      }
+    }
+
+
     Object basicAuthObj = request.getAttribute(ATTR_BASIC_AUTHENTICATION);
     if(basicAuthObj == null) {
       String user = request.getHeader(HEADER_TRINO_USER);
@@ -158,7 +174,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
   // TODO: this is just temp cache.
   public Map<String, TrinoResponse> trinoReponseCache = new HashMap<>();
 
-  private static class TrinoResponse implements Serializable {
+  public static class TrinoResponse implements Serializable {
     private String id;
     private String nextUri;
 
@@ -211,7 +227,25 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
     // change nextUri.
     if(nextUri != null) {
-      //nextUri.
+     String hostName = "https://trino-gateway-proxy-test.cloudchef-labs.com";
+
+
+      String[] tokens = nextUri.split("/");
+
+      int count = 0;
+      StringBuffer sb = new StringBuffer();
+      for(String token : tokens) {
+        if(count > 2) {
+          sb.append("/").append(token);
+        }
+        count++;
+      }
+
+      String newNextUri = hostName + sb.toString();
+      responseMap.put("nextUri", newNextUri);
+      String newJsonReponse = JsonUtils.toJson(responseMap);
+      LOG.info("newJsonReponse: \n", JsonWriter.formatJson(newJsonReponse));
+      buffer = newJsonReponse.getBytes();
     }
 
 
