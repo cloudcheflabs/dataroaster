@@ -47,10 +47,9 @@ public class GzipUtils {
                 os.write(buffer, 0, len);
             }
             content = new String(os.toByteArray());
+            os.close();
             gis.close();
             is.close();
-            os.close();
-
             return content;
         } catch (Exception e) {
             throw new RuntimeException(e);
