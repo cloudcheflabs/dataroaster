@@ -1,8 +1,8 @@
 
 apiVersion: v2
 name: dataroaster-trino-gateway
-version: v1.1.0
-appVersion: v2.0.1
+version: v1.2.0
+appVersion: v2.1.0
 description: dataroaster trino gateway
 
 dependencies:
