@@ -42,5 +42,5 @@ data:
       globally_quoted_identifiers: {{ .Values.hibernate.globally_quoted_identifiers }}  
     # redis
     redis:
-      host: {{ .Values.redis.host }}
-      port: {{ .Values.redis.port }}
+      host: {{ .Values.redisConnection.host }}
+      port: {{ .Values.redisConnection.port }}
