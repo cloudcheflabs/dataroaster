@@ -109,7 +109,7 @@ public class TrinoProxy implements InitializingBean, DisposableBean {
                             new HttpConnectionFactory(httpsConfig));
         } else {
             HttpConfiguration httpConfig = new HttpConfiguration();
-            httpConfig.setOutputBufferSize(327680);
+            httpConfig.setOutputBufferSize(32768);
             connector = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
         }
         connector.setHost("0.0.0.0");
@@ -118,7 +118,6 @@ public class TrinoProxy implements InitializingBean, DisposableBean {
         connector.setAccepting(true);
         connector.setAcceptedTcpNoDelay(true);
         connector.setReuseAddress(true);
-        connector.setAcceptedSendBufferSize(40 * 1024 * 1024);
         server.addConnector(connector);
 
         ConnectHandler proxyConnectHandler = new ConnectHandler();
