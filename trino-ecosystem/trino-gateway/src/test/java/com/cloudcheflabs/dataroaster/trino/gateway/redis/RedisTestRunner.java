@@ -29,9 +29,11 @@ public class RedisTestRunner {
     @Test
     public void addMap() throws Exception {
 
+        String host = System.getProperty("host", "localhost");
+        String port = System.getProperty("port", "6379");
         String password = System.getProperty("password");
 
-        HostAndPort hostAndPort = new HostAndPort("localhost", 6379);
+        HostAndPort hostAndPort = new HostAndPort(host, Integer.valueOf(port));
         JedisClientConfig clientConfig = DefaultJedisClientConfig.builder().password(password).build();
         List<HostAndPort> shards = new ArrayList<>();
         shards.add(hostAndPort);
