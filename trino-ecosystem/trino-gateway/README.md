@@ -92,12 +92,14 @@ trino-gateway \
 --version v1.2.0 \
 --set ingress.proxyHostName=trino-gateway-proxy-test.cloudchef-labs.com \
 --set ingress.restHostName=trino-gateway-rest-test.cloudchef-labs.com \
+--set trino.proxy.publicEndpoint="https://trino-gateway-proxy-test.cloudchef-labs.com" \
 --set dataroastermysql.storage.storageClass=oci \
 --set redis.global.storageClass=oci \
 --set redis.replica.replicaCount=1 \
 dataroaster-trino-gateway/dataroaster-trino-gateway;
 ```
 * `ingress.proxyHostName` and `ingress.restHostName` need to be replaced with the registered host names to dns above.
+* `trino.proxy.publicEndpoint` is public endpoint to which trino clients can connect to run queries.
 * `dataroastermysql.storage.storageClass` which is the storage class for the dependency mysql needs to be changed to suit to your kubernetes cluster.
 * `redis.global.storageClass` and `redis.replica.replicaCount` are the dependency redis storage class and replica count individually.
  
