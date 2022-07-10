@@ -21,7 +21,7 @@ public class StringUtilsTestRunner {
             count++;
         }
 
-        System.out.println(sb.toString());
+        System.out.println(hostName + sb.toString());
 
     }
 }
