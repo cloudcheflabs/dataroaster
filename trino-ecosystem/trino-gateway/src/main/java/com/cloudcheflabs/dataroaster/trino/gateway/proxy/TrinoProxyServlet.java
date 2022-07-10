@@ -230,20 +230,28 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                                    int length,
                                    Callback callback) {
 
+
+    //
+    // retrieve query id and nextUri from response buffer, and save them to cache.
+    // replace the hostname of nextUri with trino gateway ingress host name.
+    //
+
+
+
     // print header.
     for (String header : response.getHeaderNames()) {
-      LOG.info("header [{}]: [{}]", header, response.getHeader(header));
+      if(LOG.isDebugEnabled()) LOG.debug("header [{}]: [{}]", header, response.getHeader(header));
     }
 
-    LOG.info("buffer size: {}", buffer.length);
-    LOG.info("offset: {}", offset);
-    LOG.info("length: {}", length);
+    if(LOG.isDebugEnabled()) LOG.debug("buffer size: {}", buffer.length);
+    if(LOG.isDebugEnabled()) LOG.debug("offset: {}", offset);
+    if(LOG.isDebugEnabled()) LOG.debug("length: {}", length);
 
     String contentLength = response.getHeader("Content-Length");
-    LOG.info("contentLength: {}", contentLength);
+    if(LOG.isDebugEnabled()) LOG.debug("contentLength: {}", contentLength);
 
     String contentEncoding = response.getHeader("Content-Encoding");
-    LOG.info("contentEncoding: {}", contentEncoding);
+    if(LOG.isDebugEnabled()) LOG.debug("contentEncoding: {}", contentEncoding);
 
     String jsonResponse = null;
     if(contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
@@ -251,17 +259,17 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     } else {
       jsonResponse = new String(buffer);
     }
-    LOG.info("jsonResponse: {}", jsonResponse);
+    if(LOG.isDebugEnabled()) LOG.debug("jsonResponse: {}", jsonResponse);
 
     // save response to cache.
     Map<String, Object> responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
     String id = (String) responseMap.get("id");
-    LOG.info("id: {}", id);
+    if(LOG.isDebugEnabled()) LOG.debug("id: {}", id);
     String nextUri = (responseMap.containsKey("nextUri")) ? (String) responseMap.get("nextUri") : null;
-    LOG.info("nextUri: {}", nextUri);
+    if(LOG.isDebugEnabled()) LOG.debug("nextUri: {}", nextUri);
 
     String infoUri = (responseMap.containsKey("infoUri")) ? (String) responseMap.get("infoUri") : null;
-    LOG.info("infoUri: {}", infoUri);
+    if(LOG.isDebugEnabled()) LOG.debug("infoUri: {}", infoUri);
 
     TrinoResponse trinoResponse = new TrinoResponse();
     trinoResponse.setId(id);
@@ -277,7 +285,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
       responseMap.put("nextUri", newNextUri);
       responseMap.put("infoUri", newInfoUri);
       String newJsonReponse = JsonUtils.toJson(responseMap);
-      LOG.info("newJsonReponse: {}", newJsonReponse);
+      if(LOG.isDebugEnabled()) LOG.debug("newJsonReponse: {}", newJsonReponse);
 
       // gzip compressed json.
       if(contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
@@ -287,7 +295,8 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
       }
 
       length = buffer.length;
-      LOG.info("new length: {}", length);
+      if(LOG.isDebugEnabled()) LOG.debug("new length: {}", length);
+
       // set new content length.
       response.setHeader("Content-Length", String.valueOf(length));
     }
