@@ -4,21 +4,23 @@ import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.CacheDao;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.JedisSharding;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-
-public class AbstractCacheDao<T> implements CacheDao<T> {
+@Transactional
+public abstract class AbstractCacheDao<T> implements CacheDao<T> {
 
     protected static Kryo kryo;
 
+    @Autowired
     protected JedisSharding jedis;
 
-    public AbstractCacheDao(JedisSharding jedis, Class<T> clazz) {
+    public AbstractCacheDao(Class<T> clazz) {
         kryo = new Kryo();
         kryo.register(clazz);
-        this.jedis = jedis;
     }
 
 

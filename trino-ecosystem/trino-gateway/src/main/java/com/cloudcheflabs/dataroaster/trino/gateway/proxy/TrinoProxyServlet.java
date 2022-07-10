@@ -3,9 +3,9 @@ package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.dao.CacheDao;
+import com.cloudcheflabs.dataroaster.trino.gateway.api.service.CacheService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.UsersService;
-import com.cloudcheflabs.dataroaster.trino.gateway.dao.redis.RedisCacheDao;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.BasicAuthentication;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.TrinoResponse;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
@@ -53,8 +53,8 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
   private ClusterGroupService clusterGroupService;
 
   @Autowired
-  @Qualifier("trinoResponseCacheDao")
-  private CacheDao<TrinoResponse> trinoResponseCacheDao;
+  @Qualifier("trinoResponseCacheServiceImpl")
+  private CacheService<TrinoResponse> trinoResponseCacheService;
 
   private boolean authenticationNecessary;
 
@@ -101,7 +101,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     String queryId = getQueryId(request.getRequestURI());
     LOG.info("queryId: {}", queryId);
     if(queryId != null) {
-      TrinoResponse trinoResponse = trinoResponseCacheDao.get(queryId, TrinoResponse.class);
+      TrinoResponse trinoResponse = trinoResponseCacheService.get(queryId, TrinoResponse.class);
       if(trinoResponse != null) {
         String target = trinoResponse.getNextUri();
         if (target != null) {
@@ -246,7 +246,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     trinoResponse.setId(id);
     trinoResponse.setNextUri(nextUri);
     trinoResponse.setInfoUri(infoUri);
-    trinoResponseCacheDao.set(id, trinoResponse);
+
+    trinoResponseCacheService.set(id, trinoResponse);
+
     // change nextUri.
     if(nextUri != null) {
       // TODO: replace it with real trino gateway host name.
