@@ -63,7 +63,7 @@ public class RedisConfigurer {
     }
 
 
-    @Bean
+    @Bean("trinoResponseCacheDao")
     public CacheDao<TrinoResponse> trinoResponseCacheDao() {
         return new RedisCacheDao<TrinoResponse>(jedis(), TrinoResponse.class);
     }
