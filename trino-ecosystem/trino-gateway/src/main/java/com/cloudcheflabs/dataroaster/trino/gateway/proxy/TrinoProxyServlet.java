@@ -55,13 +55,24 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    authenticationNecessary = Boolean.valueOf(env.getProperty("trino.proxy.authentication"));
+    authenticationNecessary = Boolean.valueOf(env.getProperty("trino.proxy.!authentication"));
     LOG.info("authenticationNecessary: [{}]", authenticationNecessary);
   }
 
   @Override
   protected void addProxyHeaders(HttpServletRequest request, Request proxyRequest) {
     super.addProxyHeaders(request, proxyRequest);
+  }
+
+  private String getQueryId(String uri) {
+    if(uri.contains("/v1/statement/executing/")) {
+      uri = uri.replaceAll("/v1/statement/executing/", "");
+
+      String[] tokens = uri.split("/");
+      return tokens[0];
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -76,10 +87,10 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                     + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
 
 
-    String trinoTxId = request.getHeader("X-Trino-Transaction-Id");
-    LOG.info("trinoTxId: {}", trinoTxId);
-    if(trinoTxId != null) {
-      TrinoResponse trinoResponse = (trinoReponseCache.containsKey(trinoTxId)) ? trinoReponseCache.get(trinoTxId) : null;
+    String queryId = getQueryId(request.getRequestURI());
+    LOG.info("queryId: {}", queryId);
+    if(queryId != null) {
+      TrinoResponse trinoResponse = (trinoReponseCache.containsKey(queryId)) ? trinoReponseCache.get(queryId) : null;
       if(trinoResponse != null) {
         String target = trinoResponse.getNextUri();
         if (target != null) {
@@ -88,7 +99,6 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         }
       }
     }
-
 
     Object basicAuthObj = request.getAttribute(ATTR_BASIC_AUTHENTICATION);
     if(basicAuthObj == null) {
