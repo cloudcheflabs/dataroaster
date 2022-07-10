@@ -6,7 +6,7 @@ metadata:
     app: trino-gateway
   namespace: {{ .Values.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: trino-gateway
@@ -17,7 +17,6 @@ spec:
       annotations:
       {{- toYaml $.Values.tolerations | nindent 8 }}
     spec:
-      replicas: {{ .Values.replicas }}
       affinity:
       {{- toYaml $.Values.affinity | nindent 8 }}
       tolerations:
