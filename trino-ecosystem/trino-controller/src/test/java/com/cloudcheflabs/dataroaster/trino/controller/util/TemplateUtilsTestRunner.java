@@ -15,6 +15,6 @@ public class TemplateUtilsTestRunner {
         kv.put("customResourceNamespace", "trino-controller");
         String nginxCrString =
                 TemplateUtils.replace("/templates/cr/nginx-ingress-controller.yaml", true, kv);
-        System.out.printf("nginxCrString: \n%s", JsonWriter.formatJson(nginxCrString));
+        System.out.printf("nginxCrString: \n%s", nginxCrString);
     }
 }
