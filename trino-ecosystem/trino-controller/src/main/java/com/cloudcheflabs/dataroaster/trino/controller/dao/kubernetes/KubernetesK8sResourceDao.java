@@ -73,6 +73,21 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
             }
         }
 
+        // if there is no crd selected, search for crd outside group of cloudchef-labs.com.
+        if(selectedCRD == null) {
+            for (CustomResourceDefinition crd : crdsItems) {
+                CustomResourceDefinitionSpec spec = crd.getSpec();
+                String group = spec.getGroup();
+                String crdKind = spec.getNames().getKind();
+                LOG.info("group: [{}], crdKind: [{}]", group, crdKind);
+
+                if(crdKind.equals(kind)) {
+                    selectedCRD = crd;
+                    break;
+                }
+            }
+        }
+
         return selectedCRD;
     }
 

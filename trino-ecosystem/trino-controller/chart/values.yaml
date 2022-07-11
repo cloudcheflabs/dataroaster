@@ -1,0 +1,21 @@
+namespace: trino-controller
+serviceAccount: trino-controller
+image: cloudcheflabs/trino-controller:v1.0.0
+imagePullPolicy: Always
+replicas: 1
+resources:
+  requests:
+    cpu: 200m
+    memory: 1Gi
+  limits:
+    cpu: 300m
+    memory: 1500Mi
+priorityClassName: ""
+annotations: null
+affinity: null
+tolerations: null
+nodeSelector: null
+hostNetwork: false
+# spring boot server
+server:
+  port: 8093

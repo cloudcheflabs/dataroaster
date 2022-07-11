@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino-controller-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: trino-controller
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.server.port }}
+      targetPort: rest
+      protocol: TCP
+      name: rest
+  selector:
+    app: trino-controller

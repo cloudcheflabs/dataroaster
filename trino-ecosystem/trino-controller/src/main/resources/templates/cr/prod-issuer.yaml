@@ -2,6 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod
+  namespace: {{ namespace }}
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
