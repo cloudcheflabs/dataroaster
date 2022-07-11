@@ -4,6 +4,7 @@ import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.common.util.TemplateUtils;
 import com.cloudcheflabs.dataroaster.trino.controller.util.YamlUtils;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
+import io.fabric8.kubernetes.api.model.LoadBalancerIngress;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinitionList;
@@ -17,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +48,21 @@ public class K8sResourceTestRunner {
         }
 
         Service nginxService = kubernetesClient.services().inNamespace("ingress-nginx").withName("ingress-nginx-controller").get();
-        List<String> externalIPs = nginxService.getSpec().getExternalIPs();
-        LOG.info("external ips: {}", JsonUtils.toJson(externalIPs));
+        LoadBalancerIngress loadBalancerIngress = nginxService.getStatus().getLoadBalancer().getIngress().get(0);
+        String ip = loadBalancerIngress.getIp();
+        if(ip == null) {
+            String hostName = loadBalancerIngress.getHostname();
+
+            // get ip address of host name.
+            try {
+                InetAddress host = InetAddress.getByName(hostName);
+                ip = host.getHostAddress();
+            } catch (UnknownHostException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        LOG.info("external ip: {}", ip);
     }
 
 }
