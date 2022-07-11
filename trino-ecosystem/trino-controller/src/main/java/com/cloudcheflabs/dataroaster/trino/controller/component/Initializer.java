@@ -117,6 +117,14 @@ public class Initializer {
                     20
             );
 
+            // take a time to wait for cert manager being loaded.
+            LOG.info("take a time to wait for cert manager being loaded...");
+            try {
+                Thread.sleep(10000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             // create issuer.
             kv = new HashMap<>();
             String issuerString =

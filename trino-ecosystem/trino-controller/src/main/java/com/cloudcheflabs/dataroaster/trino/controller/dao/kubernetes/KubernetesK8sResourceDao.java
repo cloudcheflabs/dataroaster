@@ -26,13 +26,13 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
     public void createCustomResource(CustomResource customResource) {
         try {
             String namespace = customResource.getNamespace();
-            LOG.info("namespace: {}", namespace);
+            //LOG.info("namespace: {}", namespace);
 
             String kind = customResource.getKind();
-            LOG.info("kind: {}", kind);
+            //LOG.info("kind: {}", kind);
 
             String yaml = customResource.getYaml();
-            LOG.info("yaml: \n{}", yaml);
+            //LOG.info("yaml: \n{}", yaml);
 
             CustomResourceDefinition selectedCRD = selectCRD(kind);
             if(selectedCRD == null) {
