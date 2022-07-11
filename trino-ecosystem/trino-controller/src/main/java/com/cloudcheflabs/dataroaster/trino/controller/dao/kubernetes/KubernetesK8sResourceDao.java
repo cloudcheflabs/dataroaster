@@ -26,10 +26,10 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
     public void createCustomResource(CustomResource customResource) {
         try {
             String namespace = customResource.getNamespace();
-            LOG.info("namespace: \n{}", namespace);
+            LOG.info("namespace: {}", namespace);
 
             String kind = customResource.getKind();
-            LOG.info("kind: \n{}", kind);
+            LOG.info("kind: {}", kind);
 
             String yaml = customResource.getYaml();
             LOG.info("yaml: \n{}", yaml);

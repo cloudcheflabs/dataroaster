@@ -18,6 +18,7 @@ public class KubernetesClientConfigurer {
 
     @Bean
     public KubernetesClient kubernetesClient() {
+        System.setProperty("kubernetes.websocket.timeout", "10000");
         String kubeconfig = System.getProperty(PROPERTY_TRINO_CONTROLLER_KUBECONFIG);
         if(kubeconfig != null) {
             String kubeConfigYaml = FileUtils.fileToString(kubeconfig, false);
