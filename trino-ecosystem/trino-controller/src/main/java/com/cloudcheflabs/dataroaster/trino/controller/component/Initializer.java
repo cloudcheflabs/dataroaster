@@ -120,7 +120,7 @@ public class Initializer {
             // take a time to wait for cert manager being loaded.
             LOG.info("take a time to wait for cert manager being loaded...");
             try {
-                Thread.sleep(10000);
+                Thread.sleep(20000);
             } catch (Exception e) {
                 e.printStackTrace();
             }
