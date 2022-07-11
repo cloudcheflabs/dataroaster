@@ -33,10 +33,11 @@ public class Initializer {
 
 
     public Initializer() {
-        init();
     }
 
-    private void init() {
+    public void init() {
+        LOG.info("ready to run initializer...");
+
         // replace nginx templates.
         Map<String, Object> kv = new HashMap<>();
         kv.put("customResourceNamespace", getNamespace());
