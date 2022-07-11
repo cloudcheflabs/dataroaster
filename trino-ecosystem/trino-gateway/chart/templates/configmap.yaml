@@ -33,7 +33,7 @@ data:
     # jdbc
     jdbc:
       driverClassName: com.mysql.jdbc.Driver
-      url: {{ .Values.jdbc.url }}
+      url: {{ template "jdbc.url" . }}
       user: {{ .Values.jdbc.user }}
       pass: {{ .Values.jdbc.pass }}  
     # hibernate
@@ -43,5 +43,5 @@ data:
       globally_quoted_identifiers: {{ .Values.hibernate.globally_quoted_identifiers }}  
     # redis
     redis:
-      host: {{ .Values.redisConnection.host }}
+      host: {{ template "redisConnection.host" . }}
       port: {{ .Values.redisConnection.port }}
