@@ -24,6 +24,7 @@ public class Initializer {
     public static final String DEFAULT_TRINO_CONTROLLER_NAMESPACE = "trino-controller";
 
     @Autowired
+    @Qualifier("kubernetesClient")
     private KubernetesClient kubernetesClient;
 
     @Autowired
