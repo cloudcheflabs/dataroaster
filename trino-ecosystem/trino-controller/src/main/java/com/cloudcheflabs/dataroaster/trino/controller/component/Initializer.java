@@ -6,6 +6,7 @@ import com.cloudcheflabs.dataroaster.trino.controller.api.service.K8sResourceSer
 import com.cloudcheflabs.dataroaster.trino.controller.domain.CustomResource;
 import com.cloudcheflabs.dataroaster.trino.controller.util.ContainerStatusChecker;
 import com.cloudcheflabs.dataroaster.trino.controller.util.CustomResourceUtils;
+import io.fabric8.kubernetes.api.model.LoadBalancerIngress;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,9 +140,23 @@ public class Initializer {
             LOG.info("issuer custom resource created...");
         }
 
-        // TODO: get external ip of nginx service.
+        // get external ip of nginx service.
         Service nginxService = kubernetesClient.services().inNamespace(nginxNamespace).withName("ingress-nginx-controller").get();
-        List<String> externalIPs = nginxService.getSpec().getExternalIPs();
+        LoadBalancerIngress loadBalancerIngress = nginxService.getStatus().getLoadBalancer().getIngress().get(0);
+        String nginxExternalIP = loadBalancerIngress.getIp();
+        if(nginxExternalIP == null) {
+            String hostName = loadBalancerIngress.getHostname();
+
+            // get ip address of host name.
+            try {
+                InetAddress host = InetAddress.getByName(hostName);
+                nginxExternalIP = host.getHostAddress();
+            } catch (UnknownHostException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        LOG.info("nginx external ip: {}", nginxExternalIP);
 
         // TODO: get public endpoint of trino gateway.
 
