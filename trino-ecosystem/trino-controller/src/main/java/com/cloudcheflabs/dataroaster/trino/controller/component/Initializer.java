@@ -119,7 +119,6 @@ public class Initializer {
 
             // create issuer.
             kv = new HashMap<>();
-            kv.put("namespace", certManagerNamespace);
             String issuerString =
                     TemplateUtils.replace("/templates/cr/prod-issuer.yaml", true, kv);
             // build custom resource of issuer.

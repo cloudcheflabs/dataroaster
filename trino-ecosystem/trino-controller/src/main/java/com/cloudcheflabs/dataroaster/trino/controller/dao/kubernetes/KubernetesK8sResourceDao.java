@@ -25,7 +25,6 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
     @Override
     public void createCustomResource(CustomResource customResource) {
         try {
-            String name = customResource.getName();
             String namespace = customResource.getNamespace();
             String kind = customResource.getKind();
             String yaml = customResource.getYaml();
@@ -41,10 +40,13 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
                     kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
                     .load(is).get();
 
-            GenericKubernetesResource retResource =
+            GenericKubernetesResource retResource = (namespace != null) ?
                     kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
                             .inNamespace(namespace)
+                            .createOrReplace(genericKubernetesResource) :
+                    kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
                             .createOrReplace(genericKubernetesResource);
+
             if(retResource != null) {
                 ObjectMeta meta = retResource.getMetadata();
                 LOG.info("custom resource with name [{}] in namespace [{}] created or replaced", meta.getName(), meta.getNamespace());
@@ -99,9 +101,11 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
                 throw new IllegalStateException("CRD with kind [" + kind + "] not found!");
             }
 
-            boolean result =
+            boolean result = (namespace != null) ?
                     kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
                             .inNamespace(namespace)
+                            .withName(name).delete() :
+                    kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
                             .withName(name).delete();
             LOG.info("custom resource - name: [{}], namespace: [{}], kind: [{}] deleted [{}]", name, namespace, kind, result);
         } catch (Exception e) {

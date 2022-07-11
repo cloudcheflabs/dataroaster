@@ -27,7 +27,7 @@ public class CustomResourceUtils {
 
         Map<String, Object> metadataMap = (Map<String, Object>) map.get("metadata");
         String name = (String) metadataMap.get("name");
-        String namespace = (String) metadataMap.get("namespace");
+        String namespace = metadataMap.containsKey("namespace") ? (String) metadataMap.get("namespace") : null;
 
         CustomResource customResource = new CustomResource();
         customResource.setKind(kind);
