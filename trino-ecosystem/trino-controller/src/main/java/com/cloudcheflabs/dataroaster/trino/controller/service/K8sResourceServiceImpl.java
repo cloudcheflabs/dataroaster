@@ -1,13 +1,15 @@
 package com.cloudcheflabs.dataroaster.trino.controller.service;
 
 import com.cloudcheflabs.dataroaster.trino.controller.api.dao.K8sResourceDao;
+import com.cloudcheflabs.dataroaster.trino.controller.api.service.K8sResourceService;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.CustomResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-@Service
-public class K8sResourceServiceImpl implements K8sResourceDao {
+@Component
+public class K8sResourceServiceImpl implements K8sResourceService {
 
     @Autowired
     @Qualifier("kubernetesK8sResourceDao")
