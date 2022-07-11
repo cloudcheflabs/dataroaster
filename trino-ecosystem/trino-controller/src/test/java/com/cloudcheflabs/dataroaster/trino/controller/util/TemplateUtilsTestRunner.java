@@ -1,6 +1,5 @@
 package com.cloudcheflabs.dataroaster.trino.controller.util;
 
-import com.cedarsoftware.util.io.JsonWriter;
 import com.cloudcheflabs.dataroaster.common.util.TemplateUtils;
 import org.junit.Test;
 
