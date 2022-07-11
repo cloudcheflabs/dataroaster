@@ -7,12 +7,20 @@ spec:
   repo: https://cloudcheflabs.github.io/trino-gateway-helm-repo/
   chartName: dataroaster-trino-gateway
   name: trino-gateway
-  version: v1.1.0
+  version: v1.3.0
   namespace: trino-gateway
   values: |
-    dataroastermysql:
-      storage:
-        storageClass: {{ storageClass }}
     ingress:
       proxyHostName: {{ proxyHostName }}
       restHostName: {{ restHostName }}
+    trino:
+      proxy:
+        publicEndpoint: {{ publicEndpoint }}
+    dataroastermysql:
+      storage:
+        storageClass: {{ storageClass }}
+    redis:
+      global:
+        storageClass: {{ storageClass }}
+      replica:
+        replicaCount: 1
