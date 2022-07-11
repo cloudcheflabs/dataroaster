@@ -48,7 +48,6 @@ trino:
     publicEndpoint: "https://trino-gateway-proxy-test.cloudchef-labs.com"
 # jdbc
 jdbc:
-  url: jdbc:mysql://mysql-service.trino-gateway.svc:3306/trino_proxy?useSSL=false
   user: trino
   pass: Trino123!
 
@@ -59,5 +58,4 @@ hibernate:
 
 # redis connection
 redisConnection:
-  host: trino-gateway-redis-master.trino-gateway.svc
   port: 6379

@@ -4,20 +4,16 @@ DataRoaster Trino Operator is used to create and delete trino clusters easily us
 
 ## Install DataRoaster Trino Operator with Helm
 
-Add trino operator helm repository.
 ```
 helm repo add dataroaster-trino-operator https://cloudcheflabs.github.io/trino-helm-repo/
 helm repo update
-```
 
-Install trino operator with helm.
-```
 helm install \
 trino-operator \
 --create-namespace \
 --namespace trino-operator \
 --version v2.1.4 \
-dataroaster-trino-operator/dataroaster-trino-operator;
+dataroaster-trino-operator/dataroastertrinooperator;
 ```
 
 Check if trino operator is running.
