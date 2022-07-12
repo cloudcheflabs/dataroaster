@@ -58,12 +58,12 @@ public class TrinoController {
             int minReplicasInt = Integer.valueOf(minReplicas);
             int maxReplicasInt = Integer.valueOf(maxReplicas);
 
-//            if(minReplicasInt >= maxReplicasInt) {
-//                throw new IllegalArgumentException("minReplicas must be less than maxReplicas");
-//            }
-//            if(minReplicasInt > replicasInt) {
-//                throw new IllegalArgumentException("minReplicas must be less than or equals to replicas");
-//            }
+            if(minReplicasInt >= maxReplicasInt) {
+                throw new IllegalArgumentException("minReplicas must be less than maxReplicas");
+            }
+            if(minReplicasInt > replicasInt) {
+                throw new IllegalArgumentException("minReplicas must be less than or equals to replicas");
+            }
 
 
             Map<String, Object> kv = new HashMap<>();
