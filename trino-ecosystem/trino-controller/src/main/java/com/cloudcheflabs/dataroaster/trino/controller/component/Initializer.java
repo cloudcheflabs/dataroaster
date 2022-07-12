@@ -1,6 +1,7 @@
 package com.cloudcheflabs.dataroaster.trino.controller.component;
 
 import com.cloudcheflabs.dataroaster.common.util.FileUtils;
+import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.common.util.TemplateUtils;
 import com.cloudcheflabs.dataroaster.trino.controller.api.service.K8sResourceService;
 import com.cloudcheflabs.dataroaster.trino.controller.component.dns.name.JsonResponseProcessor;

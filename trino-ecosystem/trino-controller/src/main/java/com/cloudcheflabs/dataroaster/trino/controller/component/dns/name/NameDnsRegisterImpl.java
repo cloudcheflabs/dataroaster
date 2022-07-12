@@ -73,9 +73,7 @@ public class NameDnsRegisterImpl implements NameDnsRegister {
     public RestResponse updateDnsRecord(String authToken, long id, String domain, String host, String ip) {
         String urlPath = NAME_URL + "/v4/domains/" + domain + "/records" + "/" + id;
 
-        String content = "";
-
-        RequestBody body = RequestBody.create(JSON, content);
+        RequestBody body = RequestBody.create(JSON, makeData(host, ip));
         try {
             Request request = new Request.Builder()
                     .url(urlPath)

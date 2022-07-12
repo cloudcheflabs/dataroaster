@@ -21,7 +21,7 @@ public class ResponseHandler {
             ResponseBody responseBody = response.body();
 
             String ret = responseBody.string();
-            LOG.info("ret: {}", ret);
+            //LOG.info("ret: {}", ret);
             int statusCode = response.code();
 
             restResponse.setStatusCode(statusCode);
