@@ -195,8 +195,8 @@ public class Initializer {
 
                     try {
                         Thread.sleep(5000);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
                     if(count > MAX) {
                         throw new RuntimeException("nginx has not obtained external ip.");
