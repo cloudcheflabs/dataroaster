@@ -9,7 +9,7 @@ dependencies:
     version: v1.0.2
     repository: https://cloudcheflabs.github.io/mysql-helm-repo/
   - name: dataroasterhelmoperator
-    version: v1.0.1
+    version: v1.1.0
     repository: https://cloudcheflabs.github.io/helm-operator-helm-repo/
 
   - name: dataroastertrinooperator

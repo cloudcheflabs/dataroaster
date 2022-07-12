@@ -19,3 +19,6 @@ hostNetwork: false
 # spring boot server
 server:
   port: 8093
+trino:
+  operator:
+    namespace: trino-operator

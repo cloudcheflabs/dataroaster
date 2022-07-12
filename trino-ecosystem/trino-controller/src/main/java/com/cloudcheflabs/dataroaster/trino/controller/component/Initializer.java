@@ -240,6 +240,17 @@ public class Initializer {
         CustomResource trinoGatewayCr = CustomResourceUtils.fromYaml(trinoGatewayString);
         k8sResourceService.createCustomResource(trinoGatewayCr);
         LOG.info("trino gateway custom resource created...");
+
+        String trinoGatewayNamespace = CustomResourceUtils.getTargetNamespace(trinoGatewayString);
+
+        ContainerStatusChecker.checkContainerStatus(
+                kubernetesClient,
+                "trino-gateway",
+                trinoGatewayNamespace,
+                "app",
+                "trino-gateway",
+                100
+        );
     }
 
     public static String getNamespace() {
