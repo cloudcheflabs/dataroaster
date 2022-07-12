@@ -1,12 +1,17 @@
-package com.cloudcheflabs.dataroaster.trino.controller.component;
+package com.cloudcheflabs.dataroaster.trino.controller.component.http;
 
+import com.cloudcheflabs.dataroaster.trino.controller.config.KubernetesClientConfigurer;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.RestResponse;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ResponseHandler {
+
+    private static Logger LOG = LoggerFactory.getLogger(ResponseHandler.class);
 
     public static RestResponse doCall(OkHttpClient client, Request request) {
         RestResponse restResponse = new RestResponse();
@@ -17,6 +22,7 @@ public class ResponseHandler {
             ResponseBody responseBody = response.body();
 
             String ret = responseBody.string();
+            LOG.info("body: {}", ret);
             int statusCode = response.code();
 
             restResponse.setStatusCode(statusCode);

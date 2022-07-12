@@ -190,7 +190,7 @@ public class Initializer {
                 // add dns record to public dns, name.com
                 String user = env.getProperty("dns.providers.name.user");
                 String token = env.getProperty("dns.providers.name.token");
-                LOG.info("user: [{}], token: [{}]", user, token);
+                //LOG.info("user: [{}], token: [{}]", user, token);
 
                 String authToken = Base64Utils.encodeBase64(user + ":" + token);
 

@@ -1,4 +1,4 @@
-package com.cloudcheflabs.dataroaster.trino.controller.component;
+package com.cloudcheflabs.dataroaster.trino.controller.component.http;
 
 
 import okhttp3.ConnectionPool;
