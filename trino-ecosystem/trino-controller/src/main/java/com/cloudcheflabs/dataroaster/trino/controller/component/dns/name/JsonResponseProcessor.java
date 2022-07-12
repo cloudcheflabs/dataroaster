@@ -83,6 +83,7 @@ public class JsonResponseProcessor {
 
     public static DnsRecord getExistingRecord(String json, String host) {
         Map<String, Object> map = JsonUtils.toMap(new ObjectMapper(), json);
+        LOG.info("map: {}", JsonUtils.toJson(map));
         List<Map<String, Object>> list = (List<Map<String, Object>>) map.get("records");
         for(Map<String, Object> recordMap : list) {
             String tempHost = (String) recordMap.get("host");
