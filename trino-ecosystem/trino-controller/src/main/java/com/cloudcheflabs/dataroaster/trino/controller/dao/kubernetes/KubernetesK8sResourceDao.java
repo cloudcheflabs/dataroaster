@@ -4,6 +4,7 @@ import com.cloudcheflabs.dataroaster.trino.controller.api.dao.K8sResourceDao;
 import com.cloudcheflabs.dataroaster.trino.controller.dao.common.AbstractKubernetesDao;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.CustomResource;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResourceList;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinitionList;
@@ -60,6 +61,19 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<GenericKubernetesResource> listCustomResources(String namespace, String kind) {
+        CustomResourceDefinition selectedCRD = selectCRD(kind);
+        if(selectedCRD == null) {
+            throw new IllegalStateException("CRD with kind [" + kind + "] not found!");
+        }
+
+        GenericKubernetesResourceList genericKubernetesResourceList =
+                kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
+                        .inNamespace(namespace).list();
+        return genericKubernetesResourceList.getItems();
     }
 
     private CustomResourceDefinition selectCRD(String kind) {

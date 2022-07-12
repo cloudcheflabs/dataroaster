@@ -1,6 +1,6 @@
 package com.cloudcheflabs.dataroaster.trino.controller.config;
 
-import com.cloudcheflabs.dataroaster.trino.controller.component.http.SimpleHttpClient;
+import com.cloudcheflabs.dataroaster.trino.controller.component.SimpleHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;

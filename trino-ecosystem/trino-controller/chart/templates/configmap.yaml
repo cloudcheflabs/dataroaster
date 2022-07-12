@@ -19,10 +19,3 @@ data:
         proxyHostName: {{ .Values.trino.gateway.proxyHostName }}
         restHostName: {{ .Values.trino.gateway.restHostName }}
         storageClass: {{ .Values.trino.gateway.storageClass }}
-    dns:
-      enabled: {{ .Values.dns.enabled }}
-      targetProvider: name
-      providers:
-        name:
-          user: {{ .Values.dns.providers.name.user }}
-          token: {{ .Values.dns.providers.name.token }}

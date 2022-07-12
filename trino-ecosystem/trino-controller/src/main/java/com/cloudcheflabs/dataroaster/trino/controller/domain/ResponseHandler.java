@@ -1,6 +1,6 @@
-package com.cloudcheflabs.dataroaster.trino.controller.component.http;
+package com.cloudcheflabs.dataroaster.trino.controller.domain;
 
-import com.cloudcheflabs.dataroaster.trino.controller.domain.RestResponse;
+import com.cloudcheflabs.dataroaster.trino.controller.component.SimpleHttpClient;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

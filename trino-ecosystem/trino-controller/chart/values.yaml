@@ -23,14 +23,7 @@ trino:
   operator:
     namespace: trino-operator
   gateway:
-    publicEndpoint: ""
-    proxyHostName: ""
-    restHostName: ""
-    storageClass: ""
-dns:
-  enabled: false
-  targetProvider: name
-  providers:
-    name:
-      user: ""
-      token: ""
+    publicEndpoint: "https://trino-gw-proxy.example.com"
+    proxyHostName: "trino-gw-proxy.example.com"
+    restHostName: "trino-gw-rest.example.com"
+    storageClass: "oci"
