@@ -51,8 +51,19 @@ public class TrinoController {
             String namespace = params.get("namespace");
             String maxHeapSize = params.get("max_heap_size");
             String replicas = params.get("replicas");
-            String maxReplicas = params.get("max_replicas");
             String minReplicas = params.get("min_replicas");
+            String maxReplicas = params.get("max_replicas");
+
+            int replicasInt = Integer.valueOf(replicas);
+            int minReplicasInt = Integer.valueOf(minReplicas);
+            int maxReplicasInt = Integer.valueOf(maxReplicas);
+
+            if(minReplicasInt >= maxReplicasInt) {
+                throw new IllegalArgumentException("minReplicas must be less than maxReplicas");
+            }
+            if(minReplicasInt > replicasInt) {
+                throw new IllegalArgumentException("minReplicas must be less than or equals to replicas");
+            }
 
 
             Map<String, Object> kv = new HashMap<>();

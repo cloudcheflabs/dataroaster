@@ -17,15 +17,19 @@ public class TrinoClusterActionHandler implements ActionHandler<TrinoCluster> {
 
     @Override
     public void create(TrinoCluster trinoCluster) {
-        // create coordinator.
-        CoordinatorHandler coordinatorHandler = new CoordinatorHandler(trinoClusterClient.getClient());
-        coordinatorHandler.create(trinoCluster);
-        LOG.info("coordinator created...");
+        try {
+            // create coordinator.
+            CoordinatorHandler coordinatorHandler = new CoordinatorHandler(trinoClusterClient.getClient());
+            coordinatorHandler.create(trinoCluster);
+            LOG.info("coordinator created...");
 
-        // create workers.
-        WorkerHandler workerHandler = new WorkerHandler(trinoClusterClient.getClient());
-        workerHandler.create(trinoCluster);
-        LOG.info("worker created...");
+            // create workers.
+            WorkerHandler workerHandler = new WorkerHandler(trinoClusterClient.getClient());
+            workerHandler.create(trinoCluster);
+            LOG.info("worker created...");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -36,14 +40,18 @@ public class TrinoClusterActionHandler implements ActionHandler<TrinoCluster> {
 
     @Override
     public void destroy(TrinoCluster trinoCluster) {
-        // delete coordinator.
-        CoordinatorHandler coordinatorHandler = new CoordinatorHandler(trinoClusterClient.getClient());
-        coordinatorHandler.delete(trinoCluster);
-        LOG.info("coordinator deleted...");
+        try {
+            // delete coordinator.
+            CoordinatorHandler coordinatorHandler = new CoordinatorHandler(trinoClusterClient.getClient());
+            coordinatorHandler.delete(trinoCluster);
+            LOG.info("coordinator deleted...");
 
-        // delete workers.
-        WorkerHandler workerHandler = new WorkerHandler(trinoClusterClient.getClient());
-        workerHandler.delete(trinoCluster);
-        LOG.info("worker deleted...");
+            // delete workers.
+            WorkerHandler workerHandler = new WorkerHandler(trinoClusterClient.getClient());
+            workerHandler.delete(trinoCluster);
+            LOG.info("worker deleted...");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
