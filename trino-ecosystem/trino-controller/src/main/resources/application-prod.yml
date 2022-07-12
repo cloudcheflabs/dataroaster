@@ -3,3 +3,16 @@ server:
   port: 8093
   servlet:
     context-path: /
+trino:
+  gateway:
+    publicEndpoint: "https://trino-gateway-proxy-test.cloudchef-labs.com"
+    proxyHostName: trino-gateway-proxy-test.cloudchef-labs.com
+    restHostName: trino-gateway-rest-test.cloudchef-labs.com
+    storageClass: oci
+dns:
+  enabled: true
+  targetProvider: name
+  providers:
+    name:
+      user: @dns.providers.name.user@
+      token: @dns.providers.name.token@
