@@ -9,8 +9,20 @@ data:
   application.properties: |
     spring.profiles.active=@api.spring.profiles.active@
   application-prod.yml: |
-    # spring boot server
     server:
       port: {{ .Values.server.port }}
       servlet:
         context-path: /
+    trino:
+      gateway:
+        publicEndpoint: {{ .Values.trino.gateway.publicEndpoint }}
+        proxyHostName: {{ .Values.trino.gateway.proxyHostName }}
+        restHostName: {{ .Values.trino.gateway.restHostName }}
+        storageClass: {{ .Values.trino.gateway.storageClass }}
+    dns:
+      enabled: {{ .Values.dns.enabled }}
+      targetProvider: name
+      providers:
+        name:
+          user: {{ .Values.dns.providers.name.user }}
+          token: {{ .Values.dns.providers.name.token }}

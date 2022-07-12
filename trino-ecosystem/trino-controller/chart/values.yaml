@@ -22,3 +22,15 @@ server:
 trino:
   operator:
     namespace: trino-operator
+  gateway:
+    publicEndpoint: ""
+    proxyHostName: ""
+    restHostName: ""
+    storageClass: ""
+dns:
+  enabled: false
+  targetProvider: name
+  providers:
+    name:
+      user: ""
+      token: ""
