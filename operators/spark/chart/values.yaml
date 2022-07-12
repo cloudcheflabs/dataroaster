@@ -1,6 +1,6 @@
 namespace: spark-operator
 serviceAccount: spark-operator
-image: cloudcheflabs/spark-operator:v3.0.3
+image: cloudcheflabs/spark-operator:v3.0.4
 imagePullPolicy: Always
 resources: 
   requests:

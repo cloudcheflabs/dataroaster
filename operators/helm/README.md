@@ -11,9 +11,9 @@ helm repo update
 helm install \
 helm-operator \
 --create-namespace \
---namespace helm-operator \
---version v1.0.0 \
-dataroaster-helm-operator/dataroaster-helm-operator;
+--namespace dataroaster-operator \
+--version v1.1.1 \
+dataroaster-helm-operator/dataroasterhelmoperator;
 ```
 
 Check if helm operator is running.

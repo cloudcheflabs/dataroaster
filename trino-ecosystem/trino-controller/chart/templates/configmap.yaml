@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trino-controller
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: trino-controller
+data:
+  application.properties: |
+    spring.profiles.active=@api.spring.profiles.active@
+  application-prod.yml: |
+    server:
+      port: {{ .Values.server.port }}
+      servlet:
+        context-path: /
+    trino:
+      gateway:
+        publicEndpoint: {{ .Values.trino.gateway.publicEndpoint }}
+        proxyHostName: {{ .Values.trino.gateway.proxyHostName }}
+        restHostName: {{ .Values.trino.gateway.restHostName }}
+        storageClass: {{ .Values.trino.gateway.storageClass }}

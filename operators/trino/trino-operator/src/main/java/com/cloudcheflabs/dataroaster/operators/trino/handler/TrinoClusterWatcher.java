@@ -14,12 +14,10 @@ public class TrinoClusterWatcher implements Watcher<TrinoCluster>{
 
     private final CountDownLatch countDownLatch;
     private BlockingQueue<TrinoClusterActionEvent> queue;
-    private TrinoClusterWatchRunnable trinoClusterWatchRunnable;
 
-    public TrinoClusterWatcher(BlockingQueue<TrinoClusterActionEvent> queue, CountDownLatch countDownLatch, TrinoClusterWatchRunnable trinoClusterWatchRunnable) {
+    public TrinoClusterWatcher(BlockingQueue<TrinoClusterActionEvent> queue, CountDownLatch countDownLatch) {
         this.queue = queue;
         this.countDownLatch = countDownLatch;
-        this.trinoClusterWatchRunnable = trinoClusterWatchRunnable;
     }
 
     @Override
@@ -36,7 +34,5 @@ public class TrinoClusterWatcher implements Watcher<TrinoCluster>{
     public void onClose(WatcherException e) {
         this.countDownLatch.countDown();
         LOG.info("close watcher");
-        trinoClusterWatchRunnable.run();
-        LOG.info("restart watcher...");
     }
 }

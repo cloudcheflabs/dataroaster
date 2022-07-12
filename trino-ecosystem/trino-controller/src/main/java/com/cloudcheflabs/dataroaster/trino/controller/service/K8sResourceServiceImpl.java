@@ -1,14 +1,20 @@
 package com.cloudcheflabs.dataroaster.trino.controller.service;
 
 import com.cloudcheflabs.dataroaster.trino.controller.api.dao.K8sResourceDao;
+import com.cloudcheflabs.dataroaster.trino.controller.api.service.K8sResourceService;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.CustomResource;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-@Service
-public class K8sResourceServiceImpl implements K8sResourceDao {
+import java.util.List;
+
+@Component
+public class K8sResourceServiceImpl implements K8sResourceService {
 
     @Autowired
+    @Qualifier("kubernetesK8sResourceDao")
     private K8sResourceDao k8sResourceDao;
 
     @Override
@@ -24,5 +30,10 @@ public class K8sResourceServiceImpl implements K8sResourceDao {
     @Override
     public void updateCustomResource(CustomResource customResource) {
         k8sResourceDao.updateCustomResource(customResource);
+    }
+
+    @Override
+    public List<GenericKubernetesResource> listCustomResources(String namespace, String kind) {
+        return k8sResourceDao.listCustomResources(namespace, kind);
     }
 }

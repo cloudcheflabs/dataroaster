@@ -123,11 +123,11 @@ helm install \
 trino-operator \
 --create-namespace \
 --namespace trino-operator \
---version v1.0.0 \
-dataroaster-trino-operator/dataroaster-trino-operator;
+--version v2.1.4 \
+dataroaster-trino-operator/dataroastertrinooperator;
 ```
 
-### Create trino clustes with custom resource
+### Create trino clusters with custom resource
 
 Create custom resource of trino cluster, for instance `cluster-1.yaml`.
 ```

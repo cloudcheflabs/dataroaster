@@ -15,7 +15,8 @@ public class HelmChartWatcher implements Watcher<HelmChart>{
     private final CountDownLatch countDownLatch;
     private BlockingQueue<HelmChartActionEvent> queue;
 
-    public HelmChartWatcher(BlockingQueue<HelmChartActionEvent> queue, CountDownLatch countDownLatch) {
+    public HelmChartWatcher(BlockingQueue<HelmChartActionEvent> queue,
+                            CountDownLatch countDownLatch) {
         this.queue = queue;
         this.countDownLatch = countDownLatch;
     }

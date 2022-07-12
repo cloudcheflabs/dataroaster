@@ -4,6 +4,7 @@ import com.cloudcheflabs.dataroaster.trino.controller.api.dao.K8sResourceDao;
 import com.cloudcheflabs.dataroaster.trino.controller.dao.common.AbstractKubernetesDao;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.CustomResource;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResourceList;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinitionList;
@@ -25,10 +26,14 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
     @Override
     public void createCustomResource(CustomResource customResource) {
         try {
-            String name = customResource.getName();
             String namespace = customResource.getNamespace();
+            //LOG.info("namespace: {}", namespace);
+
             String kind = customResource.getKind();
+            //LOG.info("kind: {}", kind);
+
             String yaml = customResource.getYaml();
+            //LOG.info("yaml: \n{}", yaml);
 
             CustomResourceDefinition selectedCRD = selectCRD(kind);
             if(selectedCRD == null) {
@@ -41,10 +46,13 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
                     kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
                     .load(is).get();
 
-            GenericKubernetesResource retResource =
+            GenericKubernetesResource retResource = (namespace != null) ?
                     kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
                             .inNamespace(namespace)
+                            .createOrReplace(genericKubernetesResource) :
+                    kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
                             .createOrReplace(genericKubernetesResource);
+
             if(retResource != null) {
                 ObjectMeta meta = retResource.getMetadata();
                 LOG.info("custom resource with name [{}] in namespace [{}] created or replaced", meta.getName(), meta.getNamespace());
@@ -53,6 +61,19 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<GenericKubernetesResource> listCustomResources(String namespace, String kind) {
+        CustomResourceDefinition selectedCRD = selectCRD(kind);
+        if(selectedCRD == null) {
+            throw new IllegalStateException("CRD with kind [" + kind + "] not found!");
+        }
+
+        GenericKubernetesResourceList genericKubernetesResourceList =
+                kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
+                        .inNamespace(namespace).list();
+        return genericKubernetesResourceList.getItems();
     }
 
     private CustomResourceDefinition selectCRD(String kind) {
@@ -73,6 +94,21 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
             }
         }
 
+        // if there is no crd selected, search for crd outside group of cloudchef-labs.com.
+        if(selectedCRD == null) {
+            for (CustomResourceDefinition crd : crdsItems) {
+                CustomResourceDefinitionSpec spec = crd.getSpec();
+                String group = spec.getGroup();
+                String crdKind = spec.getNames().getKind();
+                LOG.info("group: [{}], crdKind: [{}]", group, crdKind);
+
+                if(crdKind.equals(kind)) {
+                    selectedCRD = crd;
+                    break;
+                }
+            }
+        }
+
         return selectedCRD;
     }
 
@@ -84,9 +120,11 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
                 throw new IllegalStateException("CRD with kind [" + kind + "] not found!");
             }
 
-            boolean result =
+            boolean result = (namespace != null) ?
                     kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
                             .inNamespace(namespace)
+                            .withName(name).delete() :
+                    kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
                             .withName(name).delete();
             LOG.info("custom resource - name: [{}], namespace: [{}], kind: [{}] deleted [{}]", name, namespace, kind, result);
         } catch (Exception e) {
