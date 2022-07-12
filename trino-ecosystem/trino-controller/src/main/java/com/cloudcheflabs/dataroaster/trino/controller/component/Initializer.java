@@ -168,18 +168,42 @@ public class Initializer {
 
         if(dnsEnabled) {
             // get external ip of nginx service.
-            Service nginxService = kubernetesClient.services().inNamespace(nginxNamespace).withName("ingress-nginx-controller").get();
-            LoadBalancerIngress loadBalancerIngress = nginxService.getStatus().getLoadBalancer().getIngress().get(0);
-            String nginxExternalIP = loadBalancerIngress.getIp();
-            if (nginxExternalIP == null) {
-                String hostName = loadBalancerIngress.getHostname();
-
-                // get ip address of host name.
+            String nginxExternalIP = null;
+            int count = 0;
+            int MAX = 20;
+            while(true) {
                 try {
-                    InetAddress host = InetAddress.getByName(hostName);
-                    nginxExternalIP = host.getHostAddress();
-                } catch (UnknownHostException ex) {
-                    ex.printStackTrace();
+                    Service nginxService = kubernetesClient.services().inNamespace(nginxNamespace).withName("ingress-nginx-controller").get();
+                    LoadBalancerIngress loadBalancerIngress = nginxService.getStatus().getLoadBalancer().getIngress().get(0);
+                    nginxExternalIP = loadBalancerIngress.getIp();
+                    if (nginxExternalIP == null) {
+                        String hostName = loadBalancerIngress.getHostname();
+
+                        // get ip address of host name.
+                        try {
+                            InetAddress host = InetAddress.getByName(hostName);
+                            nginxExternalIP = host.getHostAddress();
+                            break;
+                        } catch (UnknownHostException ex) {
+                            ex.printStackTrace();
+                        }
+                    } else {
+                        break;
+                    }
+                } catch (Exception e) {
+                    LOG.error("error", e);
+
+                    try {
+                        Thread.sleep(5000);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if(count > MAX) {
+                        throw new RuntimeException("nginx has not obtained external ip.");
+                    }
+                    count++;
+
+                    continue;
                 }
             }
 
