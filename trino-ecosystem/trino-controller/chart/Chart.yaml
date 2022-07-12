@@ -7,8 +7,8 @@ description: dataroaster trino controller
 
 dependencies:
   - name: dataroasterhelmoperator
-    version: v1.1.0
+    version: v1.1.1
     repository: https://cloudcheflabs.github.io/helm-operator-helm-repo/
   - name: dataroastertrinooperator
-    version: v2.1.4
+    version: v2.1.5
     repository: https://cloudcheflabs.github.io/trino-helm-repo/

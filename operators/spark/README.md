@@ -15,8 +15,8 @@ helm install \
 spark-operator \
 --create-namespace \
 --namespace spark-operator \
---version v1.0.0 \
-dataroaster-spark-operator/dataroaster-spark-operator;
+--version v1.0.2 \
+dataroaster-spark-operator/dataroastersparkoperator;
 ```
 
 Check if spark operator is running.

@@ -12,7 +12,7 @@ helm install \
 helm-operator \
 --create-namespace \
 --namespace dataroaster-operator \
---version v1.1.0 \
+--version v1.1.1 \
 dataroaster-helm-operator/dataroasterhelmoperator;
 ```
 
