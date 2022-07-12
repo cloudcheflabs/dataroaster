@@ -26,7 +26,7 @@ public class HelmChartWatchRunnable implements Runnable{
     public void run() {
         try {
             final CountDownLatch countDownLatch = new CountDownLatch(1);
-            helmChartClient.watch(new HelmChartWatcher(queue, countDownLatch, this));
+            helmChartClient.watch(new HelmChartWatcher(queue, countDownLatch));
             LOG.info("Watch helm charts...");
             countDownLatch.await();
         } catch (InterruptedException e) {

@@ -1,7 +1,6 @@
 package com.cloudcheflabs.dataroaster.trino.controller.component;
 
 import com.cloudcheflabs.dataroaster.common.util.TemplateUtils;
-import com.cloudcheflabs.dataroaster.trino.controller.dao.kubernetes.KubernetesK8sResourceDao;
 import com.cloudcheflabs.dataroaster.trino.controller.util.YamlUtils;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;

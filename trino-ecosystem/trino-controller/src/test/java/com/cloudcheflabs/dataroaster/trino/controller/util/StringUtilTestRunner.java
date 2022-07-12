@@ -2,8 +2,6 @@ package com.cloudcheflabs.dataroaster.trino.controller.util;
 
 import org.junit.Test;
 
-import java.net.URI;
-
 public class StringUtilTestRunner {
 
     @Test
