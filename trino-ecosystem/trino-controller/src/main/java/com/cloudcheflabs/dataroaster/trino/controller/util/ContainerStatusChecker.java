@@ -27,20 +27,20 @@ public class ContainerStatusChecker {
                 ObjectMeta metadata = pod.getMetadata();
                 //LOG.info("metadata: [{}]", JsonUtils.toJson(metadata));
                 Map<String, String> labels = metadata.getLabels();
-                LOG.info("labels: [{}]", JsonUtils.toJson(labels));
+                //LOG.info("labels: [{}]", JsonUtils.toJson(labels));
                 for(String key : labels.keySet()) {
-                    LOG.info("key: [{}]", key);
+                    //LOG.info("key: [{}]", key);
                     if(key.equals(labelKey)) {
                         String value = labels.get(key);
-                        LOG.info("key: [{}], value: [{}]", key, value);
+                        //LOG.info("key: [{}], value: [{}]", key, value);
                         if(value.equals(labelValue)) {
                             PodStatus status = pod.getStatus();
                             List<ContainerStatus> containerStatuses = status.getContainerStatuses();
-                            LOG.info("containerStatuses: [{}]", containerStatuses.size());
+                            //LOG.info("containerStatuses: [{}]", containerStatuses.size());
                             if (!containerStatuses.isEmpty()) {
                                 ContainerStatus containerStatus = containerStatuses.get(0);
                                 ContainerState state = containerStatus.getState();
-                                LOG.info("state: [{}]", state.toString());
+                                //LOG.info("state: [{}]", state.toString());
                                 ContainerStateRunning containerStateRunning = state.getRunning();
                                 if(containerStateRunning != null) {
                                     LOG.info("{} has running status now.", componentName);
@@ -54,6 +54,7 @@ public class ContainerStatusChecker {
             }
 
             if(count < MAX_COUNT) {
+                LOG.info(".....................................................");
                 count++;
                 try {
                     Thread.sleep(5000);
@@ -74,20 +75,20 @@ public class ContainerStatusChecker {
             ObjectMeta metadata = pod.getMetadata();
             //LOG.info("metadata: [{}]", JsonUtils.toJson(metadata));
             Map<String, String> labels = metadata.getLabels();
-            LOG.info("labels: [{}]", JsonUtils.toJson(labels));
+            //LOG.info("labels: [{}]", JsonUtils.toJson(labels));
             for(String key : labels.keySet()) {
-                LOG.info("key: [{}]", key);
+                //LOG.info("key: [{}]", key);
                 if(key.equals(labelKey)) {
                     String value = labels.get(key);
-                    LOG.info("key: [{}], value: [{}]", key, value);
+                    //LOG.info("key: [{}], value: [{}]", key, value);
                     if(value.equals(labelValue)) {
                         PodStatus status = pod.getStatus();
                         List<ContainerStatus> containerStatuses = status.getContainerStatuses();
-                        LOG.info("containerStatuses: [{}]", containerStatuses.size());
+                        //LOG.info("containerStatuses: [{}]", containerStatuses.size());
                         if (!containerStatuses.isEmpty()) {
                             ContainerStatus containerStatus = containerStatuses.get(0);
                             ContainerState state = containerStatus.getState();
-                            LOG.info("state: [{}]", state.toString());
+                            //LOG.info("state: [{}]", state.toString());
                             ContainerStateRunning containerStateRunning = state.getRunning();
                             if(containerStateRunning != null) {
                                 LOG.info("{} has running status now.", componentName);
