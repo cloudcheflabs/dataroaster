@@ -1,9 +1,6 @@
 package com.cloudcheflabs.dataroaster.trino.controller.component.dns.name;
 
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
-import com.cloudcheflabs.dataroaster.trino.controller.component.http.ResponseHandler;
-import com.cloudcheflabs.dataroaster.trino.controller.domain.RestResponse;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

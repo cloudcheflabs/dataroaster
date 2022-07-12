@@ -2,9 +2,7 @@ package com.cloudcheflabs.dataroaster.trino.controller.component.http;
 
 
 import okhttp3.ConnectionPool;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 

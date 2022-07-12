@@ -6,7 +6,6 @@ import com.cloudcheflabs.dataroaster.trino.controller.domain.CustomResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
 public class K8sResourceServiceImpl implements K8sResourceService {

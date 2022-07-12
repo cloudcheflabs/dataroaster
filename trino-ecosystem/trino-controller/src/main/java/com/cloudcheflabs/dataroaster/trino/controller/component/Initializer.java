@@ -1,7 +1,6 @@
 package com.cloudcheflabs.dataroaster.trino.controller.component;
 
 import com.cloudcheflabs.dataroaster.common.util.FileUtils;
-import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.common.util.TemplateUtils;
 import com.cloudcheflabs.dataroaster.trino.controller.api.service.K8sResourceService;
 import com.cloudcheflabs.dataroaster.trino.controller.component.dns.name.JsonResponseProcessor;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -161,6 +161,11 @@ public class Initializer {
         String trinoGatewayPublicEndpoint = env.getProperty("trino.gateway.publicEndpoint");
         LOG.info("trinoGatewayPublicEndpoint: {}", trinoGatewayPublicEndpoint);
 
+        String trinoProxyHost = env.getProperty("trino.gateway.proxyHostName");
+        LOG.info("trinoProxyHost: {}", trinoProxyHost);
+        String trinoRestHost = env.getProperty("trino.gateway.restHostName");
+        LOG.info("trinoRestHost: {}", trinoRestHost);
+
         if(dnsEnabled) {
             // get external ip of nginx service.
             Service nginxService = kubernetesClient.services().inNamespace(nginxNamespace).withName("ingress-nginx-controller").get();
@@ -180,11 +185,6 @@ public class Initializer {
 
             LOG.info("nginx external ip: {}", nginxExternalIP);
 
-            // extract host name and domain name from public endpoint uri.
-            HostDomainUtils.HostDomain hostDomain = HostDomainUtils.getHostDomain(trinoGatewayPublicEndpoint);
-            String domain = hostDomain.getDomain();
-            String host = hostDomain.getHost();
-
             String targetDnsProvider = env.getProperty("dns.targetProvider");
             if(targetDnsProvider.equals("name")) {
                 // add dns record to public dns, name.com
@@ -194,20 +194,30 @@ public class Initializer {
 
                 String authToken = Base64Utils.encodeBase64(user + ":" + token);
 
-                // list all the host names.
-                RestResponse restResponse = nameDnsRegister.listDnsRecords(authToken, domain);
-                JsonResponseProcessor.DnsRecord dnsRecord = JsonResponseProcessor.getExistingRecord(restResponse.getSuccessMessage(), host);
-                LOG.info("dns record: {}", (dnsRecord != null) ? JsonUtils.toJson(dnsRecord) : null);
+                // add trino gateway ingress host names to list.
+                List<String> hostNames = Arrays.asList(trinoProxyHost, trinoRestHost);
 
-                if(dnsRecord != null) {
-                    // update dns record.
-                    long id = dnsRecord.getId();
-                    nameDnsRegister.updateDnsRecord(authToken, id, domain, host, nginxExternalIP);
-                    LOG.info("dns record updated: {} --> {} in domain [{}]", host, nginxExternalIP, domain);
-                } else {
-                    // create dns record.
-                    nameDnsRegister.createDnsRecord(authToken, domain, host, nginxExternalIP);
-                    LOG.info("dns record created: {} --> {} in domain [{}]", host, nginxExternalIP, domain);
+                for(String trinoHost : hostNames) {
+                    // extract host name and domain name from trino gateway ingress host name.
+                    HostDomainUtils.HostDomain trinoProxyHostDomain = HostDomainUtils.getHostDomain(trinoHost);
+                    String domain = trinoProxyHostDomain.getDomain();
+                    String host = trinoProxyHostDomain.getHost();
+
+                    // list all the host names.
+                    RestResponse restResponse = nameDnsRegister.listDnsRecords(authToken, domain);
+                    JsonResponseProcessor.DnsRecord dnsRecord = JsonResponseProcessor.getExistingRecord(restResponse.getSuccessMessage(), host);
+                    //LOG.info("dns record: {}", (dnsRecord != null) ? JsonUtils.toJson(dnsRecord) : null);
+
+                    if (dnsRecord != null) {
+                        // update dns record.
+                        long id = dnsRecord.getId();
+                        nameDnsRegister.updateDnsRecord(authToken, id, domain, host, nginxExternalIP);
+                        LOG.info("dns record updated: {} --> {} in domain [{}]", host, nginxExternalIP, domain);
+                    } else {
+                        // create dns record.
+                        nameDnsRegister.createDnsRecord(authToken, domain, host, nginxExternalIP);
+                        LOG.info("dns record created: {} --> {} in domain [{}]", host, nginxExternalIP, domain);
+                    }
                 }
 
             } else {
@@ -220,8 +230,8 @@ public class Initializer {
         // install trino gateway.
         kv = new HashMap<>();
         kv.put("customResourceNamespace", getNamespace());
-        kv.put("proxyHostName", env.getProperty("trino.gateway.proxyHostName"));
-        kv.put("restHostName", env.getProperty("trino.gateway.restHostName"));
+        kv.put("proxyHostName", trinoProxyHost);
+        kv.put("restHostName", trinoRestHost);
         kv.put("publicEndpoint", trinoGatewayPublicEndpoint);
         kv.put("storageClass", env.getProperty("trino.gateway.storageClass"));
         String trinoGatewayString =

@@ -1,6 +1,5 @@
 package com.cloudcheflabs.dataroaster.trino.controller.component.http;
 
-import com.cloudcheflabs.dataroaster.trino.controller.config.KubernetesClientConfigurer;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.RestResponse;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
