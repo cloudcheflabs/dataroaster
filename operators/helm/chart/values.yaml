@@ -1,5 +1,5 @@
 serviceAccount: helm-operator
-image: cloudcheflabs/helm-operator:3.0.0
+image: cloudcheflabs/helm-operator:v2.0.0
 imagePullPolicy: Always
 resources:
   requests:
