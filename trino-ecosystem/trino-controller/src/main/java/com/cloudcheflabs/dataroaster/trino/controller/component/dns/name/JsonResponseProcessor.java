@@ -1,14 +1,19 @@
 package com.cloudcheflabs.dataroaster.trino.controller.component.dns.name;
 
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
+import com.cloudcheflabs.dataroaster.trino.controller.component.http.ResponseHandler;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.RestResponse;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
 public class JsonResponseProcessor {
+
+    private static Logger LOG = LoggerFactory.getLogger(JsonResponseProcessor.class);
 
     public static final class DnsRecord {
         private long id;
@@ -81,6 +86,7 @@ public class JsonResponseProcessor {
         List<Map<String, Object>> list = (List<Map<String, Object>>) map.get("records");
         for(Map<String, Object> recordMap : list) {
             String tempHost = (String) recordMap.get("host");
+            LOG.info("host: {}, tempHost: {}", host, tempHost);
             if(tempHost.equals(host)) {
 
                 return new ObjectMapper().convertValue(recordMap, DnsRecord.class);
