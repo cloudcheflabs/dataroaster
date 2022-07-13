@@ -10,5 +10,5 @@ dependencies:
     version: v1.1.1
     repository: https://cloudcheflabs.github.io/helm-operator-helm-repo/
   - name: dataroastertrinooperator
-    version: v2.1.5
+    version: v2.1.6
     repository: https://cloudcheflabs.github.io/trino-helm-repo/
