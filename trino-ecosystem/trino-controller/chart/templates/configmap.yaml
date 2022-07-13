@@ -19,3 +19,6 @@ data:
         proxyHostName: {{ .Values.trino.gateway.proxyHostName }}
         restHostName: {{ .Values.trino.gateway.restHostName }}
         storageClass: {{ .Values.trino.gateway.storageClass }}
+        restUri: {{ .Values.trino.gateway.restUri }}
+      operator:
+        restUri: {{ .Values.trino.operator.restUri }}

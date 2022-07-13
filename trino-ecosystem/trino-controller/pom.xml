@@ -84,6 +84,9 @@
 
 		<!-- spring -->
 		<spring.version>5.2.4.RELEASE</spring.version>
+
+		<!-- snake yaml -->
+		<snake-yaml.version>1.26</snake-yaml.version>
 	</properties>
 
 	<dependencies>
@@ -252,6 +255,11 @@
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>${snake-yaml.version}</version>
 		</dependency>
     </dependencies>
 	<build>

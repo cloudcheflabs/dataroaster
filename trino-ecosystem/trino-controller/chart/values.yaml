@@ -22,8 +22,10 @@ server:
 trino:
   operator:
     namespace: trino-operator
+    restUri: "http://trino-operator-service.trino-operator.svc:8092"
   gateway:
     publicEndpoint: "https://trino-gw-proxy.example.com"
     proxyHostName: "trino-gw-proxy.example.com"
     restHostName: "trino-gw-rest.example.com"
     storageClass: "oci"
+    restUri: "http://trino-gateway-rest-service.trino-gateway.svc:8099"
