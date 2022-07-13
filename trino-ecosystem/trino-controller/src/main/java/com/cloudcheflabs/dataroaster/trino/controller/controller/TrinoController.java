@@ -338,19 +338,22 @@ public class TrinoController {
             List<Map<String, Object>> scrapeConfigs = (List<Map<String, Object>>) prometheusYamlMap.get("scrape_configs");
             LOG.info("scapeConfigs: {}", JsonUtils.toJson(scrapeConfigs));
 
-            for(Map<String, Object> scrapeConfig : scrapeConfigs) {
+            // create new scrape configs with linked list to run the method of remove.
+            List<Map<String, Object>> scrapeConfigsLinkedList = new LinkedList<Map<String, Object>>(scrapeConfigs);
+
+            for(Map<String, Object> scrapeConfig : scrapeConfigsLinkedList) {
                 if(scrapeConfig.containsKey("job_name")) {
                     String jobName = (String) scrapeConfig.get("job_name");
                     if(jobName.equals(coordinatorJobName) || jobName.equals(workersJobName)) {
                         // remove jobs.
-                        scrapeConfigs.remove(scrapeConfig);
+                        scrapeConfigsLinkedList.remove(scrapeConfig);
                         LOG.info("job removed: \n{}", YamlUtils.objectToYaml(scrapeConfig));
                     }
                 }
             }
 
             // update scrape configs.
-            prometheusYamlMap.put("scrape_configs", scrapeConfigs);
+            prometheusYamlMap.put("scrape_configs", scrapeConfigsLinkedList);
 
             String updatedPrometheusYaml = YamlUtils.objectToYaml(prometheusYamlMap);
             LOG.info("updated updatedPrometheusYaml: {}", updatedPrometheusYaml);
