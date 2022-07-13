@@ -338,26 +338,25 @@ public class TrinoController {
             List<Map<String, Object>> scrapeConfigs = (List<Map<String, Object>>) prometheusYamlMap.get("scrape_configs");
             LOG.info("scapeConfigs: {}", JsonUtils.toJson(scrapeConfigs));
 
-            // create new scrape configs with linked list to run the method of remove.
-            List<Map<String, Object>> scrapeConfigsLinkedList = new LinkedList<Map<String, Object>>();
-            for(Map<String, Object> scrapeConfig : scrapeConfigsLinkedList) {
-                scrapeConfigsLinkedList.add(scrapeConfig);
-            }
-
-            scrapeConfigsLinkedList.removeIf(scrapeConfig -> {
+            // create new scrape configs.
+            List<Map<String, Object>> scrapeConfigsArrayList = new ArrayList<>();
+            for(Map<String, Object> scrapeConfig : scrapeConfigs) {
+                boolean candidated = false;
                 if(scrapeConfig.containsKey("job_name")) {
                     String jobName = (String) scrapeConfig.get("job_name");
                     if(jobName.equals(coordinatorJobName) || jobName.equals(workersJobName)) {
                         // remove jobs.
                         LOG.info("job removed: \n{}", YamlUtils.objectToYaml(scrapeConfig));
-                        return true;
+                        candidated = true;
                     }
                 }
-                return false;
-            });
+                if(!candidated) {
+                    scrapeConfigsArrayList.add(scrapeConfig);
+                }
+            }
 
             // update scrape configs.
-            prometheusYamlMap.put("scrape_configs", scrapeConfigsLinkedList);
+            prometheusYamlMap.put("scrape_configs", scrapeConfigsArrayList);
 
             String updatedPrometheusYaml = YamlUtils.objectToYaml(prometheusYamlMap);
             LOG.info("updated updatedPrometheusYaml: {}", updatedPrometheusYaml);
