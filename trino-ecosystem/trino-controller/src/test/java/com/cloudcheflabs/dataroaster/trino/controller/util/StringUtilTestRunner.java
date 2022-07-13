@@ -1,6 +1,12 @@
 package com.cloudcheflabs.dataroaster.trino.controller.util;
 
+import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class StringUtilTestRunner {
 
@@ -19,5 +25,17 @@ public class StringUtilTestRunner {
                 System.out.printf("host: [%s], domain: [%s]\n", host, domain);
             }
         }
+    }
+
+    @Test
+    public void removeObjectFromList() throws Exception {
+        List<String> list = new LinkedList<String>(Arrays.asList("a", "b", "c", "d"));
+
+        list.removeIf(str -> {
+            return str.equals("c");
+        });
+
+
+        System.out.printf("list: %s", JsonUtils.toJson(list));
     }
 }

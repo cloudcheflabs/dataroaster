@@ -314,7 +314,50 @@ public class TrinoController {
 
             k8sResourceService.deleteCustomResource(name, DEFAULT_TRINO_OPERATOR_NAMESPACE, "TrinoCluster");
 
-            // TODO: remove jobs of the trino cluster jmx exporter endpoints from prometheus configmap.
+            String coordinatorJobName = name + "-coordinator";
+            String workersJobName = name + "-workers";
+
+            // replace prometheus template.
+            Map<String, Object> kv = new HashMap<>();
+            kv.put("customResourceNamespace", Initializer.getNamespace());
+            kv.put("storageClass", "anysc");
+            String prometheusString =
+                    TemplateUtils.replace("/templates/cr/prometheus.yaml", true, kv);
+
+            // prometheus namespace.
+            String prometheusNamespace = CustomResourceUtils.getTargetNamespace(prometheusString);
+
+            // remove jobs of the trino cluster jmx exporter endpoints from prometheus configmap.
+            // get prometheus configmap.
+            ConfigMap prometheusConfigMap = kubernetesClient.configMaps().inNamespace(prometheusNamespace).withName("prometheus-server").get();
+            Map<String, String> dataMap = prometheusConfigMap.getData();
+            String prometheusYaml = dataMap.get("prometheus.yml");
+            LOG.info("prometheusYaml: {}", prometheusYaml);
+
+            Map<String, Object> prometheusYamlMap = YamlUtils.yamlToMap(prometheusYaml);
+            List<Map<String, Object>> scrapeConfigs = (List<Map<String, Object>>) prometheusYamlMap.get("scrape_configs");
+            LOG.info("scapeConfigs: {}", JsonUtils.toJson(scrapeConfigs));
+
+            for(Map<String, Object> scrapeConfig : scrapeConfigs) {
+                if(scrapeConfig.containsKey("job_name")) {
+                    String jobName = (String) scrapeConfig.get("job_name");
+                    if(jobName.equals(coordinatorJobName) || jobName.equals(workersJobName)) {
+                        // remove jobs.
+                        scrapeConfigs.remove(scrapeConfig);
+                        LOG.info("job removed: \n{}", YamlUtils.objectToYaml(scrapeConfig));
+                    }
+                }
+            }
+
+            // update scrape configs.
+            prometheusYamlMap.put("scrape_configs", scrapeConfigs);
+
+            String updatedPrometheusYaml = YamlUtils.objectToYaml(prometheusYamlMap);
+            LOG.info("updated updatedPrometheusYaml: {}", updatedPrometheusYaml);
+
+            prometheusConfigMap.getData().put("prometheus.yml", updatedPrometheusYaml);
+            kubernetesClient.configMaps().inNamespace(prometheusNamespace).withName("prometheus-server").createOrReplace(prometheusConfigMap);
+            LOG.info("prometheus configmap updated...");
 
 
             return ControllerUtils.successMessage();
