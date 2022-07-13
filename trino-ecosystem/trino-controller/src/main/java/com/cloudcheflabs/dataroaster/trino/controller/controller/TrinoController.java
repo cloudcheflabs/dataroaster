@@ -8,6 +8,7 @@ import com.cloudcheflabs.dataroaster.trino.controller.component.Initializer;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.CustomResource;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.RestResponse;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.Roles;
+import com.cloudcheflabs.dataroaster.trino.controller.util.Base64Utils;
 import com.cloudcheflabs.dataroaster.trino.controller.util.ContainerStatusChecker;
 import com.cloudcheflabs.dataroaster.trino.controller.util.CustomResourceUtils;
 import com.cloudcheflabs.dataroaster.trino.controller.util.YamlUtils;
@@ -292,17 +293,6 @@ public class TrinoController {
         return jobMap;
     }
 
-    /**
-     * TODO:
-     * - add catalog.
-     * - update catalog configuration.
-     * - update config.properties
-     * - update jvm.config.
-     *
-     *
-     *
-     *
-     */
 
 
 
@@ -386,6 +376,287 @@ public class TrinoController {
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", genericKubernetesResource.getMetadata().getName());
                 map.put("namespace", namespace);
+                mapList.add(map);
+            }
+
+            return JsonUtils.toJson(mapList);
+        });
+    }
+
+
+
+    /**
+     * TODO:
+     * - add catalog.
+     * - update catalog configuration.
+     * - update config.properties
+     * - update jvm.config.
+     *
+     *
+     *
+     *
+     */
+
+    @PostMapping("/v1/trino/config/create")
+    public String createConfig(@RequestParam Map<String, String> params) {
+        return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
+            String name = params.get("name");
+            String coordinatorConfigName = params.get("coordinator_config_name");
+            String coordinatorConfigPath = params.get("coordinator_config_path");
+            String coordinatorConfigValue = params.get("coordinator_config_value");
+            String workerConfigName = params.get("worker_config_name");
+            String workerConfigPath = params.get("worker_config_path");
+            String workerConfigValue = params.get("worker_config_value");
+
+            Map<String, Object> coordinatorConfigMap = null;
+            if(coordinatorConfigName != null && coordinatorConfigPath != null && coordinatorConfigValue != null) {
+                // decode value with base64.
+                coordinatorConfigValue = Base64Utils.decodeBase64(coordinatorConfigValue);
+
+                coordinatorConfigMap = new HashMap<>();
+                coordinatorConfigMap.put("name", coordinatorConfigName);
+                coordinatorConfigMap.put("path", coordinatorConfigPath);
+                coordinatorConfigMap.put("value", coordinatorConfigValue);
+            } else {
+                throw new IllegalArgumentException("coordinator config params NULL not allowed.");
+            }
+
+            Map<String, Object> workerConfigMap = null;
+            if(workerConfigName != null && workerConfigPath != null && workerConfigValue != null) {
+                // decode value with base64.
+                workerConfigValue = Base64Utils.decodeBase64(workerConfigValue);
+
+                workerConfigMap = new HashMap<>();
+                workerConfigMap.put("name", workerConfigName);
+                workerConfigMap.put("path", workerConfigPath);
+                workerConfigMap.put("value", workerConfigValue);
+            } else {
+                throw new IllegalArgumentException("worker config params NULL not allowed.");
+            }
+
+
+            List<GenericKubernetesResource> trinoClusters =
+                    k8sResourceService.listCustomResources(DEFAULT_TRINO_OPERATOR_NAMESPACE, "TrinoCluster");
+
+            for (GenericKubernetesResource genericKubernetesResource : trinoClusters) {
+                String clusterName = genericKubernetesResource.getMetadata().getName();
+                if(clusterName.equals(name)) {
+                    Map<String, Object> additionalMap = genericKubernetesResource.getAdditionalProperties();
+                    Map<String, Object> specMap = (Map<String, Object>) additionalMap.get("spec");
+                    Map<String, Object> coordinatorMap = (Map<String, Object>) specMap.get("coordinator");
+                    List<Map<String, Object>> coordinatorConfigs = (List<Map<String, Object>>) coordinatorMap.get("configs");
+                    Map<String, Object> workerMap = (Map<String, Object>) specMap.get("worker");
+                    List<Map<String, Object>> workerConfigs = (List<Map<String, Object>>) workerMap.get("configs");
+
+                    boolean coordinatorConfigExists = false;
+                    for(Map<String, Object> coordinatorConfig : coordinatorConfigs) {
+                        if(coordinatorConfig.get("name").equals(coordinatorConfigName) &&
+                                coordinatorConfig.get("path").equals(coordinatorConfigPath)) {
+                            coordinatorConfigExists = true;
+                            break;
+                        }
+                    }
+
+                    // if not such config with the same name and path exists.
+                    if(!coordinatorConfigExists) {
+                        coordinatorConfigs.add(coordinatorConfigMap);
+                    }
+
+                    boolean workerConfigExists = false;
+                    for(Map<String, Object> workerConfig : workerConfigs) {
+                        if(workerConfig.get("name").equals(workerConfigName) &&
+                                workerConfig.get("path").equals(workerConfigPath)) {
+                            workerConfigExists = true;
+                            break;
+                        }
+                    }
+                    // if not such config with the same name and path exists.
+                    if(!workerConfigExists) {
+                        workerConfigs.add(workerConfigMap);
+                    }
+                }
+                LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
+
+                k8sResourceService.updateCustomResource(genericKubernetesResource);
+                LOG.info("cluster [{}] configs updated.", name);
+                break;
+            }
+
+            return ControllerUtils.successMessage();
+        });
+    }
+
+
+
+    @PutMapping("/v1/trino/config/update")
+    public String updateConfig(@RequestParam Map<String, String> params) {
+        return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
+            String name = params.get("name");
+            String coordinatorConfigName = params.get("coordinator_config_name");
+            String coordinatorConfigPath = params.get("coordinator_config_path");
+            String coordinatorConfigValue = params.get("coordinator_config_value");
+            String workerConfigName = params.get("worker_config_name");
+            String workerConfigPath = params.get("worker_config_path");
+            String workerConfigValue = params.get("worker_config_value");
+
+            Map<String, Object> coordinatorConfigMap = null;
+            if(coordinatorConfigName != null && coordinatorConfigPath != null && coordinatorConfigValue != null) {
+                // decode value with base64.
+                coordinatorConfigValue = Base64Utils.decodeBase64(coordinatorConfigValue);
+
+                coordinatorConfigMap = new HashMap<>();
+                coordinatorConfigMap.put("name", coordinatorConfigName);
+                coordinatorConfigMap.put("path", coordinatorConfigPath);
+                coordinatorConfigMap.put("value", coordinatorConfigValue);
+            } else {
+                throw new IllegalArgumentException("coordinator config params NULL not allowed.");
+            }
+
+            Map<String, Object> workerConfigMap = null;
+            if(workerConfigName != null && workerConfigPath != null && workerConfigValue != null) {
+                // decode value with base64.
+                workerConfigValue = Base64Utils.decodeBase64(workerConfigValue);
+
+                workerConfigMap = new HashMap<>();
+                workerConfigMap.put("name", workerConfigName);
+                workerConfigMap.put("path", workerConfigPath);
+                workerConfigMap.put("value", workerConfigValue);
+            } else {
+                throw new IllegalArgumentException("worker config params NULL not allowed.");
+            }
+
+
+            List<GenericKubernetesResource> trinoClusters =
+                    k8sResourceService.listCustomResources(DEFAULT_TRINO_OPERATOR_NAMESPACE, "TrinoCluster");
+
+            for (GenericKubernetesResource genericKubernetesResource : trinoClusters) {
+                String clusterName = genericKubernetesResource.getMetadata().getName();
+                if(clusterName.equals(name)) {
+                    Map<String, Object> additionalMap = genericKubernetesResource.getAdditionalProperties();
+                    Map<String, Object> specMap = (Map<String, Object>) additionalMap.get("spec");
+                    Map<String, Object> coordinatorMap = (Map<String, Object>) specMap.get("coordinator");
+                    List<Map<String, Object>> coordinatorConfigs = (List<Map<String, Object>>) coordinatorMap.get("configs");
+                    Map<String, Object> workerMap = (Map<String, Object>) specMap.get("worker");
+                    List<Map<String, Object>> workerConfigs = (List<Map<String, Object>>) workerMap.get("configs");
+
+                    for(Map<String, Object> coordinatorConfig : coordinatorConfigs) {
+                        if(coordinatorConfig.get("name").equals(coordinatorConfigName) &&
+                                coordinatorConfig.get("path").equals(coordinatorConfigPath)) {
+                            coordinatorConfig.put("value", coordinatorConfigValue);
+                            LOG.info("coordinator config value updated: name [{}], path [{}]", coordinatorConfigName, coordinatorConfigPath);
+                            break;
+                        }
+                    }
+
+                    for(Map<String, Object> workerConfig : workerConfigs) {
+                        if(workerConfig.get("name").equals(workerConfigName) &&
+                                workerConfig.get("path").equals(workerConfigPath)) {
+                            workerConfig.put("value", workerConfigValue);
+                            LOG.info("worker config value updated: name [{}], path [{}]", workerConfigName, workerConfigPath);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
+
+                k8sResourceService.updateCustomResource(genericKubernetesResource);
+                LOG.info("cluster [{}] configs updated.", name);
+                break;
+            }
+
+            return ControllerUtils.successMessage();
+        });
+    }
+
+    @DeleteMapping("/v1/trino/config/delete")
+    public String deleteConfig(@RequestParam Map<String, String> params) {
+        return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
+            String name = params.get("name");
+            String coordinatorConfigName = params.get("coordinator_config_name");
+            String coordinatorConfigPath = params.get("coordinator_config_path");
+            String workerConfigName = params.get("worker_config_name");
+            String workerConfigPath = params.get("worker_config_path");
+
+            if(coordinatorConfigName == null || coordinatorConfigPath == null) {
+                throw new IllegalArgumentException("coordinator config params NULL not allowed.");
+            }
+
+            if(workerConfigName == null || workerConfigPath == null) {
+                throw new IllegalArgumentException("worker config params NULL not allowed.");
+            }
+
+            List<GenericKubernetesResource> trinoClusters =
+                    k8sResourceService.listCustomResources(DEFAULT_TRINO_OPERATOR_NAMESPACE, "TrinoCluster");
+
+            for (GenericKubernetesResource genericKubernetesResource : trinoClusters) {
+                String clusterName = genericKubernetesResource.getMetadata().getName();
+                if(clusterName.equals(name)) {
+                    Map<String, Object> additionalMap = genericKubernetesResource.getAdditionalProperties();
+                    Map<String, Object> specMap = (Map<String, Object>) additionalMap.get("spec");
+                    Map<String, Object> coordinatorMap = (Map<String, Object>) specMap.get("coordinator");
+                    List<Map<String, Object>> coordinatorConfigs = (List<Map<String, Object>>) coordinatorMap.get("configs");
+                    Map<String, Object> workerMap = (Map<String, Object>) specMap.get("worker");
+                    List<Map<String, Object>> workerConfigs = (List<Map<String, Object>>) workerMap.get("configs");
+
+                    List<Map<String, Object>> coordinatorConfigsArrayList = new ArrayList<>();
+                    for(Map<String, Object> coordinatorConfig : coordinatorConfigs) {
+                        if(coordinatorConfig.get("name").equals(coordinatorConfigName) &&
+                                coordinatorConfig.get("path").equals(coordinatorConfigPath)) {
+                            LOG.info("coordinator config removed: name [{}], path [{}]", coordinatorConfigName, coordinatorConfigPath);
+                        } else {
+                            coordinatorConfigsArrayList.add(coordinatorConfig);
+                        }
+                    }
+                    // update coordinator configs.
+                    coordinatorMap.put("configs", coordinatorConfigsArrayList);
+
+
+                    List<Map<String, Object>> workerConfigsArrayList = new ArrayList<>();
+                    for(Map<String, Object> workerConfig : workerConfigs) {
+                        if(workerConfig.get("name").equals(workerConfigName) &&
+                                workerConfig.get("path").equals(workerConfigPath)) {
+                            LOG.info("worker config removed: name [{}], path [{}]", workerConfigName, workerConfigPath);
+                        } else {
+                            workerConfigsArrayList.add(workerConfig);
+                        }
+                    }
+                    // update worker configs.
+                    workerMap.put("configs", workerConfigsArrayList);
+
+                    break;
+                }
+                LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
+
+                k8sResourceService.updateCustomResource(genericKubernetesResource);
+                LOG.info("cluster [{}] configs updated.", name);
+                break;
+            }
+
+            return ControllerUtils.successMessage();
+        });
+    }
+
+    @GetMapping("/v1/trino/config/list")
+    public String listClusterConfigs(@RequestParam Map<String, String> params) {
+        return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
+
+            List<GenericKubernetesResource> trinoClusters =
+                    k8sResourceService.listCustomResources(DEFAULT_TRINO_OPERATOR_NAMESPACE, "TrinoCluster");
+
+            List<Map<String, Object>> mapList = new ArrayList<>();
+            for (GenericKubernetesResource genericKubernetesResource : trinoClusters) {
+                Map<String, Object> additionalMap = genericKubernetesResource.getAdditionalProperties();
+                Map<String, Object> specMap = (Map<String, Object>) additionalMap.get("spec");
+                Map<String, Object> coordinatorMap = (Map<String, Object>) specMap.get("coordinator");
+                List<Map<String, Object>> coordinatorConfigs = (List<Map<String, Object>>) coordinatorMap.get("configs");
+                Map<String, Object> workerMap = (Map<String, Object>) specMap.get("worker");
+                List<Map<String, Object>> workerConfigs = (List<Map<String, Object>>) workerMap.get("configs");
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("name", genericKubernetesResource.getMetadata().getName());
+                map.put("coordinator", coordinatorConfigs);
+                map.put("worker", workerConfigs);
                 mapList.add(map);
             }
 

@@ -1,6 +1,5 @@
 package com.cloudcheflabs.dataroaster.trino.controller.util;
 
-import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;

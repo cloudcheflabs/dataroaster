@@ -33,6 +33,11 @@ public class K8sResourceServiceImpl implements K8sResourceService {
     }
 
     @Override
+    public void updateCustomResource(GenericKubernetesResource genericKubernetesResource) {
+        k8sResourceDao.updateCustomResource(genericKubernetesResource);
+    }
+
+    @Override
     public List<GenericKubernetesResource> listCustomResources(String namespace, String kind) {
         return k8sResourceDao.listCustomResources(namespace, kind);
     }

@@ -4,7 +4,6 @@ import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
