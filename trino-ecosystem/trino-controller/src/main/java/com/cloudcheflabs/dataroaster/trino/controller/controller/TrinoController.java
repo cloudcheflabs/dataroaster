@@ -385,18 +385,6 @@ public class TrinoController {
 
 
 
-    /**
-     * TODO:
-     * - add catalog.
-     * - update catalog configuration.
-     * - update config.properties
-     * - update jvm.config.
-     *
-     *
-     *
-     *
-     */
-
     @PostMapping("/v1/trino/config/create")
     public String createConfig(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
@@ -474,12 +462,12 @@ public class TrinoController {
                     if(!workerConfigExists) {
                         workerConfigs.add(workerConfigMap);
                     }
-                }
-                LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
+                    LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
 
-                k8sResourceService.updateCustomResource(genericKubernetesResource);
-                LOG.info("cluster [{}] configs updated.", name);
-                break;
+                    k8sResourceService.updateCustomResource(genericKubernetesResource);
+                    LOG.info("cluster [{}] configs updated.", name);
+                    break;
+                }
             }
 
             return ControllerUtils.successMessage();
@@ -556,13 +544,12 @@ public class TrinoController {
                             break;
                         }
                     }
+                    LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
+
+                    k8sResourceService.updateCustomResource(genericKubernetesResource);
+                    LOG.info("cluster [{}] configs updated.", name);
                     break;
                 }
-                LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
-
-                k8sResourceService.updateCustomResource(genericKubernetesResource);
-                LOG.info("cluster [{}] configs updated.", name);
-                break;
             }
 
             return ControllerUtils.successMessage();
@@ -624,13 +611,12 @@ public class TrinoController {
                     // update worker configs.
                     workerMap.put("configs", workerConfigsArrayList);
 
+                    LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
+
+                    k8sResourceService.updateCustomResource(genericKubernetesResource);
+                    LOG.info("cluster [{}] configs updated.", name);
                     break;
                 }
-                LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
-
-                k8sResourceService.updateCustomResource(genericKubernetesResource);
-                LOG.info("cluster [{}] configs updated.", name);
-                break;
             }
 
             return ControllerUtils.successMessage();
