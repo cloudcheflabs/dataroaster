@@ -12,5 +12,7 @@ public interface K8sResourceService {
 
     void updateCustomResource(CustomResource customResource);
 
+    void updateCustomResource(GenericKubernetesResource genericKubernetesResource);
+
     List<GenericKubernetesResource> listCustomResources(String namespace, String kind);
 }

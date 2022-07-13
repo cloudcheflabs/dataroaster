@@ -34,7 +34,7 @@ public class TrinoClusterQueueConsumer implements Runnable{
                         LOG.info("[{}] created...", trinoCluster.getMetadata().getName());
                     } else if(action.name().equals("MODIFIED")) {
                         LOG.info("update trino cluster: \n{}", YamlUtils.objectToYaml(trinoCluster));
-                        actionHandler.create(trinoCluster);
+                        actionHandler.update(trinoCluster);
                         LOG.info("[{}] updated...", trinoCluster.getMetadata().getName());
                     }
                     else if(action.name().equals("DELETED")) {

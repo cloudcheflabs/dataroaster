@@ -14,5 +14,7 @@ public interface K8sResourceDao {
 
     void updateCustomResource(CustomResource customResource);
 
+    void updateCustomResource(GenericKubernetesResource genericKubernetesResource);
+
     List<GenericKubernetesResource> listCustomResources(String namespace, String kind);
 }

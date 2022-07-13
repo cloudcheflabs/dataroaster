@@ -137,4 +137,26 @@ public class KubernetesK8sResourceDao extends AbstractKubernetesDao implements K
     public void updateCustomResource(CustomResource customResource) {
         createCustomResource(customResource);
     }
+
+    @Override
+    public void updateCustomResource(GenericKubernetesResource genericKubernetesResource) {
+        String kind = genericKubernetesResource.getKind();
+        ObjectMeta meta = genericKubernetesResource.getMetadata();
+        String name = meta.getName();
+        String namespace = meta.getNamespace();
+
+        CustomResourceDefinition selectedCRD = selectCRD(kind);
+        if(selectedCRD == null) {
+            throw new IllegalStateException("CRD with kind [" + kind + "] not found!");
+        }
+
+        GenericKubernetesResource retResource =
+                kubernetesClient.genericKubernetesResources(CustomResourceDefinitionContext.fromCrd(selectedCRD))
+                        .inNamespace(namespace)
+                        .withName(name).createOrReplace(genericKubernetesResource);
+
+        if(retResource != null) {
+            LOG.info("custom resource with name [{}] in namespace [{}] created or replaced", meta.getName(), meta.getNamespace());
+        }
+    }
 }

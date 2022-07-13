@@ -1,5 +1,6 @@
 package com.cloudcheflabs.dataroaster.common.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
@@ -32,7 +33,7 @@ public class JsonUtils {
     public static List<Map<String, Object>> toMapList(ObjectMapper mapper, String json)
     {
         try {
-            List<Map<String, Object>> list = (List<Map<String, Object>>) mapper.readValue(json, List.class);
+            List<Map<String, Object>> list = mapper.readValue(json, new TypeReference<List<Map<String, Object>>>(){});
             return list;
         } catch (IOException e) {
             throw new RuntimeException(e);
