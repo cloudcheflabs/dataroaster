@@ -60,9 +60,26 @@ To access DataRoaster from local, port-forward the service of `dataroaster-opera
 kubectl port-forward svc/dataroaster-operator-service 8089 -n dataroaster-operator;
 ```
 
-## REST API
+### DataRoaster REST API
 To access DataRoaster with REST, see [DataRoaster REST API](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/dataroaster) for more details.
 
+
+## DataRoaster Trino Gateway
+DataRoaster Trino Gateway is used to route the trino queries dynamically to downstream trino clusters.
+
+See [DataRoaster Trino Gateway](https://github.com/cloudcheflabs/dataroaster/tree/master/trino-ecosystem/trino-gateway) for more details.
+
+
+## DataRoaster Trino Operator
+DataRoaster Trino Operator is used to create/delete trino clusters easily.
+
+See [DataRoaster Trino Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/trino) for more details.
+
+
+## DataRoaster Helm Operator
+DataRoaster Helm Operator is used to install / upgrade / uninstall applications of helm charts easily.
+
+See [DataRoaster Helm Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/helm) for more details.
 
 
 ## DataRoaster Spark Operator
@@ -71,21 +88,6 @@ DataRoaster Spark Operator is used to submit and delete spark applications on ku
 See [DataRoaster Spark Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/spark) for more details.
 
 
-## DataRoaster Trino Operator
-DataRoaster Trino Operator is used to create/delete trino clusters easily.
-
-See [DataRoaster Trino Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/trino) for more details.
-
-## DataRoaster Trino Gateway
-DataRoaster Trino Gateway is used to route the trino queries dynamically to downstream trino clusters.
-
-See [DataRoaster Trino Gateway](https://github.com/cloudcheflabs/dataroaster/tree/master/trino-ecosystem/trino-gateway) for more details.
-
-
-## DataRoaster Helm Operator
-DataRoaster Helm Operator is used to install / upgrade / uninstall applications of helm charts easily.
-
-See [DataRoaster Helm Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/helm) for more details.
 
 
 ## Community
