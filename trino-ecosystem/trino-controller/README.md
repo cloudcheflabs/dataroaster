@@ -190,7 +190,7 @@ curl -XPOST \
 http://localhost:8093/v1/cluster/create \
 -d  "cluster_name=etl-2" \
 -d  "cluster_type=etl" \
--d  "url=http://trino-coordinator-service.trino-trino-etl-2.svc:8080" \
+-d  "url=http://trino-coordinator-service.trino-etl-2.svc:8080" \
 -d  "activated=true" \
 -d  "group_name=etl_group";
 
