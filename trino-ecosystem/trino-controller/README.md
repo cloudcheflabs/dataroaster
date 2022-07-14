@@ -312,10 +312,10 @@ Parameters:
 * `name` : cluster name.
 * `coordinator_config_name` : coordinator config name.
 * `coordinator_config_path` : coordinator config path.
-* `coordinator_config_value` :  coordinator config value.
+* `coordinator_config_value` :  coordinator config value which is base64 encoded.
 * `worker_config_name` : worker config name.
 * `worker_config_path` :  worker config path.
-* `worker_config_value` : worker config value.
+* `worker_config_value` : worker config value which is base64 encoded.
 
 ```
 cat <<EOF > hive.properties
@@ -353,10 +353,10 @@ Parameters:
 * `name` : cluster name.
 * `coordinator_config_name` : coordinator config name.
 * `coordinator_config_path` : coordinator config path.
-* `coordinator_config_value` :  coordinator config value.
+* `coordinator_config_value` :  coordinator config value which is base64 encoded.
 * `worker_config_name` : worker config name.
 * `worker_config_path` :  worker config path.
-* `worker_config_value` : worker config value.
+* `worker_config_value` : worker config value which is base64 encoded.
 
 ```
 cat <<EOF > hive.properties
