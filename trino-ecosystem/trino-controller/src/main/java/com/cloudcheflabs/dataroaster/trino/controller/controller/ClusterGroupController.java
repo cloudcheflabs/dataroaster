@@ -1,7 +1,6 @@
 package com.cloudcheflabs.dataroaster.trino.controller.controller;
 
 import com.cloudcheflabs.dataroaster.trino.controller.api.service.RegisterClusterService;
-import com.cloudcheflabs.dataroaster.trino.controller.api.service.ScaleWorkerService;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.RestResponse;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.Roles;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,8 +13,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @RestController

@@ -1,10 +1,7 @@
 package com.cloudcheflabs.dataroaster.operators.trino.handler;
 
-import com.cloudcheflabs.dataroaster.operators.trino.crd.Coordinator;
-import com.cloudcheflabs.dataroaster.operators.trino.crd.Image;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoClusterSpec;
-import io.fabric8.kubernetes.api.model.PodSecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
