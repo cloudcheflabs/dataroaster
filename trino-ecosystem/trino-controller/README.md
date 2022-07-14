@@ -26,7 +26,7 @@ helm install \
 trino-controller \
 --create-namespace \
 --namespace trino-controller \
---version v1.0.0 \
+--version v1.0.1 \
 --set trino.gateway.publicEndpoint="https://trino-gateway-proxy-test.cloudchef-labs.com" \
 --set trino.gateway.proxyHostName=trino-gateway-proxy-test.cloudchef-labs.com \
 --set trino.gateway.restHostName=trino-gateway-rest-test.cloudchef-labs.com \
@@ -269,6 +269,7 @@ Parameters:
 * `replicas` : trino worker replica count.
 * `min_replicas` : worker hpa min. replica count.
 * `max_replicas` : worker hpa max. replica count.
+* `trino_image` : trino image, optional.
 
 ```
 curl -XPOST \
@@ -279,6 +280,7 @@ http://localhost:8093/v1/trino/create \
 -d  "replicas=3" \
 -d  "min_replicas=2" \
 -d  "max_replicas=5" \
+--data-urlencode "trino_image=trinodb/trino:389" \
 ;
 ```
 
