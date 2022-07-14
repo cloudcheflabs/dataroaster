@@ -590,4 +590,5 @@ http://localhost:8093/v1/cluster/delete \
 ```
 
 
- 
+## Publishment
+* [Trino Gateway](https://itnext.io/trino-gateway-8e654366df5e)
