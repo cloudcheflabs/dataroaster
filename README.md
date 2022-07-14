@@ -31,7 +31,7 @@ helm install \
 dataroaster-operator \
 --create-namespace \
 --namespace dataroaster-operator \
---version v3.0.9 \
+--version v3.0.8 \
 --set image=cloudcheflabs/dataroaster-operator:4.3.0 \
 --set dataroastermysql.storage.storageClass=oci \
 dataroaster-operator/dataroaster-operator;

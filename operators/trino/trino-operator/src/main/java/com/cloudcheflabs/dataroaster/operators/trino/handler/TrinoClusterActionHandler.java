@@ -1,10 +1,7 @@
 package com.cloudcheflabs.dataroaster.operators.trino.handler;
 
-import com.cloudcheflabs.dataroaster.operators.trino.crd.Coordinator;
-import com.cloudcheflabs.dataroaster.operators.trino.crd.Image;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoClusterSpec;
-import io.fabric8.kubernetes.api.model.PodSecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,20 +40,6 @@ public class TrinoClusterActionHandler implements ActionHandler<TrinoCluster> {
     @Override
     public void update(TrinoCluster trinoCluster) {
         create(trinoCluster);
-
-        String name = trinoCluster.getMetadata().getName();
-        TrinoClusterSpec spec = trinoCluster.getSpec();
-        String namespace = spec.getNamespace();
-
-        // rollout coordinator.
-        trinoClusterClient.getClient().apps().deployments().inNamespace(namespace).withName(DEFAULT_COORDINATOR_DEPLOYMENT)
-                .rolling().restart();
-        LOG.info("cluster [{}] deployment [{}] rollout restarted.", name, DEFAULT_COORDINATOR_DEPLOYMENT);
-
-        // rollout workers.
-        trinoClusterClient.getClient().apps().deployments().inNamespace(namespace).withName(DEFAULT_WORKER_DEPLOYMENT)
-                .rolling().restart();
-        LOG.info("cluster [{}] deployment [{}] rollout restarted.", name, DEFAULT_WORKER_DEPLOYMENT);
     }
 
     @Override

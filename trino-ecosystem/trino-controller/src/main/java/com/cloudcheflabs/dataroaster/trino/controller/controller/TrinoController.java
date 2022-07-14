@@ -466,12 +466,24 @@ public class TrinoController {
 
                     k8sResourceService.updateCustomResource(genericKubernetesResource);
                     LOG.info("cluster [{}] configs updated.", name);
+
+                    String clusterNamespace = (String) specMap.get("namespace");
+                    rolloutDeployment(clusterNamespace);
+
                     break;
                 }
             }
 
             return ControllerUtils.successMessage();
         });
+    }
+
+    private void rolloutDeployment(String clusterNamespace) {
+        kubernetesClient.apps().deployments().inNamespace(clusterNamespace).withName("trino-coordinator").rolling().restart();
+        LOG.info("deployment [{}] in namespace [{}] rollout restarted...", "trino-coordinator", clusterNamespace);
+
+        kubernetesClient.apps().deployments().inNamespace(clusterNamespace).withName("trino-worker").rolling().restart();
+        LOG.info("deployment [{}] in namespace [{}] rollout restarted...", "trino-worker", clusterNamespace);
     }
 
 
@@ -548,6 +560,9 @@ public class TrinoController {
 
                     k8sResourceService.updateCustomResource(genericKubernetesResource);
                     LOG.info("cluster [{}] configs updated.", name);
+
+                    String clusterNamespace = (String) specMap.get("namespace");
+                    rolloutDeployment(clusterNamespace);
                     break;
                 }
             }
@@ -615,6 +630,9 @@ public class TrinoController {
 
                     k8sResourceService.updateCustomResource(genericKubernetesResource);
                     LOG.info("cluster [{}] configs updated.", name);
+
+                    String clusterNamespace = (String) specMap.get("namespace");
+                    rolloutDeployment(clusterNamespace);
                     break;
                 }
             }
