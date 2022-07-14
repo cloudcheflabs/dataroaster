@@ -34,6 +34,8 @@ public class TrinoController {
     private ObjectMapper mapper = new ObjectMapper();
 
     public static final String DEFAULT_TRINO_OPERATOR_NAMESPACE = "trino-operator";
+    public static final String DEFAULT_TRINO_IMAGE_REPO = "trinodb/trino";
+    public static final String DEFAULT_TRINO_IMAGE_TAG = "384";
 
     @Autowired
     private HttpServletRequest context;
@@ -65,6 +67,19 @@ public class TrinoController {
             String minReplicas = params.get("min_replicas");
             String maxReplicas = params.get("max_replicas");
             String storageClass = params.get("storage_class");
+            // optional.
+            String trinoImage = params.get("trino_image");
+
+            String trinoImageRepo = DEFAULT_TRINO_IMAGE_REPO;
+            String trinoImageTag = DEFAULT_TRINO_IMAGE_TAG;
+            if(trinoImage != null) {
+                String[] tokens = trinoImage.split(":");
+                trinoImageRepo = tokens[0];
+                trinoImageTag = tokens[1];
+            }
+            LOG.info("trinoImageRepo: {}", trinoImageRepo);
+            LOG.info("trinoImageTag: {}", trinoImageTag);
+
 
             int replicasInt = Integer.valueOf(replicas);
             int minReplicasInt = Integer.valueOf(minReplicas);
@@ -85,6 +100,8 @@ public class TrinoController {
             kv.put("replicas", replicas);
             kv.put("maxReplicas", maxReplicas);
             kv.put("minReplicas", minReplicas);
+            kv.put("trinoImageRepo", trinoImageRepo);
+            kv.put("trinoImageTag", trinoImageTag);
             String trinoClusterString =
                     TemplateUtils.replace("/templates/cr/trino-cluster-jmx.yaml", true, kv);
 

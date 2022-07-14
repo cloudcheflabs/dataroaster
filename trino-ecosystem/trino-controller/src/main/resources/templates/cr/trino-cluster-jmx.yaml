@@ -7,8 +7,8 @@ spec:
   namespace: {{ namespace }}
   serviceAccountName: trino
   image:
-    repository: trinodb/trino
-    tag: "384"
+    repository: {{ trinoImageRepo }}
+    tag: "{{ trinoImageTag }}"
     imagePullPolicy: IfNotPresent
     imagePullSecrets: null
   securityContext:
