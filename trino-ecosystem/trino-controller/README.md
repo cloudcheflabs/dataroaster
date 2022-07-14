@@ -327,9 +327,9 @@ hive.compression-codec=NONE
 hive.s3.path-style-access=true
 hive.s3.ssl.enabled=true
 hive.s3.max-connections=100
-hive.s3.endpoint=https://cnobgk2u8blu.compat.objectstorage.ap-seoul-1.oraclecloud.com
-hive.s3.aws-access-key=771688d08619c77939566af9290a2f1c277a2920
-hive.s3.aws-secret-key=CXKnO6a5zxMEjozVOk5yv5n58qM0l0FQNVFgNg/aBzY=
+hive.s3.endpoint=endpoint
+hive.s3.aws-access-key=acces-key
+hive.s3.aws-secret-key=secret-key
 EOF
 
 
@@ -368,9 +368,9 @@ hive.compression-codec=NONE
 hive.s3.path-style-access=true
 hive.s3.ssl.enabled=true
 hive.s3.max-connections=1000
-hive.s3.endpoint=https://cnobgk2u8blu.compat.objectstorage.ap-seoul-1.oraclecloud.com
-hive.s3.aws-access-key=771688d08619c77939566af9290a2f1c277a2920
-hive.s3.aws-secret-key=CXKnO6a5zxMEjozVOk5yv5n58qM0l0FQNVFgNg/aBzY=
+hive.s3.endpoint=endpoint
+hive.s3.aws-access-key=access-key
+hive.s3.aws-secret-key=secret-key
 EOF
 
 
