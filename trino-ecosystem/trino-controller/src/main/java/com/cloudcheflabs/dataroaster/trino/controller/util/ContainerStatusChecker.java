@@ -21,48 +21,60 @@ public class ContainerStatusChecker {
         boolean running = true;
         // watch pod if it has the status of RUNNING.
         while (running) {
-            PodList podList = kubernetesClient.pods().inNamespace(namespace).list();
-            for(Pod pod : podList.getItems()) {
-                ObjectMeta metadata = pod.getMetadata();
-                //LOG.info("metadata: [{}]", JsonUtils.toJson(metadata));
-                Map<String, String> labels = metadata.getLabels();
-                //LOG.info("labels: [{}]", JsonUtils.toJson(labels));
-                for(String key : labels.keySet()) {
-                    //LOG.info("key: [{}]", key);
-                    if(key.equals(labelKey)) {
-                        String value = labels.get(key);
-                        //LOG.info("key: [{}], value: [{}]", key, value);
-                        if(value.equals(labelValue)) {
-                            PodStatus status = pod.getStatus();
-                            List<ContainerStatus> containerStatuses = status.getContainerStatuses();
-                            //LOG.info("containerStatuses: [{}]", containerStatuses.size());
-                            if (!containerStatuses.isEmpty()) {
-                                ContainerStatus containerStatus = containerStatuses.get(0);
-                                ContainerState state = containerStatus.getState();
-                                //LOG.info("state: [{}]", state.toString());
-                                ContainerStateRunning containerStateRunning = state.getRunning();
-                                if(containerStateRunning != null) {
-                                    LOG.info("{} has running status now.", componentName);
-                                    running = false;
-                                    break;
+            try {
+                PodList podList = kubernetesClient.pods().inNamespace(namespace).list();
+                for (Pod pod : podList.getItems()) {
+                    ObjectMeta metadata = pod.getMetadata();
+                    //LOG.info("metadata: [{}]", JsonUtils.toJson(metadata));
+                    Map<String, String> labels = metadata.getLabels();
+                    //LOG.info("labels: [{}]", JsonUtils.toJson(labels));
+                    for (String key : labels.keySet()) {
+                        //LOG.info("key: [{}]", key);
+                        if (key.equals(labelKey)) {
+                            String value = labels.get(key);
+                            //LOG.info("key: [{}], value: [{}]", key, value);
+                            if (value.equals(labelValue)) {
+                                PodStatus status = pod.getStatus();
+                                List<ContainerStatus> containerStatuses = status.getContainerStatuses();
+                                //LOG.info("containerStatuses: [{}]", containerStatuses.size());
+                                if (!containerStatuses.isEmpty()) {
+                                    ContainerStatus containerStatus = containerStatuses.get(0);
+                                    ContainerState state = containerStatus.getState();
+                                    //LOG.info("state: [{}]", state.toString());
+                                    ContainerStateRunning containerStateRunning = state.getRunning();
+                                    if (containerStateRunning != null) {
+                                        LOG.info("{} has running status now.", componentName);
+                                        running = false;
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            if(count < MAX_COUNT) {
+                if (count < MAX_COUNT) {
+                    LOG.info(".....................................................");
+                    count++;
+                    try {
+                        Thread.sleep(5000);
+                        continue;
+                    } catch (Exception e) {
+                        System.err.println(e);
+                    }
+                } else {
+                    throw new IllegalStateException("[" + componentName + "] has no running status!");
+                }
+            } catch (Exception e) {
+                LOG.error("error", e);
                 LOG.info(".....................................................");
                 count++;
                 try {
                     Thread.sleep(5000);
                     continue;
-                } catch (Exception e) {
-                    System.err.println(e);
+                } catch (Exception ex) {
+                    LOG.error("error", ex);
                 }
-            } else {
-                throw new IllegalStateException("[" + componentName + "] has no running status!");
             }
         }
     }
