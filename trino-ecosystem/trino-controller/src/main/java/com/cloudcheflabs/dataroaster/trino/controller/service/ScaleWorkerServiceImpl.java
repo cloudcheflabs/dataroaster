@@ -1,12 +1,13 @@
 package com.cloudcheflabs.dataroaster.trino.controller.service;
 
-import com.cloudcheflabs.dataroaster.trino.controller.api.dao.ClusterJmxDao;
 import com.cloudcheflabs.dataroaster.trino.controller.api.dao.ScaleWorkerDao;
 import com.cloudcheflabs.dataroaster.trino.controller.api.service.ScaleWorkerService;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ScaleWorkerServiceImpl implements ScaleWorkerService {
 
     @Autowired

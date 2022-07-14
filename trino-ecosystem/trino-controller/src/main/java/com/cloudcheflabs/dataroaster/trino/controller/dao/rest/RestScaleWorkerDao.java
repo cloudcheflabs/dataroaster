@@ -9,8 +9,6 @@ import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-import java.io.IOException;
-
 public class RestScaleWorkerDao extends AbstractRestDao implements ScaleWorkerDao {
 
 
