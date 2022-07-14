@@ -64,6 +64,12 @@ kubectl port-forward svc/dataroaster-operator-service 8089 -n dataroaster-operat
 To access DataRoaster with REST, see [DataRoaster REST API](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/dataroaster) for more details.
 
 
+## DataRoaster Trino Controller
+DataRoaster Trino Controller is used to control all the trino ecosystem components to build a trino gateway easily.
+
+See [DataRoaster Trino Controller](https://github.com/cloudcheflabs/dataroaster/tree/master/trino-ecosystem/trino-controller) for more details.
+
+
 ## DataRoaster Trino Gateway
 DataRoaster Trino Gateway is used to route the trino queries dynamically to downstream trino clusters.
 
