@@ -7,7 +7,9 @@ DataRoaster is open source data platform running on Kubernetes.
 
 DataRoaster has a simple architecture. There are several operators in DataRoaster to install data platform components easily.
 * `DataRoaster Operator` handles REST requests to create custom resources.
-* After creating custom resources, `Helm Operator` and other operators like `Trino Operator` and `Spark Operator` will be notified and create data platform components.
+* After creating custom resources, [DataRoaster Helm Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/helm) 
+and other operators like [DataRoaster Trino Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/trino) 
+and [DataRoaster Spark Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/spark) will be notified and create data platform components.
 
 ## Data Platform Components supported by DataRoaster
 
