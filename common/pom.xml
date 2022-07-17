@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>com.cloudcheflabs.dataroaster</groupId>
 		<artifactId>dataroaster-parent</artifactId>
-		<version>4.7.2</version>
+		<version>4.8.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cloudcheflabs.dataroaster</groupId>
 	<artifactId>common</artifactId>
-	<version>4.7.2</version>
+	<version>4.8.0-SNAPSHOT</version>
 	<name>Common Library</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
