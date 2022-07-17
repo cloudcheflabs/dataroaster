@@ -8,10 +8,7 @@ import com.cloudcheflabs.dataroaster.trino.controller.component.Initializer;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.CustomResource;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.RestResponse;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.Roles;
-import com.cloudcheflabs.dataroaster.trino.controller.util.Base64Utils;
-import com.cloudcheflabs.dataroaster.trino.controller.util.ContainerStatusChecker;
-import com.cloudcheflabs.dataroaster.trino.controller.util.CustomResourceUtils;
-import com.cloudcheflabs.dataroaster.trino.controller.util.YamlUtils;
+import com.cloudcheflabs.dataroaster.trino.controller.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
@@ -296,6 +293,18 @@ public class TrinoController {
         });
     }
 
+    private String getPrometheusNamespace() {
+        Map<String, Object> kv = new HashMap<>();
+        kv.put("customResourceNamespace", Initializer.getNamespace());
+        kv.put("storageClass", "");
+        String prometheusString =
+                TemplateUtils.replace("/templates/cr/prometheus.yaml", true, kv);
+
+
+        // prometheus namespace.
+        return CustomResourceUtils.getTargetNamespace(prometheusString);
+    }
+
     private Map<String, Object> makePrometheusJob(String jobName, List<String> endpoints) {
         Map<String, Object> jobMap = new HashMap<>();
         jobMap.put("job_name", jobName);
@@ -308,6 +317,93 @@ public class TrinoController {
         jobMap.put("static_configs", staticConfigs);
 
         return jobMap;
+    }
+
+    private void updatePrometheusConfigMap(String name, String trinoClusterNamespace) {
+        // get trino jmx exporter endpoints from trino operator with accessing rest api of it.
+        String trinoOperatorRestUri = env.getProperty("trino.operator.restUri");
+        RestResponse restResponse = clusterJmxService.listClusterJmxEndpoints(DEFAULT_TRINO_OPERATOR_NAMESPACE, trinoOperatorRestUri);
+        String jmxEndpointsJson = restResponse.getSuccessMessage();
+        LOG.info("jmxEndpointsJson: {}", jmxEndpointsJson);
+
+        List<Map<String, Object>> mapList = JsonUtils.toMapList(new ObjectMapper(), jmxEndpointsJson);
+
+        // coordinator jmx exporter endpoint.
+        String coordinatorJmxExporterEndpoint = null;
+
+        // worker jmx endpoints.
+        List<String> workerJmxExporterEndpoints = null;
+        for(Map<String, Object> clusterMap : mapList) {
+            String clusterName = (String) clusterMap.get("clusterName");
+            String clusterNamespace = (String) clusterMap.get("clusterNamespace");
+
+            if(clusterName.equals(name) && clusterNamespace.equals(trinoClusterNamespace)) {
+                List<Map<String, Object>> coordinatorJmxExporterEpList = (List<Map<String, Object>>) clusterMap.get("coordinatorJmxExporterEndpoints");
+
+                coordinatorJmxExporterEndpoint = (String) coordinatorJmxExporterEpList.get(0).get("address");
+
+                List<Map<String, Object>> workerJmxExporterEpList = (List<Map<String, Object>>) clusterMap.get("workerJmxExporterEndpoints");
+
+                // worker jmx endpoints.
+                workerJmxExporterEndpoints = new ArrayList<>();
+                for(Map<String, Object> workerJmxExporterEpMap : workerJmxExporterEpList) {
+                    String workerJmxExporterEndpoint = (String) workerJmxExporterEpMap.get("address");
+                    workerJmxExporterEndpoints.add(workerJmxExporterEndpoint);
+                }
+
+                break;
+            }
+        }
+
+        // prometheus namespace.
+        String prometheusNamespace = getPrometheusNamespace();
+
+        // add jobs of jmx exporter endpoints of trino coordinator and workers to configmap in prometheus to monitor trino cluster.
+        if(coordinatorJmxExporterEndpoint != null && workerJmxExporterEndpoints != null) {
+            String coordinatorJobName = name + "-coordinator";
+            String workerJobName = name + "-workers";
+            Map<String, Object> coordinatorJobMap = makePrometheusJob(coordinatorJobName, Arrays.asList(coordinatorJmxExporterEndpoint));
+            Map<String, Object> workerJobMap = makePrometheusJob(workerJobName, workerJmxExporterEndpoints);
+
+            // get prometheus configmap.
+            ConfigMap prometheusConfigMap = kubernetesClient.configMaps().inNamespace(prometheusNamespace).withName("prometheus-server").get();
+            Map<String, String> dataMap = prometheusConfigMap.getData();
+            String prometheusYaml = dataMap.get("prometheus.yml");
+            LOG.info("prometheusYaml: {}", prometheusYaml);
+
+            Map<String, Object> prometheusYamlMap = YamlUtils.yamlToMap(prometheusYaml);
+            List<Map<String, Object>> scrapeConfigs = (List<Map<String, Object>>) prometheusYamlMap.get("scrape_configs");
+            LOG.info("scapeConfigs: {}", JsonUtils.toJson(scrapeConfigs));
+
+            List<Map<String, Object>> scrapeConfigsArrayList = new ArrayList<>();
+            for(Map<String, Object> scrapeConfig : scrapeConfigs) {
+                if(scrapeConfig.containsKey("job_name")) {
+                    String jobName = (String) scrapeConfig.get("job_name");
+                    // update coordinator job map.
+                    if(jobName.equals(coordinatorJobName)) {
+                        scrapeConfigsArrayList.add(coordinatorJobMap);
+                    }
+                    // update worker job map.
+                    else if(jobName.equals(workerJobName)) {
+                        scrapeConfigsArrayList.add(workerJobMap);
+                    } else {
+                        scrapeConfigsArrayList.add(scrapeConfig);
+                    }
+                } else {
+                    scrapeConfigsArrayList.add(scrapeConfig);
+                }
+            }
+
+            // update scrape configs.
+            prometheusYamlMap.put("scrape_configs", scrapeConfigsArrayList);
+
+            String updatedPrometheusYaml = YamlUtils.objectToYaml(prometheusYamlMap);
+            LOG.info("updated updatedPrometheusYaml: {}", updatedPrometheusYaml);
+
+            prometheusConfigMap.getData().put("prometheus.yml", updatedPrometheusYaml);
+            kubernetesClient.configMaps().inNamespace(prometheusNamespace).withName("prometheus-server").createOrReplace(prometheusConfigMap);
+            LOG.info("prometheus configmap updated...");
+        }
     }
 
 
@@ -487,6 +583,13 @@ public class TrinoController {
                     String clusterNamespace = (String) specMap.get("namespace");
                     rolloutDeployment(clusterNamespace);
 
+                    // wait for coordinator and workers restarted.
+                    LOG.info("waiting for coordinator and workers restarted...");
+                    PauseUtils.pause(20000);
+
+                    // update prometheus configmap to update prometheus jobs.
+                    updatePrometheusConfigMap(name, clusterNamespace);
+
                     break;
                 }
             }
@@ -580,6 +683,14 @@ public class TrinoController {
 
                     String clusterNamespace = (String) specMap.get("namespace");
                     rolloutDeployment(clusterNamespace);
+
+                    // wait for coordinator and workers restarted.
+                    LOG.info("waiting for coordinator and workers restarted...");
+                    PauseUtils.pause(20000);
+
+                    // update prometheus configmap to update prometheus jobs.
+                    updatePrometheusConfigMap(name, clusterNamespace);
+
                     break;
                 }
             }
@@ -650,6 +761,14 @@ public class TrinoController {
 
                     String clusterNamespace = (String) specMap.get("namespace");
                     rolloutDeployment(clusterNamespace);
+
+                    // wait for coordinator and workers restarted.
+                    LOG.info("waiting for coordinator and workers restarted...");
+                    PauseUtils.pause(20000);
+
+                    // update prometheus configmap to update prometheus jobs.
+                    updatePrometheusConfigMap(name, clusterNamespace);
+
                     break;
                 }
             }
