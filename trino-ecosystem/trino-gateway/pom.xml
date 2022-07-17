@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cloudcheflabs.dataroaster</groupId>
 	<artifactId>trino-gateway</artifactId>
-	<version>4.8.0-SNAPSHOT</version>
+	<version>4.7.2</version>
 	<name>Trino Gateway</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -94,7 +94,7 @@
 		<dependency>
 			<groupId>com.cloudcheflabs.dataroaster</groupId>
 			<artifactId>common</artifactId>
-			<version>4.8.0-SNAPSHOT</version>
+			<version>4.7.2</version>
 		</dependency>
 		<dependency>
 			<groupId>io.trino</groupId>
