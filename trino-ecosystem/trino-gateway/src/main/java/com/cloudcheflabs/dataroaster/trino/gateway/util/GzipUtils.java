@@ -60,7 +60,7 @@ public class GzipUtils {
             bos = new ByteArrayOutputStream();
             gzipIS = new GZIPInputStream(bis);
 
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[4096];
             int len;
             while((len = gzipIS.read(buffer)) != -1){
                 LOG.info("buffer: {}", new String(buffer));
