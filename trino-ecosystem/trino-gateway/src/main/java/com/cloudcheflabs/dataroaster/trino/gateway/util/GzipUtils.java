@@ -81,7 +81,7 @@ public class GzipUtils {
                 e.printStackTrace();
             }
         }
-        return new byte[]{};
+        return new String("").getBytes();
     }
 
 
