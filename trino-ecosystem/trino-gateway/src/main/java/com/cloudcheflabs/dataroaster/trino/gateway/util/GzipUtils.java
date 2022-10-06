@@ -4,9 +4,8 @@ import com.cloudcheflabs.dataroaster.trino.gateway.proxy.TrinoProxyServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -60,7 +59,7 @@ public class GzipUtils {
             bos = new ByteArrayOutputStream();
             gzipIS = new GZIPInputStream(bis);
 
-            byte[] buffer = new byte[4096];
+            byte[] buffer = new byte[1024];
             int len;
             while((len = gzipIS.read(buffer)) != -1){
                 LOG.info("buffer: {}", new String(buffer));
@@ -82,6 +81,30 @@ public class GzipUtils {
             }
         }
         return new byte[]{};
+    }
+
+    public static String plainTextFromGz(byte[] compressed) {
+        final StringBuilder outStr = new StringBuilder();
+        if ((compressed == null) || (compressed.length == 0)) {
+            return "";
+        }
+        if (isGzipCompressed(compressed)) {
+            try {
+                final GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed));
+                final BufferedReader bufferedReader =
+                        new BufferedReader(new InputStreamReader(gis, Charset.defaultCharset()));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    outStr.append(line);
+                }
+                gis.close();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            outStr.append(compressed);
+        }
+        return outStr.toString();
     }
 
     public static boolean isGzipCompressed(final byte[] compressed) {
