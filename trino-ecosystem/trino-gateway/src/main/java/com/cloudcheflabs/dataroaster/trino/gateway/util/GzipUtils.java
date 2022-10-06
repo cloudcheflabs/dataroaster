@@ -1,5 +1,9 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.util;
 
+import com.cloudcheflabs.dataroaster.trino.gateway.proxy.TrinoProxyServlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -7,6 +11,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class GzipUtils {
+
+    private static Logger LOG = LoggerFactory.getLogger(GzipUtils.class);
 
     public static byte[] compressStringInGzip(String content) {
         return compress(content.getBytes());
@@ -57,6 +63,7 @@ public class GzipUtils {
             byte[] buffer = new byte[1024];
             int len;
             while((len = gzipIS.read(buffer)) != -1){
+                LOG.info("buffer: {}", new String(buffer));
                 bos.write(buffer, 0, len);
             }
             return bos.toByteArray();
