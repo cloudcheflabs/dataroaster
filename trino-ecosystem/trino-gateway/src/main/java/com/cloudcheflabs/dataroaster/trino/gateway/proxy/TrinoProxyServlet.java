@@ -244,6 +244,12 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         }
         if (LOG.isDebugEnabled()) LOG.debug("jsonResponse: {}", jsonResponse);
 
+        if(jsonResponse.equals(""))
+        {
+            LOG.info("json response {}", jsonResponse);
+            return;
+        }
+
         // save response to cache.
         Map<String, Object> responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
         String id = (String) responseMap.get("id");
