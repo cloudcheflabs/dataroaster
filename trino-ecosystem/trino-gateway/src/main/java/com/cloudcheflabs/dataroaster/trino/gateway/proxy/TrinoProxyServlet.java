@@ -231,8 +231,15 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
         String jsonResponse = null;
         if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
-            jsonResponse = GzipUtils.plainTextFromGz(buffer);
+            if(GzipUtils.isGzipCompressed(buffer)) {
+                LOG.info("gzip compressed!!!");
+                jsonResponse = GzipUtils.decompressGzip(buffer);
+            } else {
+                LOG.info("gzip NOT compressed!!!");
+                jsonResponse = new String(buffer);
+            }
         } else {
+            LOG.info("NOT gzip encoding!!!");
             jsonResponse = new String(buffer);
         }
         if (LOG.isDebugEnabled()) LOG.debug("jsonResponse: {}", jsonResponse);

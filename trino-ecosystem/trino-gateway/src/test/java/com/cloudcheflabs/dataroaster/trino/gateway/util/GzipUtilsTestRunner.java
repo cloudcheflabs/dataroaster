@@ -17,7 +17,7 @@ public class GzipUtilsTestRunner {
         byte[] gzippedBytes = GzipUtils.compressStringInGzip(json);
         Assert.assertTrue(GzipUtils.isGzipCompressed(gzippedBytes));
 
-        String decompressedJson = GzipUtils.plainTextFromGz(gzippedBytes);
+        String decompressedJson = GzipUtils.decompressGzip(gzippedBytes);
         System.out.println(decompressedJson);
     }
 
@@ -28,7 +28,7 @@ public class GzipUtilsTestRunner {
         byte[] gzippedBytes = IOUtils.toByteArray(is);
         Assert.assertTrue(GzipUtils.isGzipCompressed(gzippedBytes));
 
-        String decompressedJson = GzipUtils.plainTextFromGz(gzippedBytes);
+        String decompressedJson = GzipUtils.decompressGzip(gzippedBytes);
         System.out.println(decompressedJson);
     }
 }
