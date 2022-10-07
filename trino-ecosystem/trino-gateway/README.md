@@ -89,7 +89,7 @@ helm install \
 trino-gateway \
 --create-namespace \
 --namespace trino-gateway \
---version v1.3.0 \
+--version v1.4.0 \
 --set ingress.proxyHostName=trino-gateway-proxy-test.cloudchef-labs.com \
 --set ingress.restHostName=trino-gateway-rest-test.cloudchef-labs.com \
 --set trino.proxy.publicEndpoint="https://trino-gateway-proxy-test.cloudchef-labs.com" \
