@@ -56,6 +56,7 @@ public class GzipUtils {
         GZIPInputStream gzipIS = null;
 
         try {
+            LOG.info("compressed bytes size: {}, isGzipCompressed: {}", compressedData.length, isGzipCompressed(compressedData));
             bis = new ByteArrayInputStream(compressedData);
             bos = new ByteArrayOutputStream();
             gzipIS = new GZIPInputStream(bis);
