@@ -251,7 +251,6 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             try {
                 responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
             } catch (Exception e) {
-                LOG.info("contents encoding: {}, contents: {}", contentEncoding, jsonResponse);
                 super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
                 return;
             }

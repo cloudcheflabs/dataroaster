@@ -60,7 +60,7 @@ public class GzipUtils {
             }
             return result.readUtf8().getBytes();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage());
         }
 
         return new String("").getBytes();
