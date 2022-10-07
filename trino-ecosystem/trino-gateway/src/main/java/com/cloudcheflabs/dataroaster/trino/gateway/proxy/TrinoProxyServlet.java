@@ -1,6 +1,7 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 
+import com.cedarsoftware.util.io.JsonWriter;
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.CacheService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
@@ -242,6 +243,8 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             LOG.info("NOT gzip encoding!!!");
             jsonResponse = new String(buffer);
         }
+        LOG.info("{}", JsonWriter.formatJson(jsonResponse));
+
         if (LOG.isDebugEnabled()) LOG.debug("jsonResponse: {}", jsonResponse);
 
         if(jsonResponse.equals(""))
