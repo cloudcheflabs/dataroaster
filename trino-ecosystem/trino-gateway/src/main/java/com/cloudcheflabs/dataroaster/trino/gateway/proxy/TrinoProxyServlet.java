@@ -252,7 +252,13 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
             return;
         } else {
-            LOG.info("{}", JsonWriter.formatJson(jsonResponse));
+            try {
+                LOG.info("{}", JsonWriter.formatJson(jsonResponse));
+            } catch (Exception e) {
+                LOG.info("contents: {}", jsonResponse);
+                e.printStackTrace();
+                super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
+            }
         }
 
         // save response to cache.
