@@ -233,37 +233,31 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         String jsonResponse = null;
         if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
             if(GzipUtils.isGzipCompressed(buffer)) {
-                LOG.info("gzip compressed!!!");
                 jsonResponse = GzipUtils.decompressGzip(buffer);
             } else {
-                LOG.info("gzip NOT compressed!!!");
                 jsonResponse = new String(buffer);
             }
         } else {
-            LOG.info("NOT gzip encoding!!!");
             jsonResponse = new String(buffer);
         }
 
-        if (LOG.isDebugEnabled()) LOG.debug("jsonResponse: {}", jsonResponse);
+        Map<String, Object> responseMap = null;
 
         if(jsonResponse.equals(""))
         {
-            LOG.info("error occurred with unzipping gzip contents..");
             super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
             return;
         } else {
             try {
-                LOG.info("{}", JsonWriter.formatJson(jsonResponse));
+                responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
             } catch (Exception e) {
-                LOG.info("contents: {}", jsonResponse);
-                e.printStackTrace();
+                LOG.info("contents encoding: {}, contents: {}", contentEncoding, jsonResponse);
                 super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
                 return;
             }
         }
 
         // save response to cache.
-        Map<String, Object> responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
         String id = (String) responseMap.get("id");
         if (LOG.isDebugEnabled()) LOG.debug("id: {}", id);
         String nextUri = (responseMap.containsKey("nextUri")) ? (String) responseMap.get("nextUri") : null;
