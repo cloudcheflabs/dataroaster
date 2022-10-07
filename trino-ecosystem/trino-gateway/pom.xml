@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cloudcheflabs.dataroaster</groupId>
 	<artifactId>trino-gateway</artifactId>
-	<version>4.8.0-SNAPSHOT</version>
+	<version>4.7.3</version>
 	<name>Trino Gateway</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -88,13 +88,16 @@
 
 		<!-- kryo -->
 		<kryo.version>5.3.0</kryo.version>
+
+		<!-- okio -->
+		<okio.version>3.2.0</okio.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.cloudcheflabs.dataroaster</groupId>
 			<artifactId>common</artifactId>
-			<version>4.8.0-SNAPSHOT</version>
+			<version>4.7.3</version>
 		</dependency>
 		<dependency>
 			<groupId>io.trino</groupId>
@@ -297,6 +300,11 @@
 			<groupId>com.esotericsoftware</groupId>
 			<artifactId>kryo</artifactId>
 			<version>${kryo.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okio</groupId>
+			<artifactId>okio</artifactId>
+			<version>${okio.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

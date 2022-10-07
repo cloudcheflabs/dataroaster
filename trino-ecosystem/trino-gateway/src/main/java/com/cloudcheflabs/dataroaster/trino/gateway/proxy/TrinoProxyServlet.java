@@ -1,6 +1,7 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 
+import com.cedarsoftware.util.io.JsonWriter;
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.CacheService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
@@ -239,10 +240,23 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         } else {
             jsonResponse = new String(buffer);
         }
-        if (LOG.isDebugEnabled()) LOG.debug("jsonResponse: {}", jsonResponse);
+
+        Map<String, Object> responseMap = null;
+
+        if(jsonResponse.equals(""))
+        {
+            super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
+            return;
+        } else {
+            try {
+                responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
+            } catch (Exception e) {
+                super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
+                return;
+            }
+        }
 
         // save response to cache.
-        Map<String, Object> responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
         String id = (String) responseMap.get("id");
         if (LOG.isDebugEnabled()) LOG.debug("id: {}", id);
         String nextUri = (responseMap.containsKey("nextUri")) ? (String) responseMap.get("nextUri") : null;

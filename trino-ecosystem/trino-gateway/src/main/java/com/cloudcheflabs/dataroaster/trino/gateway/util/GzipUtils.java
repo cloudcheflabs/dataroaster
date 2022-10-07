@@ -1,12 +1,18 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.util;
 
-import java.io.ByteArrayInputStream;
+import okio.Buffer;
+import okio.GzipSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class GzipUtils {
+
+    private static Logger LOG = LoggerFactory.getLogger(GzipUtils.class);
 
     public static byte[] compressStringInGzip(String content) {
         return compress(content.getBytes());
@@ -45,36 +51,19 @@ public class GzipUtils {
 
 
     private static byte[] uncompress(byte[] compressedData) {
-        ByteArrayInputStream bis = null;
-        ByteArrayOutputStream bos = null;
-        GZIPInputStream gzipIS = null;
+        Buffer gzippedBuffer = new Buffer().write(compressedData);
 
+        Buffer result = new Buffer();
+        GzipSource source = new GzipSource(gzippedBuffer);
         try {
-            bis = new ByteArrayInputStream(compressedData);
-            bos = new ByteArrayOutputStream();
-            gzipIS = new GZIPInputStream(bis);
+            while (source.read(result, Integer.MAX_VALUE) != -1) {
+            }
+            return result.readUtf8().getBytes();
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+        }
 
-            byte[] buffer = new byte[1024];
-            int len;
-            while((len = gzipIS.read(buffer)) != -1){
-                bos.write(buffer, 0, len);
-            }
-            return bos.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                assert gzipIS != null;
-                gzipIS.close();
-                bos.close();
-                bis.close();
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return new byte[]{};
+        return new String("").getBytes();
     }
 
     public static boolean isGzipCompressed(final byte[] compressed) {
