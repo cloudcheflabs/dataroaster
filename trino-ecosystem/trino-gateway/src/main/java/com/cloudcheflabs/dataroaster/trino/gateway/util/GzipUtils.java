@@ -1,6 +1,8 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.util;
 
 import com.cloudcheflabs.dataroaster.trino.gateway.proxy.TrinoProxyServlet;
+import okio.Buffer;
+import okio.GzipSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,39 +53,56 @@ public class GzipUtils {
 
 
     private static byte[] uncompress(byte[] compressedData) {
-        ByteArrayInputStream bis = null;
-        ByteArrayOutputStream bos = null;
-        GZIPInputStream gzipIS = null;
+        Buffer gzippedBuffer = new Buffer().write(compressedData);
 
+        Buffer result = new Buffer();
+        GzipSource source = new GzipSource(gzippedBuffer);
         try {
-            LOG.info("compressed bytes size: {}, isGzipCompressed: {}", compressedData.length, isGzipCompressed(compressedData));
-            bis = new ByteArrayInputStream(compressedData);
-            bos = new ByteArrayOutputStream();
-            gzipIS = new GZIPInputStream(bis);
-
-            byte[] buffer = new byte[1024];
-            int len;
-            while((len = gzipIS.read(buffer)) != -1){
-                LOG.info("buffer: {}", new String(buffer));
-                bos.write(buffer, 0, len);
+            while (source.read(result, Integer.MAX_VALUE) != -1) {
             }
-            return bos.toByteArray();
-        } catch (IOException e) {
+            return result.readUtf8().getBytes();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        finally {
-            try {
-                assert gzipIS != null;
-                gzipIS.close();
-                bos.close();
-                bis.close();
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+
         return new String("").getBytes();
     }
+
+
+//    private static byte[] uncompress(byte[] compressedData) {
+//        ByteArrayInputStream bis = null;
+//        ByteArrayOutputStream bos = null;
+//        GZIPInputStream gzipIS = null;
+//
+//        try {
+//            LOG.info("compressed bytes size: {}, isGzipCompressed: {}", compressedData.length, isGzipCompressed(compressedData));
+//            bis = new ByteArrayInputStream(compressedData);
+//            bos = new ByteArrayOutputStream();
+//            gzipIS = new GZIPInputStream(bis);
+//
+//            byte[] buffer = new byte[1024];
+//            int len;
+//            while((len = gzipIS.read(buffer)) != -1){
+//                LOG.info("buffer: {}", new String(buffer));
+//                bos.write(buffer, 0, len);
+//            }
+//            return bos.toByteArray();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        finally {
+//            try {
+//                assert gzipIS != null;
+//                gzipIS.close();
+//                bos.close();
+//                bis.close();
+//            }
+//            catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return new String("").getBytes();
+//    }
 
 
     public static boolean isGzipCompressed(final byte[] compressed) {
