@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: livy
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: livy
+    component: dataroaster
+data:
+  livy.conf: |
+    livy.spark.master = {{ .Values.livy.master }}
+    livy.spark.deployMode = {{ .Values.livy.deploy }}
+  log4j.properties: |
+    log4j.rootCategory=DEBUG, console
+    log4j.appender.console=org.apache.log4j.ConsoleAppender
+    log4j.appender.console.target=System.err
+    log4j.appender.console.layout=org.apache.log4j.PatternLayout
+    log4j.appender.console.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n
+    log4j.logger.org.eclipse.jetty=WARN
+    

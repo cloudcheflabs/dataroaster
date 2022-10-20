@@ -1,0 +1,42 @@
+namespace: metabase
+serviceAccount: metabase
+image: cloudcheflabs/metabase:v0.44.3
+imagePullPolicy: Always
+replicas: 1
+resources:
+  requests:
+    cpu: 200m
+    memory: 1Gi
+  limits:
+    cpu: 1000m
+    memory: 5Gi
+priorityClassName: ""
+annotations: null
+affinity: {}
+tolerations: {}
+nodeSelector: {}
+hostNetwork: false
+
+server:
+  port: 3000
+
+db:
+  type: mysql
+  name: metabase
+  port: 3306
+  user: root
+  password: mysqlpass123
+  host: mysql-service.metabase.svc
+  connectionUri: jdbc:mysql://mysql-service.metabase.svc:3306/metabase?useSSL=false&createDatabaseIfNotExist=true
+
+
+
+# readiness probe.
+readiness:
+ initialDelaySeconds: 15
+ periodSeconds: 10
+ 
+# liveness probe.
+liveness:
+ initialDelaySeconds: 3
+ periodSeconds: 10

@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livy
+  labels:
+    app: livy
+    component: dataroaster
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: livy
+      component: dataroaster
+  template:
+    metadata:
+      labels:
+        app: livy
+        component: dataroaster
+      annotations:
+      {{- toYaml $.Values.tolerations | nindent 8 }}
+    spec:
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
+      hostNetwork: {{ .Values.hostNetwork }}
+      serviceAccountName: {{ .Values.serviceAccount }}
+      containers:
+        - name: livy
+          image: {{ .Values.image }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          resources: 
+          {{- toYaml $.Values.resources | nindent 12 }}
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          command:
+            - "./run-livy.sh"
+          volumeMounts:
+            - name: livy-volume
+              mountPath: /opt/livy/conf/livy.conf
+              subPath: livy.conf
+            - name: livy-volume
+              mountPath: /opt/livy/conf/log4j.properties
+              subPath: log4j.properties
+            - mountPath: /opt/livy/logs
+              name: livy-log-volume
+          ports:
+            - name: rest
+              containerPort: {{ .Values.server.port }}
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.server.port }}
+            initialDelaySeconds: {{ .Values.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readiness.periodSeconds }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.server.port }}
+            initialDelaySeconds: {{ .Values.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.liveness.periodSeconds }}
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "sleep", "15" ]
+      volumes:
+        - name: livy-volume
+          configMap:
+            name: livy
+        - name: livy-log-volume
+          persistentVolumeClaim:
+            claimName: livy-log-pvc

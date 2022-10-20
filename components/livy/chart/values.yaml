@@ -1,0 +1,39 @@
+namespace: livy
+serviceAccount: livy
+image: cloudcheflabs/livy:0.7.1
+imagePullPolicy: Always
+replicas: 1
+resources:
+  requests:
+    cpu: 200m
+    memory: 1Gi
+  limits:
+    cpu: 1000m
+    memory: 5Gi
+priorityClassName: ""
+annotations: null
+affinity: {}
+tolerations: {}
+nodeSelector: {}
+hostNetwork: false
+
+server:
+  port: 8998
+
+
+# readiness probe.
+readiness:
+ initialDelaySeconds: 15
+ periodSeconds: 10
+ 
+# liveness probe.
+liveness:
+ initialDelaySeconds: 3
+ periodSeconds: 10
+
+# livy.
+livy:
+  master: k8s://https://kubernetes.default.svc:443
+  deploy: cluster
+  storageClass: nfs-external
+  storageSize: 2Gi

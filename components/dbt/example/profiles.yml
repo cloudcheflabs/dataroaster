@@ -1,0 +1,17 @@
+trino:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      method: ldap
+      user: trino
+      password: trino123
+      host: trino-gateway-proxy-test.cloudchef-labs.com
+      port: 443
+      database: iceberg
+      schema: silver
+      threads: 8
+      http_scheme: https
+      session_properties:
+        query_max_run_time: 5d
+        exchange_compression: True
