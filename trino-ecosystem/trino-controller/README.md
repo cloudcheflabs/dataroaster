@@ -26,7 +26,7 @@ helm install \
 trino-controller \
 --create-namespace \
 --namespace trino-controller \
---version v1.0.2 \
+--version v1.1.0 \
 --set trino.gateway.publicEndpoint="https://trino-gateway-proxy-test.cloudchef-labs.com" \
 --set trino.gateway.proxyHostName=trino-gateway-proxy-test.cloudchef-labs.com \
 --set trino.gateway.restHostName=trino-gateway-rest-test.cloudchef-labs.com \

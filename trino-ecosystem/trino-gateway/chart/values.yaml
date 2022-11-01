@@ -1,6 +1,6 @@
 namespace: trino-gateway
 serviceAccount: trino-gateway
-image: cloudcheflabs/trino-gateway:v2.1.0
+image: cloudcheflabs/trino-gateway:v2.2.0
 imagePullPolicy: Always
 replicas: 1
 resources:

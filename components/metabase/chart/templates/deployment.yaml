@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metabase
+  labels:
+    app: metabase
+    component: dataroaster
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: metabase
+      component: dataroaster
+  template:
+    metadata:
+      labels:
+        app: metabase
+        component: dataroaster
+      annotations:
+      {{- toYaml $.Values.tolerations | nindent 8 }}
+    spec:
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
+      hostNetwork: {{ .Values.hostNetwork }}
+      serviceAccountName: {{ .Values.serviceAccount }}
+      containers:
+        - name: metabase
+          image: {{ .Values.image }}
+          env:
+            - name: MB_DB_TYPE
+              value: {{ .Values.db.type }}
+            - name: MB_DB_DBNAME
+              value: {{ .Values.db.name }}
+            - name: MB_DB_PORT
+              value: "{{ .Values.db.port }}"
+            - name: MB_DB_USER
+              value: {{ .Values.db.user }}
+            - name: MB_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: PASSWORD
+            - name: MB_DB_HOST
+              value: {{ .Values.db.host }}
+            - name: MB_DB_CONNECTION_URI
+              value: {{ .Values.db.connectionUri }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          resources: 
+          {{- toYaml $.Values.resources | nindent 12 }}
+          command:
+            - "./run-metabase.sh"
+          ports:
+            - name: ui
+              containerPort: {{ .Values.server.port }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: {{ .Values.server.port }}
+            initialDelaySeconds: {{ .Values.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readiness.periodSeconds }}
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: {{ .Values.server.port }}
+            initialDelaySeconds: {{ .Values.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.liveness.periodSeconds }}
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "sleep", "15" ]

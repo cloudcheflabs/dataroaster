@@ -1,0 +1,6 @@
+apiVersion: v2
+name: dataroasterlivy
+version: 1.0.0
+appVersion: 0.7.1
+description: dataroaster livy.
+

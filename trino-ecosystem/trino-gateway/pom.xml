@@ -88,6 +88,9 @@
 
 		<!-- kryo -->
 		<kryo.version>5.3.0</kryo.version>
+
+		<!-- okio -->
+		<okio.version>3.2.0</okio.version>
 	</properties>
 
 	<dependencies>
@@ -298,6 +301,11 @@
 			<artifactId>kryo</artifactId>
 			<version>${kryo.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.squareup.okio</groupId>
+			<artifactId>okio</artifactId>
+			<version>${okio.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>
@@ -319,8 +327,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>11</source>
+					<target>11</target>
 					<encoding>utf-8</encoding>
 				</configuration>
 			</plugin>
