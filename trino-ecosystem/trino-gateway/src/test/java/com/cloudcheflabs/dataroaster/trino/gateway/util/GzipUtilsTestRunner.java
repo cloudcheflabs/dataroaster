@@ -13,4 +13,16 @@ public class GzipUtilsTestRunner {
         String decompressedJson = GzipUtils.decompressGzip(gzippedBytes);
         System.out.println(decompressedJson);
     }
+
+
+
+    @Test
+    public void decompressGzip() throws Exception {
+        String json = "{\"id\": 2, \"count\": 4}";
+
+        byte[] gzippedBytes = GzipUtils.compressStringInGzip(json);
+
+        String decompressedJson = GzipUtils.decompressGzip(gzippedBytes);
+        System.out.println(decompressedJson);
+    }
 }
