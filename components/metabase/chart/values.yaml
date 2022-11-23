@@ -30,6 +30,12 @@ db:
   connectionUri: jdbc:mysql://mysql-service.metabase.svc:3306/metabase?useSSL=false&createDatabaseIfNotExist=true
 
 
+# ingress.
+ingress:
+  enabled: false
+  ingressClassName: nginx
+  hostName: dataroaster-metabase.cloudchef-labs.com
+
 
 # readiness probe.
 readiness:
