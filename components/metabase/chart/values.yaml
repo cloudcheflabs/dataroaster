@@ -36,6 +36,9 @@ ingress:
   ingressClassName: nginx
   hostName: dataroaster-metabase.cloudchef-labs.com
 
+# cert-manager.
+certManager:
+  clusterIssue: letsencrypt-prod
 
 # readiness probe.
 readiness:
