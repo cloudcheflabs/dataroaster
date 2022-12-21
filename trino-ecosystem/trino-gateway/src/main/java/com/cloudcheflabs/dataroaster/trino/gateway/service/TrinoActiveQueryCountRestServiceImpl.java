@@ -65,7 +65,7 @@ public class TrinoActiveQueryCountRestServiceImpl implements TrinoActiveQueryCou
                     if(count == null) {
                         count = "0";
                     }
-                    //LOG.info("cluster name: {}, active query count: {}", clusterName, count);
+                    LOG.info("cluster name: {}, active query count: {}", clusterName, count);
                     TrinoActiveQueryCount trinoActiveQueryCount = new TrinoActiveQueryCount();
                     trinoActiveQueryCount.setClusterName(clusterName);
                     trinoActiveQueryCount.setCoordinatorAddress(address);

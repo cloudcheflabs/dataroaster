@@ -190,7 +190,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 List<ClusterWithActiveQueryCount> clusterWithActiveQueryCounts = new ArrayList<>();
                 for(Cluster cluster : clusterList) {
                     TrinoActiveQueryCount trinoActiveQueryCount = trinoActiveQueryCountUpdaterCacheService.get(cluster.getClusterName(), TrinoActiveQueryCount.class);
-                    clusterWithActiveQueryCounts.add(new ClusterWithActiveQueryCount(cluster, trinoActiveQueryCount));
+                    if(trinoActiveQueryCount != null) {
+                        clusterWithActiveQueryCounts.add(new ClusterWithActiveQueryCount(cluster, trinoActiveQueryCount));
+                    }
                 }
 
                 // sort by trino active query count.
@@ -202,9 +204,16 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 });
 
                 // choose one cluster with lowest active query count.
-                ClusterWithActiveQueryCount chosenClusterWithActiveQueryCount = clusterWithActiveQueryCounts.get(0);
-                Cluster chosenCluster = chosenClusterWithActiveQueryCount.getCluster();
-                LOG.info("chosen cluster: {}, active query count: {}", chosenCluster.getClusterName(), chosenClusterWithActiveQueryCount.getTrinoActiveQueryCount().getCount());
+                Cluster chosenCluster = null;
+                if(clusterWithActiveQueryCounts.size() > 0) {
+                    ClusterWithActiveQueryCount chosenClusterWithActiveQueryCount = clusterWithActiveQueryCounts.get(0);
+                    chosenCluster = chosenClusterWithActiveQueryCount.getCluster();
+                    LOG.info("chosen cluster: {}, active query count: {}", chosenCluster.getClusterName(),
+                            chosenClusterWithActiveQueryCount.getTrinoActiveQueryCount().getCount());
+                } else {
+                    chosenCluster = RandomUtils.randomize(clusterList);
+                }
+
                 String backendTrinoAddress = chosenCluster.getUrl();
                 String target =
                         backendTrinoAddress
