@@ -16,6 +16,7 @@ spark-operator \
 --create-namespace \
 --namespace spark-operator \
 --version v1.0.2 \
+--set image=cloudcheflabs/spark-operator:latest \
 dataroaster-spark-operator/dataroastersparkoperator;
 ```
 
@@ -76,10 +77,10 @@ spec:
     applicationType: EndlessRun
     deployMode: Cluster
     container:
-      image: "cloudcheflabs/spark:v3.0.3"
+      image: "cloudcheflabs/spark:v3.2.2"
       imagePullPolicy: Always
     class: com.cloudcheflabs.dataroaster.hive.SparkThriftServerRunner
-    applicationFileUrl: "s3a://mykidong/spark-app/spark-thrift-server-3.0.3-spark-job.jar"
+    applicationFileUrl: "s3a://mykidong/spark-app/spark-thrift-server-4.8.0-SNAPSHOT-spark-job.jar"
     namespace: spark
     s3:
       bucket: mykidong
