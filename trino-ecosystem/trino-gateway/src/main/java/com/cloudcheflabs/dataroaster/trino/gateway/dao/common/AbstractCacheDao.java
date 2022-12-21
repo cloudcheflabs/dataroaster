@@ -11,13 +11,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 public abstract class AbstractCacheDao<T> implements CacheDao<T> {
 
-    protected static Kryo kryo;
+    private Kryo kryo = new Kryo();
 
     @Autowired
     protected JedisSharding jedis;
 
     public AbstractCacheDao(Class<T> clazz) {
-        kryo = new Kryo();
         kryo.register(clazz);
     }
 
@@ -37,7 +36,7 @@ public abstract class AbstractCacheDao<T> implements CacheDao<T> {
     }
 
 
-    private static <T> byte[]  serialize(T t) {
+    private <T> byte[]  serialize(T t) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Output output = new Output(os);
         kryo.writeObject(output, t);
@@ -46,7 +45,7 @@ public abstract class AbstractCacheDao<T> implements CacheDao<T> {
         return os.toByteArray();
     }
 
-    private static <T> T deserialize(byte[] bytes, Class<T> clazz) {
+    private <T> T deserialize(byte[] bytes, Class<T> clazz) {
         ByteArrayInputStream is = new ByteArrayInputStream(bytes);
         Input input = new Input(is);
         T t = kryo.readObject(input, clazz);

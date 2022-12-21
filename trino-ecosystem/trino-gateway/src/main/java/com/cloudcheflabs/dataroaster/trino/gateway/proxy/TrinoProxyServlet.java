@@ -7,6 +7,8 @@ import com.cloudcheflabs.dataroaster.trino.gateway.api.service.CacheService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.UsersService;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.BasicAuthentication;
+import com.cloudcheflabs.dataroaster.trino.gateway.domain.ClusterWithActiveQueryCount;
+import com.cloudcheflabs.dataroaster.trino.gateway.domain.TrinoActiveQueryCount;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.TrinoResponse;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
@@ -56,6 +58,10 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     @Autowired
     @Qualifier("trinoResponseRedisCache")
     private CacheService<TrinoResponse> trinoResponseRedisCache;
+
+    @Autowired
+    @Qualifier("trinoActiveQueryCountCacheServiceImpl")
+    private CacheService<TrinoActiveQueryCount> trinoActiveQueryCountUpdaterCacheService;
 
     @Autowired
     private KubernetesClient kubernetesClient;
@@ -181,9 +187,34 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                     throw new IllegalStateException("There is no cluster for routing");
                 }
 
-                // choose one of the clusters through cluster randomization.
-                Cluster chosedCluster = RandomUtils.randomize(clusterList);
-                String backendTrinoAddress = chosedCluster.getUrl();
+                List<ClusterWithActiveQueryCount> clusterWithActiveQueryCounts = new ArrayList<>();
+                for(Cluster cluster : clusterList) {
+                    TrinoActiveQueryCount trinoActiveQueryCount = trinoActiveQueryCountUpdaterCacheService.get(cluster.getClusterName(), TrinoActiveQueryCount.class);
+                    if(trinoActiveQueryCount != null) {
+                        clusterWithActiveQueryCounts.add(new ClusterWithActiveQueryCount(cluster, trinoActiveQueryCount));
+                    }
+                }
+
+                // sort by trino active query count.
+                Collections.sort(clusterWithActiveQueryCounts, new Comparator<ClusterWithActiveQueryCount>() {
+                    @Override
+                    public int compare(ClusterWithActiveQueryCount o1, ClusterWithActiveQueryCount o2) {
+                        return o1.getTrinoActiveQueryCount().getCount() - o2.getTrinoActiveQueryCount().getCount();
+                    }
+                });
+
+                // choose one cluster with lowest active query count.
+                Cluster chosenCluster = null;
+                if(clusterWithActiveQueryCounts.size() > 0) {
+                    ClusterWithActiveQueryCount chosenClusterWithActiveQueryCount = clusterWithActiveQueryCounts.get(0);
+                    chosenCluster = chosenClusterWithActiveQueryCount.getCluster();
+                    LOG.info("chosen cluster: {}, active query count: {}", chosenCluster.getClusterName(),
+                            chosenClusterWithActiveQueryCount.getTrinoActiveQueryCount().getCount());
+                } else {
+                    chosenCluster = RandomUtils.randomize(clusterList);
+                }
+
+                String backendTrinoAddress = chosenCluster.getUrl();
                 String target =
                         backendTrinoAddress
                                 + request.getRequestURI()
