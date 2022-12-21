@@ -30,6 +30,8 @@ data:
           minThreads: {{ .Values.trino.proxy.threadPool.minThreads }}
           idleTimeout: {{ .Values.trino.proxy.threadPool.idleTimeout }}
         publicEndpoint: {{ .Values.trino.proxy.publicEndpoint }}
+      operator:
+        url: http://trino-operator-service.trino-operator.svc:8092
     # jdbc
     jdbc:
       driverClassName: com.mysql.jdbc.Driver

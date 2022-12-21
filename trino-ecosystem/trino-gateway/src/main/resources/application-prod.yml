@@ -19,6 +19,8 @@ trino:
       minThreads: 10
       idleTimeout: 120
     publicEndpoint: "https://trino-gateway-proxy-test.cloudchef-labs.com"
+  operator:
+    url: http://trino-operator-service.trino-operator.svc:8092
 # jdbc
 jdbc:
   driverClassName: com.mysql.jdbc.Driver
