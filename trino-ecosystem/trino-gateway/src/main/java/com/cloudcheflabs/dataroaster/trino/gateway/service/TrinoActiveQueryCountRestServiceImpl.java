@@ -14,10 +14,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class TrinoActiveQueryCountRestServiceImpl implements TrinoActiveQueryCountRestService, InitializingBean {
 
     private static Logger LOG = LoggerFactory.getLogger(TrinoActiveQueryCountRestServiceImpl.class);
