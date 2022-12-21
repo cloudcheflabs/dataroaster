@@ -9,7 +9,7 @@ DataRoaster Trino Gateway is used to route trino queries dynamically to downstre
 * `Admin` creates and deletes trino clusters using trino operator like [DataRoaster Trino Operator](https://github.com/cloudcheflabs/dataroaster/tree/master/operators/trino).
 * After creating trino clusters on kubernetes, `Admin` registers trino cluster and users to `Trino Gateway` to route trino queries to the registered trino clusters.
 * `Admin` can deactivate trino clusters to which the queries will not be routed.
-* When the queries are sent by clients, `Trino Gateway` first will authenticate users and find the cluster group to which the user belongs to, and the queries will be routed to the random selected downstream trino cluster which belongs to the cluster group.
+* When the queries are sent by clients, `Trino Gateway` first will authenticate users and find the cluster group to which the user belongs to, and the queries will be routed to the lowest active query execution downstream trino cluster which belongs to the cluster group.
 
 ## Install DataRoaster Trino Gateway
 
@@ -89,7 +89,7 @@ helm install \
 trino-gateway \
 --create-namespace \
 --namespace trino-gateway \
---version v1.4.0 \
+--version v1.5.0 \
 --set ingress.proxyHostName=trino-gateway-proxy-test.cloudchef-labs.com \
 --set ingress.restHostName=trino-gateway-rest-test.cloudchef-labs.com \
 --set trino.proxy.publicEndpoint="https://trino-gateway-proxy-test.cloudchef-labs.com" \
