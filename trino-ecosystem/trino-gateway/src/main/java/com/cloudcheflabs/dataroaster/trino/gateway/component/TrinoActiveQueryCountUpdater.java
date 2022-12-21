@@ -57,32 +57,42 @@ public class TrinoActiveQueryCountUpdater implements Runnable {
     public void run() {
 
         while (true) {
-            // get current cluster list.
-            List<Cluster> clusterList = new ArrayList<>();
-            List<ClusterGroup> clusterGroupList = clusterGroupService.findAll();
-            for (ClusterGroup clusterGroup : clusterGroupList) {
-                for (Cluster cluster : clusterGroup.getClusterSet()) {
-                    if (cluster.isActivated()) {
-                        clusterList.add(cluster);
+            try {
+                // get current cluster list.
+                List<Cluster> clusterList = new ArrayList<>();
+                List<ClusterGroup> clusterGroupList = clusterGroupService.findAll();
+                if (clusterGroupList == null) {
+                    pause(1000);
+                    continue;
+                }
+                for (ClusterGroup clusterGroup : clusterGroupList) {
+                    for (Cluster cluster : clusterGroup.getClusterSet()) {
+                        if (cluster.isActivated()) {
+                            clusterList.add(cluster);
+                        }
                     }
                 }
-            }
 
-            if (clusterList.size() == 0) {
+                if (clusterList.size() == 0) {
+                    pause(1000);
+                    continue;
+                }
+                for (Cluster cluster : clusterList) {
+                    String clusterName = cluster.getClusterName();
+                    // get active query count from trino operator using rest api.
+                    TrinoActiveQueryCount trinoActiveQueryCount = trinoActiveQueryCountRestService.getTrinoActiveQueryCount(clusterName);
+                    if (trinoActiveQueryCount == null) {
+                        continue;
+                    }
+                    // update active query count to redis.
+                    trinoActiveQueryCountUpdaterCacheService.set(clusterName, trinoActiveQueryCount);
+                }
+                pause(1000);
+            } catch (Exception e) {
+                e.printStackTrace();
                 pause(1000);
                 continue;
             }
-            for(Cluster cluster : clusterList) {
-                String clusterName = cluster.getClusterName();
-                // get active query count from trino operator using rest api.
-                TrinoActiveQueryCount trinoActiveQueryCount = trinoActiveQueryCountRestService.getTrinoActiveQueryCount(clusterName);
-                if(trinoActiveQueryCount == null) {
-                    continue;
-                }
-                // update active query count to redis.
-                trinoActiveQueryCountUpdaterCacheService.set(clusterName, trinoActiveQueryCount);
-            }
-            pause(1000);
         }
 
     }
