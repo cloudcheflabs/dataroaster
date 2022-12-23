@@ -11,6 +11,6 @@ server:
 
 # ingress.
 ingress:
-  enabled: true
+  enabled: false
   ingressClassName: nginx
   hostName: dataroaster-redash.cloudchef-labs.com
