@@ -1,6 +1,6 @@
 apiVersion: v2
 name: dataroasterredash
-version: 2.1.0
+version: 2.1.1
 appVersion: 10.0.0-beta.b49597
 description: dataroaster redash.
 

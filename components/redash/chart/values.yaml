@@ -14,3 +14,7 @@ ingress:
   enabled: false
   ingressClassName: nginx
   hostName: dataroaster-redash.cloudchef-labs.com
+
+# cert-manager.
+certManager:
+  clusterIssue: letsencrypt-prod
