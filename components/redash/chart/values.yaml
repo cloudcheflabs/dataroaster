@@ -1,7 +1,16 @@
 namespace: redash
 image: redash/redash:10.0.0-beta.b49597
 storage:
-  storageClass: standard
-  size: 2
+  storageClass: oci
+  size: 10
 service:
   type: ClusterIP
+
+server:
+  port: 5000
+
+# ingress.
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hostName: dataroaster-redash.cloudchef-labs.com

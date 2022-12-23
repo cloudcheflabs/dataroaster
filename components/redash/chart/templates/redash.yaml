@@ -19,7 +19,7 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: 5000
+    - port: {{ .Values.server.port }}
       targetPort: redash
       name: redash
   selector:
@@ -74,7 +74,7 @@ spec:
             exec:
               command: [ "/bin/sh", "-c", "/app/bin/docker-entrypoint create_db" ]
         ports:
-        - containerPort: 5000
+        - containerPort: {{ .Values.server.port }}
           name: redash
       - name: scheduler
         image: {{ .Values.image }}
