@@ -35,9 +35,11 @@ public class TrinoJdbcForIcebergTestRunner {
 
         ResultSetMetaData meta = rs.getMetaData();
         int columnCount = meta.getColumnCount();
+        int rowCount = 0;
         while (rs.next()) {
             for(int count = 0; count < columnCount; count++) {
                 LOG.info("{}: {}", meta.getColumnName(count + 1), rs.getObject(count + 1));
+                LOG.info("------------------ [{}]", ++rowCount);
             }
         }
     }
