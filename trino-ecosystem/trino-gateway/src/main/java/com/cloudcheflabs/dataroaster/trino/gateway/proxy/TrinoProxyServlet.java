@@ -339,6 +339,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         LOG.info("contentEncoding: {}", contentEncoding);
 
         long threadId = Thread.currentThread().getId();
+        LOG.info("thread id: {}, request id: {}", threadId, getRequestId(request));
 
         if(!tempResponseBufferMap.contains(threadId)) {
             tempResponseBufferMap.put(threadId, new NotCompletedResponseBuffer(
@@ -351,18 +352,10 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
         Map<String, Object> responseMap = null;
         if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
+            byte[] decompressedBytes = null;
             try {
-                byte[] decompressedBytes = GzipUtils.decompress(buffer);
+                decompressedBytes = GzipUtils.decompress(buffer);
                 LOG.info("gzip decompression success...");
-                try {
-                    String jsonResponse = new String(decompressedBytes);
-                    LOG.info("ready to convert to map...");
-                    responseMap = JsonUtils.toMap(mapper, jsonResponse);
-                    LOG.info("map conversion done...");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    throw new RuntimeException(ex);
-                }
             } catch (Exception e) {
                 LOG.info("portion of gzip data...[{}]", threadId);
                 notCompletedResponseBuffer.getOs().write(buffer, offset, length);
@@ -378,6 +371,18 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 } catch (Exception ex) {
                     LOG.info("not json format...");
                     return;
+                }
+            }
+
+            if(decompressedBytes != null) {
+                try {
+                    String jsonResponse = new String(decompressedBytes);
+                    LOG.info("ready to convert to map...");
+                    responseMap = JsonUtils.toMap(mapper, jsonResponse);
+                    LOG.info("map conversion done...");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    throw new RuntimeException(ex);
                 }
             }
         } else {
