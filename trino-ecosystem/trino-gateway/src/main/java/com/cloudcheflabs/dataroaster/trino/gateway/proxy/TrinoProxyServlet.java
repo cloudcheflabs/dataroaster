@@ -69,6 +69,8 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     private boolean authenticationNecessary;
     private String publicEndpoint;
 
+    private ObjectMapper mapper = new ObjectMapper();
+
     @Override
     public void afterPropertiesSet() throws Exception {
         authenticationNecessary = Boolean.valueOf(env.getProperty("trino.proxy.authentication"));
@@ -248,7 +250,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
         // print header.
         for (String header : response.getHeaderNames()) {
-            if (LOG.isDebugEnabled()) LOG.debug("header [{}]: [{}]", header, response.getHeader(header));
+            if (LOG.isInfoEnabled()) LOG.info("header [{}]: [{}]", header, response.getHeader(header));
         }
 
         if (LOG.isDebugEnabled()) LOG.debug("buffer size: {}", buffer.length);
@@ -280,12 +282,14 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             return;
         } else {
             try {
-                responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
+                responseMap = JsonUtils.toMap(mapper, jsonResponse);
             } catch (Exception e) {
                 super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
                 return;
             }
         }
+
+        LOG.info("jsonResponse: {}", jsonResponse);
 
         // save response to cache.
         String id = (String) responseMap.get("id");
