@@ -22,6 +22,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.compress.compressors.deflate64.Deflate64CompressorInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.proxy.ProxyServlet;
@@ -279,7 +280,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 try {
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     ByteArrayInputStream in = new ByteArrayInputStream(buffer);
-                    Deflate64CompressorInputStream defIn = new Deflate64CompressorInputStream(in);
+                    GzipCompressorInputStream defIn = new GzipCompressorInputStream(in);
                     final byte[] tempBuf = new byte[1024];
                     int n = 0;
                     while (-1 != (n = defIn.read(tempBuf))) {
@@ -306,7 +307,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
         if(jsonResponse.equals(""))
         {
-            LOG.info("json reponse empty...");
+            LOG.info("json response empty...");
             super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
             return;
         } else {
