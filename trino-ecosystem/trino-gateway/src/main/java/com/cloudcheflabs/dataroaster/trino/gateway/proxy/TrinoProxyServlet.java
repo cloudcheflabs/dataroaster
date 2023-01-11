@@ -253,6 +253,10 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             LOG.info("header [{}]: [{}]", header, response.getHeader(header));
         }
 
+        // referer added.
+        response.setHeader("Referer", publicEndpoint);
+        
+
         if (LOG.isDebugEnabled()) LOG.debug("buffer size: {}", buffer.length);
         if (LOG.isDebugEnabled()) LOG.debug("offset: {}", offset);
         if (LOG.isDebugEnabled()) LOG.debug("length: {}", length);

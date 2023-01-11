@@ -37,7 +37,6 @@ public class TrinoJdbcForIcebergTestRunner {
             for(int count = 0; count < columnCount; count++) {
                 LOG.info("{}: {}", meta.getColumnName(count + 1), rs.getObject(count + 1));
             }
-            LOG.info("-------------------");
         }
     }
 }
