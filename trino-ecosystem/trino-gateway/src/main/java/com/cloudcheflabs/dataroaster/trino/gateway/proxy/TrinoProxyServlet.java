@@ -253,41 +253,45 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             LOG.info("header [{}]: [{}]", header, response.getHeader(header));
         }
 
-        // referer added.
-        response.setHeader("Referer", publicEndpoint);
-
-
-        if (LOG.isDebugEnabled()) LOG.debug("buffer size: {}", buffer.length);
-        if (LOG.isDebugEnabled()) LOG.debug("offset: {}", offset);
-        if (LOG.isDebugEnabled()) LOG.debug("length: {}", length);
+        LOG.info("buffer size: {}", buffer.length);
+        LOG.info("offset: {}", offset);
+        LOG.info("length: {}", length);
 
         String contentLength = response.getHeader("Content-Length");
-        if (LOG.isDebugEnabled()) LOG.debug("contentLength: {}", contentLength);
+        LOG.info("contentLength: {}", contentLength);
 
         String contentEncoding = response.getHeader("Content-Encoding");
-        if (LOG.isDebugEnabled()) LOG.debug("contentEncoding: {}", contentEncoding);
+        LOG.info("contentEncoding: {}", contentEncoding);
 
         String jsonResponse = null;
         if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
             if(GzipUtils.isGzipCompressed(buffer)) {
+                LOG.info("ready to decompress gzip data...");
                 jsonResponse = GzipUtils.decompressGzip(buffer);
             } else {
+                LOG.info("non-gzip data...");
                 jsonResponse = new String(buffer);
             }
         } else {
+            LOG.info("content encoding not gzip...");
             jsonResponse = new String(buffer);
         }
+
+        LOG.info("jsonResponse: {}", jsonResponse);
+
 
         Map<String, Object> responseMap = null;
 
         if(jsonResponse.equals(""))
         {
+            LOG.info("json reponse empty...");
             super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
             return;
         } else {
             try {
                 responseMap = JsonUtils.toMap(mapper, jsonResponse);
             } catch (Exception e) {
+                LOG.info("not json format...");
                 super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
                 return;
             }
@@ -335,8 +339,10 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             // gzip compressed json.
             if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
                 buffer = GzipUtils.compressStringInGzip(newJsonReponse);
+                LOG.info("compress json to gzip...");
             } else {
                 buffer = newJsonReponse.getBytes();
+                LOG.info("just get bytes...");
             }
 
             length = buffer.length;
