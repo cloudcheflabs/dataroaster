@@ -19,6 +19,7 @@ public class TrinoJdbcForIcebergTestRunner {
         LOG.info("port: [{}]", port);
         boolean auth = Boolean.valueOf(System.getProperty("auth", "true"));
         LOG.info("auth: [{}]", auth);
+        String query = System.getProperty("query", "select * from iceberg.iceberg_db.test_ctas limit 1000");
 
         String url = "jdbc:trino://" + host + ":" + port + "/iceberg/iceberg_db";
         Properties properties = new Properties();
@@ -29,7 +30,7 @@ public class TrinoJdbcForIcebergTestRunner {
         }
         Connection connection = DriverManager.getConnection(url, properties);
         Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery("select * from iceberg.iceberg_db.test_ctas limit 1000");
+        ResultSet rs = stmt.executeQuery(query);
 
         ResultSetMetaData meta = rs.getMetaData();
         int columnCount = meta.getColumnCount();
