@@ -272,15 +272,17 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 jsonResponse = GzipUtils.decompressGzip(buffer);
             } else {
                 LOG.info("non-gzip data...");
-                jsonResponse = GzipUtils.decompressGzip(buffer);
-                if(jsonResponse.equals("")) {
+                try {
+                    byte[] deflateBytes = DeflateUtils.deflateDecompressBytes(buffer);
+                    jsonResponse = new String(deflateBytes);
+                } catch (Exception e) {
                     LOG.info("ok, this is non-gzip data!");
-                    jsonResponse = new String(buffer, StandardCharsets.UTF_8);
+                    jsonResponse = new String(buffer);
                 }
             }
         } else {
             LOG.info("content encoding not gzip...");
-            jsonResponse = new String(buffer, StandardCharsets.UTF_8);
+            jsonResponse = new String(buffer);
         }
 
         LOG.info("jsonResponse: {}", jsonResponse);
@@ -295,7 +297,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             return;
         } else {
             try {
+                LOG.info("ready to convert to map...");
                 responseMap = JsonUtils.toMap(mapper, jsonResponse);
+                LOG.info("map conversion done...");
             } catch (Exception e) {
                 LOG.info("not json format...");
                 super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
@@ -307,15 +311,15 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
         // save response to cache.
         String id = (String) responseMap.get("id");
-        if (LOG.isDebugEnabled()) LOG.debug("id: {}", id);
+        LOG.info("id: {}", id);
         String nextUri = (responseMap.containsKey("nextUri")) ? (String) responseMap.get("nextUri") : null;
-        if (LOG.isDebugEnabled()) LOG.debug("nextUri: {}", nextUri);
+        LOG.info("nextUri: {}", nextUri);
 
         String infoUri = (responseMap.containsKey("infoUri")) ? (String) responseMap.get("infoUri") : null;
-        if (LOG.isDebugEnabled()) LOG.debug("infoUri: {}", infoUri);
+        LOG.info("infoUri: {}", infoUri);
 
         String partialCancelUri = (responseMap.containsKey("partialCancelUri")) ? (String) responseMap.get("partialCancelUri") : null;
-        if (LOG.isDebugEnabled()) LOG.debug("partialCancelUri: {}", partialCancelUri);
+        LOG.info("partialCancelUri: {}", partialCancelUri);
 
         TrinoResponse trinoResponse = new TrinoResponse();
         trinoResponse.setId(id);
@@ -325,10 +329,13 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             trinoResponse.setPartialCancelUri(partialCancelUri);
         }
 
+        // cache nextUri.
         trinoResponseRedisCache.set(id, trinoResponse);
 
         // change nextUri.
         if (nextUri != null) {
+            LOG.info("nextUri is not null!");
+
             // replace the backend trino hostname with proxy public endpoint.
             String newNextUri = replaceUri(nextUri, publicEndpoint);
             String newInfoUri = replaceUri(infoUri, publicEndpoint);
