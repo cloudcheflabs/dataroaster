@@ -90,7 +90,7 @@ public class TrinoActiveQueryCountUpdater implements Runnable {
                 pause(1000);
             } catch (Exception e) {
                 e.printStackTrace();
-                pause(1000);
+                pause(5000);
                 continue;
             }
         }
@@ -98,7 +98,7 @@ public class TrinoActiveQueryCountUpdater implements Runnable {
     }
 
 
-    private static void pause(long millis) {
+    public static void pause(long millis) {
         try {
             Thread.sleep(millis);
         } catch (Exception e) {

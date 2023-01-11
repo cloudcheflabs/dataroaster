@@ -50,6 +50,17 @@ public class GzipUtils {
     }
 
 
+    public static byte[] decompress(byte[] compressedData) throws IOException{
+        Buffer gzippedBuffer = new Buffer().write(compressedData);
+
+        Buffer result = new Buffer();
+        GzipSource source = new GzipSource(gzippedBuffer);
+        while (source.read(result, Integer.MAX_VALUE) != -1) {
+        }
+        return result.readUtf8().getBytes();
+    }
+
+
     private static byte[] uncompress(byte[] compressedData) {
         Buffer gzippedBuffer = new Buffer().write(compressedData);
 

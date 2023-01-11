@@ -6,6 +6,7 @@ import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.CacheService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.UsersService;
+import com.cloudcheflabs.dataroaster.trino.gateway.component.TrinoActiveQueryCountUpdater;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.BasicAuthentication;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.ClusterWithActiveQueryCount;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.TrinoActiveQueryCount;
@@ -23,10 +24,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.compress.compressors.deflate64.Deflate64CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.lang3.time.DateUtils;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.proxy.ProxyServlet;
 import org.eclipse.jetty.util.Callback;
+import org.joda.time.DateTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -40,6 +43,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class TrinoProxyServlet extends ProxyServlet.Transparent implements InitializingBean {
@@ -78,12 +82,76 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    private ConcurrentHashMap<Long, NotCompletedResponseBuffer> tempResponseBufferMap = new ConcurrentHashMap<>();
+
+    private static class NotCompletedResponseBuffer {
+        private ByteArrayOutputStream os;
+        private long threadId;
+        private long startTime;
+
+        public NotCompletedResponseBuffer(ByteArrayOutputStream os,
+                                          long threadId,
+                                          long startTime) {
+            this.os = os;
+            this.threadId = threadId;
+            this.startTime = startTime;
+        }
+
+        public ByteArrayOutputStream getOs() {
+            return os;
+        }
+
+        public long getThreadId() {
+            return threadId;
+        }
+
+        public long getStartTime() {
+            return startTime;
+        }
+    }
+
+    private static class NotCompletedResponseBufferExpirationChecker implements Runnable {
+
+        private ConcurrentHashMap<Long, NotCompletedResponseBuffer> tempResponseBufferMap;
+
+        public NotCompletedResponseBufferExpirationChecker(ConcurrentHashMap<Long, NotCompletedResponseBuffer> tempResponseBufferMap) {
+            this.tempResponseBufferMap = tempResponseBufferMap;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    for (Long threadId : tempResponseBufferMap.keySet()) {
+                        NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(threadId);
+                        long startTime = notCompletedResponseBuffer.getStartTime();
+                        long endTime = DateTimeUtils.currentTimeMillis();
+                        // if 30seconds elapsed, remove buffer.
+                        if ((endTime - startTime) > 30 * 1000) {
+                            tempResponseBufferMap.remove(threadId);
+                            LOG.info("notCompletedResponseBuffer with thread id [{}] removed from temp buffer map.", threadId);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // pause.
+                TrinoActiveQueryCountUpdater.pause(30 * 1000);
+            }
+        }
+    }
+
+
     @Override
     public void afterPropertiesSet() throws Exception {
         authenticationNecessary = Boolean.valueOf(env.getProperty("trino.proxy.authentication"));
         LOG.info("authenticationNecessary: [{}]", authenticationNecessary);
         publicEndpoint = env.getProperty("trino.proxy.publicEndpoint");
         LOG.info("publicEndpoint: [{}]", publicEndpoint);
+
+        // run temp response buffer checker.
+        new Thread(new NotCompletedResponseBufferExpirationChecker(tempResponseBufferMap)).start();
     }
 
     @Override
@@ -270,41 +338,64 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         String contentEncoding = response.getHeader("Content-Encoding");
         LOG.info("contentEncoding: {}", contentEncoding);
 
-        String jsonResponse = null;
-        if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
-            if(GzipUtils.isGzipCompressed(buffer)) {
-                LOG.info("ready to decompress gzip data...");
-                jsonResponse = GzipUtils.decompressGzip(buffer);
-            } else {
-                LOG.info("portion of gzip data...[{}]", Thread.currentThread().getId());
-                jsonResponse = "";
-            }
-        } else {
-            LOG.info("content encoding not gzip...");
-            jsonResponse = new String(buffer);
-        }
+        long threadId = Thread.currentThread().getId();
 
+        if(!tempResponseBufferMap.contains(threadId)) {
+            tempResponseBufferMap.put(threadId, new NotCompletedResponseBuffer(
+                    new ByteArrayOutputStream(),
+                    threadId,
+                    DateTimeUtils.currentTimeMillis()
+            ));
+        }
+        NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(threadId);
 
         Map<String, Object> responseMap = null;
-
-        if(jsonResponse.equals(""))
-        {
-            LOG.info("json response empty...");
-            super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
-            return;
-        } else {
+        if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
             try {
+                byte[] decompressedBytes = GzipUtils.decompress(buffer);
+                LOG.info("gzip decompression success...");
+                try {
+                    String jsonResponse = new String(decompressedBytes);
+                    LOG.info("ready to convert to map...");
+                    responseMap = JsonUtils.toMap(mapper, jsonResponse);
+                    LOG.info("map conversion done...");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    throw new RuntimeException(ex);
+                }
+            } catch (Exception e) {
+                LOG.info("portion of gzip data...[{}]", threadId);
+                notCompletedResponseBuffer.getOs().write(buffer, offset, length);
+                try {
+                    byte[] accumulatedBytes = notCompletedResponseBuffer.getOs().toByteArray();
+                    byte[] tempDecompressedBytes = GzipUtils.decompress(accumulatedBytes);
+                    String jsonResponse = new String(tempDecompressedBytes);
+                    LOG.info("ready to convert to map...");
+                    responseMap = JsonUtils.toMap(mapper, jsonResponse);
+                    LOG.info("map conversion done...");
+                } catch (Exception ex) {
+                    LOG.info("not json format...");
+                    return;
+                }
+            }
+        } else {
+            LOG.info("content encoding not gzip...[{}]", threadId);
+            notCompletedResponseBuffer.getOs().write(buffer, offset, length);
+            try {
+                String jsonResponse = new String(notCompletedResponseBuffer.getOs().toByteArray());
                 LOG.info("ready to convert to map...");
                 responseMap = JsonUtils.toMap(mapper, jsonResponse);
                 LOG.info("map conversion done...");
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 LOG.info("not json format...");
-                super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
                 return;
             }
         }
 
-        LOG.info("jsonResponse: {}", jsonResponse);
+        // remove temp buffer.
+        tempResponseBufferMap.remove(threadId);
+
+        LOG.info("jsonResponse: {}", JsonUtils.toJson(responseMap));
 
         // save response to cache.
         String id = (String) responseMap.get("id");
