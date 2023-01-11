@@ -14,6 +14,7 @@ import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Users;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.BCryptUtils;
+import com.cloudcheflabs.dataroaster.trino.gateway.util.DeflateUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.GzipUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.RandomUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -270,7 +271,14 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 jsonResponse = GzipUtils.decompressGzip(buffer);
             } else {
                 LOG.info("non-gzip data...");
-                jsonResponse = new String(buffer);
+                try {
+                    LOG.info("deflate data...");
+                    byte[] deflateBytes = DeflateUtils.deflateDecompressBytes(buffer);
+                    jsonResponse = new String(deflateBytes);
+                } catch (Exception e) {
+                    LOG.info("non deflate data...");
+                    jsonResponse = new String(buffer);
+                }
             }
         } else {
             LOG.info("content encoding not gzip...");
