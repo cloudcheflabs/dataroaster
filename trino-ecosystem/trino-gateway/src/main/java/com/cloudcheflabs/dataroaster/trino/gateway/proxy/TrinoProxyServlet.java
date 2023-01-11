@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.compress.compressors.deflate64.Deflate64CompressorInputStream;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.proxy.ProxyServlet;
@@ -33,6 +34,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -271,9 +275,19 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 LOG.info("ready to decompress gzip data...");
                 jsonResponse = GzipUtils.decompressGzip(buffer);
             } else {
-                LOG.info("non-gzip data...");
+                LOG.info("maybe deflate compressed...");
                 try {
-                    byte[] deflateBytes = DeflateUtils.deflateDecompressBytes(buffer);
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    ByteArrayInputStream in = new ByteArrayInputStream(buffer);
+                    Deflate64CompressorInputStream defIn = new Deflate64CompressorInputStream(in);
+                    final byte[] tempBuf = new byte[1024];
+                    int n = 0;
+                    while (-1 != (n = defIn.read(tempBuf))) {
+                        out.write(tempBuf, 0, n);
+                    }
+                    out.close();
+                    defIn.close();
+                    byte[] deflateBytes = out.toByteArray();
                     jsonResponse = new String(deflateBytes);
                 } catch (Exception e) {
                     LOG.info("ok, this is non-gzip data!");
