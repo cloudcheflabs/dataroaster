@@ -250,7 +250,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
         // print header.
         for (String header : response.getHeaderNames()) {
-            if (LOG.isInfoEnabled()) LOG.info("header [{}]: [{}]", header, response.getHeader(header));
+            LOG.info("header [{}]: [{}]", header, response.getHeader(header));
         }
 
         if (LOG.isDebugEnabled()) LOG.debug("buffer size: {}", buffer.length);
@@ -300,10 +300,16 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         String infoUri = (responseMap.containsKey("infoUri")) ? (String) responseMap.get("infoUri") : null;
         if (LOG.isDebugEnabled()) LOG.debug("infoUri: {}", infoUri);
 
+        String partialCancelUri = (responseMap.containsKey("partialCancelUri")) ? (String) responseMap.get("partialCancelUri") : null;
+        if (LOG.isDebugEnabled()) LOG.debug("partialCancelUri: {}", partialCancelUri);
+
         TrinoResponse trinoResponse = new TrinoResponse();
         trinoResponse.setId(id);
         trinoResponse.setNextUri(nextUri);
         trinoResponse.setInfoUri(infoUri);
+        if(partialCancelUri != null) {
+            trinoResponse.setPartialCancelUri(partialCancelUri);
+        }
 
         trinoResponseRedisCache.set(id, trinoResponse);
 
@@ -314,8 +320,13 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             String newInfoUri = replaceUri(infoUri, publicEndpoint);
             responseMap.put("nextUri", newNextUri);
             responseMap.put("infoUri", newInfoUri);
+            if(partialCancelUri != null) {
+                String newPartialCancelUri = replaceUri(partialCancelUri, publicEndpoint);
+                responseMap.put("partialCancelUri", newPartialCancelUri);
+            }
+
             String newJsonReponse = JsonUtils.toJson(responseMap);
-            if (LOG.isDebugEnabled()) LOG.debug("newJsonReponse: {}", newJsonReponse);
+            LOG.info("newJsonReponse: {}", newJsonReponse);
 
             // gzip compressed json.
             if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
