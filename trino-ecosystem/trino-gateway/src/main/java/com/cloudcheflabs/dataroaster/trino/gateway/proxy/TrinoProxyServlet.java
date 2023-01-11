@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Component
@@ -274,12 +275,12 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 jsonResponse = GzipUtils.decompressGzip(buffer);
                 if(jsonResponse.equals("")) {
                     LOG.info("ok, this is non-gzip data!");
-                    jsonResponse = new String(buffer);
+                    jsonResponse = new String(buffer, StandardCharsets.UTF_8);
                 }
             }
         } else {
             LOG.info("content encoding not gzip...");
-            jsonResponse = new String(buffer);
+            jsonResponse = new String(buffer, StandardCharsets.UTF_8);
         }
 
         LOG.info("jsonResponse: {}", jsonResponse);
