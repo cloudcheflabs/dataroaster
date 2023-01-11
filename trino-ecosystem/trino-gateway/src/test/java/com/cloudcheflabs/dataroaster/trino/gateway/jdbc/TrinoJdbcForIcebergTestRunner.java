@@ -20,6 +20,7 @@ public class TrinoJdbcForIcebergTestRunner {
         boolean auth = Boolean.valueOf(System.getProperty("auth", "true"));
         LOG.info("auth: [{}]", auth);
         String query = System.getProperty("query", "select * from iceberg.iceberg_db.test_ctas limit 1000");
+        LOG.info("query: [{}]", query);
 
         String url = "jdbc:trino://" + host + ":" + port + "/iceberg/iceberg_db";
         Properties properties = new Properties();
