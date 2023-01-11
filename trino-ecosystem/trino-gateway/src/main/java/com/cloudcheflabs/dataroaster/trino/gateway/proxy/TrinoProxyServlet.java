@@ -271,12 +271,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 jsonResponse = GzipUtils.decompressGzip(buffer);
             } else {
                 LOG.info("non-gzip data...");
-                try {
-                    LOG.info("deflate data...");
-                    byte[] deflateBytes = DeflateUtils.deflateDecompressBytes(buffer);
-                    jsonResponse = new String(deflateBytes);
-                } catch (Exception e) {
-                    LOG.info("non deflate data...");
+                jsonResponse = GzipUtils.decompressGzip(buffer);
+                if(jsonResponse.equals("")) {
+                    LOG.info("ok, this is non-gzip data!");
                     jsonResponse = new String(buffer);
                 }
             }
