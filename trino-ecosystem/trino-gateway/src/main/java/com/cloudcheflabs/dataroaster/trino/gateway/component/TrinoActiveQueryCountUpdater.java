@@ -3,25 +3,17 @@ package com.cloudcheflabs.dataroaster.trino.gateway.component;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.CacheService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.TrinoActiveQueryCountRestService;
-import com.cloudcheflabs.dataroaster.trino.gateway.domain.Privileges;
-import com.cloudcheflabs.dataroaster.trino.gateway.domain.Roles;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.TrinoActiveQueryCount;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.Cluster;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.model.ClusterGroup;
-import okhttp3.HttpUrl;
-import okhttp3.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.*;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Component
