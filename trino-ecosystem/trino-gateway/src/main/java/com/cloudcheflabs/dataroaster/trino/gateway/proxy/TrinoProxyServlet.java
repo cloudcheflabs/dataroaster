@@ -355,7 +355,12 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 decompressedBytes = GzipUtils.decompress(buffer);
             } catch (Exception e) {
                 // write zero bytes to output stream.
-                super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
+                try {
+                    response.getOutputStream().write(new byte[0], 0, 0);
+                } catch (IOException exception) {
+                    throw new RuntimeException(exception);
+                }
+
                 // append portion of gzipped data to temp buffer.
                 notCompletedResponseBuffer.appendBuffer(buffer);
                 try {
@@ -395,7 +400,11 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 responseMap = JsonUtils.toMap(mapper, jsonResponse);
             } catch (Exception ex) {
                 // write zero bytes to output stream.
-                super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
+                try {
+                    response.getOutputStream().write(new byte[0], 0, 0);
+                } catch (IOException exception) {
+                    throw new RuntimeException(exception);
+                }
                 return;
             }
         }
