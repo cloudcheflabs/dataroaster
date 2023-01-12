@@ -7,10 +7,9 @@ spec:
   repo: https://cloudcheflabs.github.io/trino-gateway-helm-repo/
   chartName: dataroaster-trino-gateway
   name: trino-gateway
-  version: v1.5.0
+  version: v1.6.0
   namespace: trino-gateway
   values: |
-    image: cloudcheflabs/trino-gateway:latest
     ingress:
       proxyHostName: {{ proxyHostName }}
       restHostName: {{ restHostName }}
