@@ -22,7 +22,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
-import org.eclipse.jetty.client.api.Result;
 import org.eclipse.jetty.proxy.ProxyServlet;
 import org.eclipse.jetty.util.Callback;
 import org.joda.time.DateTimeUtils;
@@ -36,7 +35,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -312,107 +310,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         }
     }
 
+
     @Override
-    public Response.Listener newProxyResponseListener(HttpServletRequest request, HttpServletResponse response)
-    {
-        return new BufferedResponseListener(request, response, this);
-    }
-
-
-    private class BufferedResponseListener extends ProxyResponseListener
-    {
-        private final HttpServletRequest request;
-        private final HttpServletResponse response;
-
-        private TrinoProxyServlet trinoProxyServlet;
-
-        protected BufferedResponseListener(HttpServletRequest request, HttpServletResponse response, TrinoProxyServlet trinoProxyServlet)
-        {
-            super(request, response);
-            this.request = request;
-            this.response = response;
-            this.trinoProxyServlet = trinoProxyServlet;
-        }
-
-        @Override
-        public void onContent(Response proxyResponse, ByteBuffer content, Callback callback)
-        {
-            byte[] buffer;
-            int offset;
-            int length = content.remaining();
-            if (content.hasArray())
-            {
-                buffer = content.array();
-                offset = content.arrayOffset();
-            }
-            else
-            {
-                buffer = new byte[length];
-                content.get(buffer);
-                offset = 0;
-            }
-
-            String contentEncoding = response.getHeader("Content-Encoding");
-
-            int requestId = getRequestId(request);
-            if(!tempResponseBufferMap.containsKey(requestId)) {
-                tempResponseBufferMap.put(requestId, new NotCompletedResponseBuffer(
-                        requestId,
-                        DateTimeUtils.currentTimeMillis()
-                ));
-            }
-            NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(requestId);
-
-            // append portion of data to temp buffer.
-            notCompletedResponseBuffer.appendBuffer(buffer);
-
-            // get accumulated buffer.
-            byte[] completeBytes = notCompletedResponseBuffer.getAccumulatedBuffer();
-
-            Map<String, Object> responseMap = null;
-            if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
-                // gzip compressed data.
-                try {
-                    // decompress gzipped data.
-                    GzipUtils.decompress(completeBytes);
-                } catch (Exception e) {
-                    // accumulated buffer is not complete gzipped data yet.
-                    return;
-                }
-            }
-            else {
-                // not gzipped encoded data.
-                try {
-                    // try to convert json to map.
-                    String jsonResponse = new String(completeBytes);
-                    responseMap = JsonUtils.toMap(mapper, jsonResponse);
-                } catch (Exception ex) {
-                    return;
-                }
-            }
-
-            // remove temp buffer.
-            tempResponseBufferMap.remove(requestId);
-            LOG.info("temp accumulated buffer [{}] removed...", requestId);
-
-            int contentLength = completeBytes.length;
-            LOG.info("contentLength: {}", contentLength);
-
-            response.setHeader("Content-Length", String.valueOf(contentLength));
-            trinoProxyServlet.transformResponseContent(request, response, proxyResponse, completeBytes, 0, contentLength, new Callback.Nested(callback)
-            {
-                @Override
-                public void failed(Throwable x)
-                {
-                    super.failed(x);
-                    proxyResponse.abort(x);
-                }
-            });
-        }
-    }
-
-
-    public void transformResponseContent(HttpServletRequest request,
+    protected void onResponseContent(HttpServletRequest request,
                                      HttpServletResponse response,
                                      Response proxyResponse,
                                      byte[] buffer,
@@ -437,28 +337,72 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
         String contentEncoding = response.getHeader("Content-Encoding");
 
+        int requestId = getRequestId(request);
+        if(!tempResponseBufferMap.containsKey(requestId)) {
+            tempResponseBufferMap.put(requestId, new NotCompletedResponseBuffer(
+                    requestId,
+                    DateTimeUtils.currentTimeMillis()
+            ));
+        }
+        NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(requestId);
+
         Map<String, Object> responseMap = null;
         if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
             // gzip compressed data.
+            byte[] decompressedBytes = null;
             try {
                 // decompress gzipped data.
-                byte[] decompressedBytes = GzipUtils.decompress(buffer);
-                String jsonResponse = new String(decompressedBytes);
-                responseMap = JsonUtils.toMap(mapper, jsonResponse);
+                decompressedBytes = GzipUtils.decompress(buffer);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                // write zero bytes to output stream.
+                super.onResponseContent(request, response, proxyResponse, new byte[0], 0, 0, callback);
+                // append portion of gzipped data to temp buffer.
+                notCompletedResponseBuffer.appendBuffer(buffer);
+                try {
+                    // get accumulated buffer.
+                    byte[] accumulatedBytes = notCompletedResponseBuffer.getAccumulatedBuffer();
+
+                    // try to decompress with accumulated buffer.
+                    byte[] tempDecompressedBytes = GzipUtils.decompress(accumulatedBytes);
+
+                    // if decompression is successful, then try to convert decompressed json to map.
+                    String jsonResponse = new String(tempDecompressedBytes);
+                    responseMap = JsonUtils.toMap(mapper, jsonResponse);
+                } catch (Exception ex) {
+                    // accumulated buffer is not complete gzipped data yet.
+                    return;
+                }
+            }
+
+            // if current gzipped request buffer is decompressed successfully.
+            if(decompressedBytes != null) {
+                try {
+                    // try to convert decompressed json to map.
+                    String jsonResponse = new String(decompressedBytes);
+                    responseMap = JsonUtils.toMap(mapper, jsonResponse);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    throw new RuntimeException(ex);
+                }
             }
         }
         else {
             // not gzipped encoded data.
+            notCompletedResponseBuffer.appendBuffer(buffer);
             try {
                 // try to convert decompressed json to map.
-                String jsonResponse = new String(buffer);
+                String jsonResponse = new String(notCompletedResponseBuffer.getAccumulatedBuffer());
                 responseMap = JsonUtils.toMap(mapper, jsonResponse);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            } catch (Exception ex) {
+                // write zero bytes to output stream.
+                super.onResponseContent(request, response, proxyResponse, new byte[0], 0, 0, callback);
+                return;
             }
         }
+
+        // remove temp buffer.
+        tempResponseBufferMap.remove(requestId);
+        LOG.info("temp accumulated buffer [{}] removed...", requestId);
 
         // save nextUri, etc to cache.
         String id = (String) responseMap.get("id");
@@ -506,12 +450,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         }
 
         // finally, write new constructed json to output stream.
-        try {
-            response.getOutputStream().write(buffer, offset, length);
-            callback.succeeded();
-        } catch (Throwable t) {
-            callback.failed(t);
-        }
+        super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
     }
 
 
