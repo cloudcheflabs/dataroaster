@@ -412,20 +412,22 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         trinoResponse.setId(id);
         trinoResponse.setNextUri(nextUri);
         trinoResponse.setInfoUri(infoUri);
-        if(partialCancelUri != null) {
-            trinoResponse.setPartialCancelUri(partialCancelUri);
-        }
+        trinoResponse.setPartialCancelUri(partialCancelUri);
 
         // cache nextUri.
         trinoResponseRedisCache.set(id, trinoResponse);
 
         // change nextUri.
-        if (nextUri != null) {
+        if (nextUri != null || infoUri != null || partialCancelUri != null) {
             // replace the backend trino hostname with proxy public endpoint.
-            String newNextUri = replaceUri(nextUri, publicEndpoint);
-            String newInfoUri = replaceUri(infoUri, publicEndpoint);
-            responseMap.put("nextUri", newNextUri);
-            responseMap.put("infoUri", newInfoUri);
+            if(nextUri != null) {
+                String newNextUri = replaceUri(nextUri, publicEndpoint);
+                responseMap.put("nextUri", newNextUri);
+            }
+            if(infoUri != null) {
+                String newInfoUri = replaceUri(infoUri, publicEndpoint);
+                responseMap.put("infoUri", newInfoUri);
+            }
             if(partialCancelUri != null) {
                 String newPartialCancelUri = replaceUri(partialCancelUri, publicEndpoint);
                 responseMap.put("partialCancelUri", newPartialCancelUri);
