@@ -329,10 +329,12 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
 
         // print header.
-        for (String header : response.getHeaderNames()) {
-            //LOG.info("header [{}]: [{}]", header, response.getHeader(header));
+        if(LOG.isDebugEnabled()) {
+            for (String header : response.getHeaderNames()) {
+                //LOG.debug("header [{}]: [{}]", header, response.getHeader(header));
+            }
         }
-        String contentLength = response.getHeader("Content-Length");
+
         String contentEncoding = response.getHeader("Content-Encoding");
 
         int requestId = getRequestId(request);
@@ -417,7 +419,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         // cache nextUri.
         trinoResponseRedisCache.set(id, trinoResponse);
 
-        // change nextUri.
+        // replace host names of nextUri, infoUri and partialCancelUri with trino gateway hostname.
         if (nextUri != null || infoUri != null || partialCancelUri != null) {
             // replace the backend trino hostname with proxy public endpoint.
             if(nextUri != null) {
