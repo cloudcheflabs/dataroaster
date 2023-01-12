@@ -40,6 +40,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -82,27 +83,41 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private ConcurrentHashMap<Long, NotCompletedResponseBuffer> tempResponseBufferMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, NotCompletedResponseBuffer> tempResponseBufferMap = new ConcurrentHashMap<>();
 
     private static class NotCompletedResponseBuffer {
-        private ByteArrayOutputStream os;
-        private long threadId;
+        private int requestId;
         private long startTime;
 
-        public NotCompletedResponseBuffer(ByteArrayOutputStream os,
-                                          long threadId,
+        private byte[] accumulatedBuffer = null;
+
+        public NotCompletedResponseBuffer(int requestId,
                                           long startTime) {
-            this.os = os;
-            this.threadId = threadId;
+            this.requestId = requestId;
             this.startTime = startTime;
         }
 
-        public ByteArrayOutputStream getOs() {
-            return os;
+        public void appendBuffer(byte[] buffer) {
+            if(accumulatedBuffer == null) {
+                accumulatedBuffer = buffer;
+            } else {
+                try {
+                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    os.write(accumulatedBuffer);
+                    os.write(buffer);
+                    accumulatedBuffer = os.toByteArray();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
-        public long getThreadId() {
-            return threadId;
+        public byte[] getAccumulatedBuffer() {
+            return accumulatedBuffer;
+        }
+
+        public int getRequestId() {
+            return requestId;
         }
 
         public long getStartTime() {
@@ -112,9 +127,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
 
     private static class NotCompletedResponseBufferExpirationChecker implements Runnable {
 
-        private ConcurrentHashMap<Long, NotCompletedResponseBuffer> tempResponseBufferMap;
+        private ConcurrentHashMap<Integer, NotCompletedResponseBuffer> tempResponseBufferMap;
 
-        public NotCompletedResponseBufferExpirationChecker(ConcurrentHashMap<Long, NotCompletedResponseBuffer> tempResponseBufferMap) {
+        public NotCompletedResponseBufferExpirationChecker(ConcurrentHashMap<Integer, NotCompletedResponseBuffer> tempResponseBufferMap) {
             this.tempResponseBufferMap = tempResponseBufferMap;
         }
 
@@ -122,14 +137,14 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         public void run() {
             while (true) {
                 try {
-                    for (Long threadId : tempResponseBufferMap.keySet()) {
-                        NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(threadId);
+                    for (Integer requestId : tempResponseBufferMap.keySet()) {
+                        NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(requestId);
                         long startTime = notCompletedResponseBuffer.getStartTime();
                         long endTime = DateTimeUtils.currentTimeMillis();
                         // if 30seconds elapsed, remove buffer.
                         if ((endTime - startTime) > 30 * 1000) {
-                            tempResponseBufferMap.remove(threadId);
-                            LOG.info("notCompletedResponseBuffer with thread id [{}] removed from temp buffer map.", threadId);
+                            tempResponseBufferMap.remove(requestId);
+                            LOG.info("notCompletedResponseBuffer with request id [{}] removed from temp buffer map.", requestId);
                         }
                     }
                 } catch (Exception e) {
@@ -338,17 +353,16 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         String contentEncoding = response.getHeader("Content-Encoding");
         LOG.info("contentEncoding: {}", contentEncoding);
 
-        long threadId = Thread.currentThread().getId();
-        LOG.info("thread id: {}, request id: {}", threadId, getRequestId(request));
+        int requestId = getRequestId(request);
+        LOG.info("request id: {}", requestId);
 
-        if(!tempResponseBufferMap.contains(threadId)) {
-            tempResponseBufferMap.put(threadId, new NotCompletedResponseBuffer(
-                    new ByteArrayOutputStream(),
-                    threadId,
+        if(!tempResponseBufferMap.contains(requestId)) {
+            tempResponseBufferMap.put(requestId, new NotCompletedResponseBuffer(
+                    requestId,
                     DateTimeUtils.currentTimeMillis()
             ));
         }
-        NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(threadId);
+        NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(requestId);
 
         Map<String, Object> responseMap = null;
         if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
@@ -358,10 +372,10 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 LOG.info("gzip decompression success...");
             } catch (Exception e) {
                 super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
-                LOG.info("portion of gzip data...[{}]", threadId);
-                notCompletedResponseBuffer.getOs().write(buffer, offset, length);
+                LOG.info("portion of gzip data...[{}]", requestId);
+                notCompletedResponseBuffer.appendBuffer(buffer);
                 try {
-                    byte[] accumulatedBytes = notCompletedResponseBuffer.getOs().toByteArray();
+                    byte[] accumulatedBytes = notCompletedResponseBuffer.getAccumulatedBuffer();
                     LOG.info("accumulatedBytes: {}", accumulatedBytes.length);
                     byte[] tempDecompressedBytes = GzipUtils.decompress(accumulatedBytes);
                     String jsonResponse = new String(tempDecompressedBytes);
@@ -386,10 +400,10 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 }
             }
         } else {
-            LOG.info("content encoding not gzip...[{}]", threadId);
-            notCompletedResponseBuffer.getOs().write(buffer, offset, length);
+            LOG.info("content encoding not gzip...[{}]", requestId);
+            notCompletedResponseBuffer.appendBuffer(buffer);
             try {
-                String jsonResponse = new String(notCompletedResponseBuffer.getOs().toByteArray());
+                String jsonResponse = new String(notCompletedResponseBuffer.getAccumulatedBuffer());
                 LOG.info("ready to convert to map...");
                 responseMap = JsonUtils.toMap(mapper, jsonResponse);
                 LOG.info("map conversion done...");
@@ -401,7 +415,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         }
 
         // remove temp buffer.
-        tempResponseBufferMap.remove(threadId);
+        tempResponseBufferMap.remove(requestId);
 
         LOG.info("jsonResponse: {}", JsonUtils.toJson(responseMap));
 
