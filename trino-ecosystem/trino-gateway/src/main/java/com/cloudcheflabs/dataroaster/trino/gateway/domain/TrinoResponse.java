@@ -8,6 +8,16 @@ public class TrinoResponse implements Serializable {
 
     private String infoUri;
 
+    private String partialCancelUri;
+
+    public String getPartialCancelUri() {
+        return partialCancelUri;
+    }
+
+    public void setPartialCancelUri(String partialCancelUri) {
+        this.partialCancelUri = partialCancelUri;
+    }
+
     public String getInfoUri() {
         return infoUri;
     }

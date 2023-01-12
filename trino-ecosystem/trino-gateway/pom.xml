@@ -94,6 +94,9 @@
 
 		<!-- ok http -->
 		<okhttp.version>4.9.3</okhttp.version>
+
+		<!-- commons compress -->
+		<commmons-compress.version>1.22</commmons-compress.version>
 	</properties>
 
 	<dependencies>
@@ -313,6 +316,11 @@
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
 			<version>${okhttp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>${commmons-compress.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

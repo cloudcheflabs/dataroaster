@@ -1,11 +1,11 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 
-import com.cedarsoftware.util.io.JsonWriter;
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.CacheService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.ClusterGroupService;
 import com.cloudcheflabs.dataroaster.trino.gateway.api.service.UsersService;
+import com.cloudcheflabs.dataroaster.trino.gateway.component.TrinoActiveQueryCountUpdater;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.BasicAuthentication;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.ClusterWithActiveQueryCount;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.TrinoActiveQueryCount;
@@ -24,6 +24,7 @@ import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.proxy.ProxyServlet;
 import org.eclipse.jetty.util.Callback;
+import org.joda.time.DateTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -32,7 +33,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class TrinoProxyServlet extends ProxyServlet.Transparent implements InitializingBean {
@@ -69,12 +73,89 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     private boolean authenticationNecessary;
     private String publicEndpoint;
 
+    private ObjectMapper mapper = new ObjectMapper();
+
+    private ConcurrentHashMap<Integer, NotCompletedResponseBuffer> tempResponseBufferMap = new ConcurrentHashMap<>();
+
+    private static class NotCompletedResponseBuffer {
+        private int requestId;
+        private long startTime;
+
+        private byte[] accumulatedBuffer = new byte[0];
+
+        public NotCompletedResponseBuffer(int requestId,
+                                          long startTime) {
+            this.requestId = requestId;
+            this.startTime = startTime;
+        }
+
+        public void appendBuffer(byte[] buffer) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            try {
+                os.write(accumulatedBuffer);
+                os.write(buffer);
+                accumulatedBuffer = os.toByteArray();
+                os.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public byte[] getAccumulatedBuffer() {
+            return accumulatedBuffer;
+        }
+
+        public int getRequestId() {
+            return requestId;
+        }
+
+        public long getStartTime() {
+            return startTime;
+        }
+    }
+
+    private static class NotCompletedResponseBufferExpirationChecker implements Runnable {
+
+        private ConcurrentHashMap<Integer, NotCompletedResponseBuffer> tempResponseBufferMap;
+
+        public NotCompletedResponseBufferExpirationChecker(ConcurrentHashMap<Integer, NotCompletedResponseBuffer> tempResponseBufferMap) {
+            this.tempResponseBufferMap = tempResponseBufferMap;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    for (Integer requestId : tempResponseBufferMap.keySet()) {
+                        NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(requestId);
+                        long startTime = notCompletedResponseBuffer.getStartTime();
+                        long endTime = DateTimeUtils.currentTimeMillis();
+                        // if 30seconds elapsed, remove buffer.
+                        if ((endTime - startTime) > 30 * 1000) {
+                            tempResponseBufferMap.remove(requestId);
+                            LOG.info("notCompletedResponseBuffer with request id [{}] removed from temp buffer map.", requestId);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // pause.
+                TrinoActiveQueryCountUpdater.pause(30 * 1000);
+            }
+        }
+    }
+
+
     @Override
     public void afterPropertiesSet() throws Exception {
         authenticationNecessary = Boolean.valueOf(env.getProperty("trino.proxy.authentication"));
         LOG.info("authenticationNecessary: [{}]", authenticationNecessary);
         publicEndpoint = env.getProperty("trino.proxy.publicEndpoint");
         LOG.info("publicEndpoint: [{}]", publicEndpoint);
+
+        // run temp response buffer checker.
+        new Thread(new NotCompletedResponseBufferExpirationChecker(tempResponseBufferMap)).start();
     }
 
     @Override
@@ -243,64 +324,99 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         //
         // retrieve query id and nextUri from response buffer, and save them to cache.
         // replace the hostname of nextUri with trino gateway ingress host name.
+        // accumulate portion of gzipped data to temp buffer.
         //
 
 
         // print header.
         for (String header : response.getHeaderNames()) {
-            if (LOG.isDebugEnabled()) LOG.debug("header [{}]: [{}]", header, response.getHeader(header));
+            //LOG.info("header [{}]: [{}]", header, response.getHeader(header));
         }
-
-        if (LOG.isDebugEnabled()) LOG.debug("buffer size: {}", buffer.length);
-        if (LOG.isDebugEnabled()) LOG.debug("offset: {}", offset);
-        if (LOG.isDebugEnabled()) LOG.debug("length: {}", length);
-
         String contentLength = response.getHeader("Content-Length");
-        if (LOG.isDebugEnabled()) LOG.debug("contentLength: {}", contentLength);
-
         String contentEncoding = response.getHeader("Content-Encoding");
-        if (LOG.isDebugEnabled()) LOG.debug("contentEncoding: {}", contentEncoding);
 
-        String jsonResponse = null;
-        if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
-            if(GzipUtils.isGzipCompressed(buffer)) {
-                jsonResponse = GzipUtils.decompressGzip(buffer);
-            } else {
-                jsonResponse = new String(buffer);
-            }
-        } else {
-            jsonResponse = new String(buffer);
+        int requestId = getRequestId(request);
+        if(!tempResponseBufferMap.containsKey(requestId)) {
+            tempResponseBufferMap.put(requestId, new NotCompletedResponseBuffer(
+                    requestId,
+                    DateTimeUtils.currentTimeMillis()
+            ));
         }
+        NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(requestId);
 
         Map<String, Object> responseMap = null;
-
-        if(jsonResponse.equals(""))
-        {
-            super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
-            return;
-        } else {
+        if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
+            // gzip compressed data.
+            byte[] decompressedBytes = null;
             try {
-                responseMap = JsonUtils.toMap(new ObjectMapper(), jsonResponse);
+                // decompress gzipped data.
+                decompressedBytes = GzipUtils.decompress(buffer);
             } catch (Exception e) {
-                super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
+                // write zero bytes to output stream.
+                super.onResponseContent(request, response, proxyResponse, new byte[0], 0, 0, callback);
+                // append portion of gzipped data to temp buffer.
+                notCompletedResponseBuffer.appendBuffer(buffer);
+                try {
+                    // get accumulated buffer.
+                    byte[] accumulatedBytes = notCompletedResponseBuffer.getAccumulatedBuffer();
+
+                    // try to decompress with accumulated buffer.
+                    byte[] tempDecompressedBytes = GzipUtils.decompress(accumulatedBytes);
+
+                    // if decompression is successful, then try to convert decompressed json to map.
+                    String jsonResponse = new String(tempDecompressedBytes);
+                    responseMap = JsonUtils.toMap(mapper, jsonResponse);
+                } catch (Exception ex) {
+                    // accumulated buffer is not complete gzipped data yet.
+                    return;
+                }
+            }
+
+            // if current gzipped request buffer is decompressed successfully.
+            if(decompressedBytes != null) {
+                try {
+                    // try to convert decompressed json to map.
+                    String jsonResponse = new String(decompressedBytes);
+                    responseMap = JsonUtils.toMap(mapper, jsonResponse);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
+        else {
+            // not gzipped encoded data.
+            notCompletedResponseBuffer.appendBuffer(buffer);
+            try {
+                // try to convert decompressed json to map.
+                String jsonResponse = new String(notCompletedResponseBuffer.getAccumulatedBuffer());
+                responseMap = JsonUtils.toMap(mapper, jsonResponse);
+            } catch (Exception ex) {
+                // write zero bytes to output stream.
+                super.onResponseContent(request, response, proxyResponse, new byte[0], 0, 0, callback);
                 return;
             }
         }
 
-        // save response to cache.
-        String id = (String) responseMap.get("id");
-        if (LOG.isDebugEnabled()) LOG.debug("id: {}", id);
-        String nextUri = (responseMap.containsKey("nextUri")) ? (String) responseMap.get("nextUri") : null;
-        if (LOG.isDebugEnabled()) LOG.debug("nextUri: {}", nextUri);
+        // remove temp buffer.
+        tempResponseBufferMap.remove(requestId);
+        LOG.info("temp accumulated buffer [{}] removed...", requestId);
 
+        // save nextUri, etc to cache.
+        String id = (String) responseMap.get("id");
+        String nextUri = (responseMap.containsKey("nextUri")) ? (String) responseMap.get("nextUri") : null;
         String infoUri = (responseMap.containsKey("infoUri")) ? (String) responseMap.get("infoUri") : null;
-        if (LOG.isDebugEnabled()) LOG.debug("infoUri: {}", infoUri);
+        String partialCancelUri = (responseMap.containsKey("partialCancelUri")) ? (String) responseMap.get("partialCancelUri") : null;
 
         TrinoResponse trinoResponse = new TrinoResponse();
         trinoResponse.setId(id);
         trinoResponse.setNextUri(nextUri);
         trinoResponse.setInfoUri(infoUri);
+        if(partialCancelUri != null) {
+            trinoResponse.setPartialCancelUri(partialCancelUri);
+        }
 
+        // cache nextUri.
         trinoResponseRedisCache.set(id, trinoResponse);
 
         // change nextUri.
@@ -310,23 +426,26 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             String newInfoUri = replaceUri(infoUri, publicEndpoint);
             responseMap.put("nextUri", newNextUri);
             responseMap.put("infoUri", newInfoUri);
+            if(partialCancelUri != null) {
+                String newPartialCancelUri = replaceUri(partialCancelUri, publicEndpoint);
+                responseMap.put("partialCancelUri", newPartialCancelUri);
+            }
             String newJsonReponse = JsonUtils.toJson(responseMap);
-            if (LOG.isDebugEnabled()) LOG.debug("newJsonReponse: {}", newJsonReponse);
-
             // gzip compressed json.
             if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
+                // compress new constructed json in gzip.
                 buffer = GzipUtils.compressStringInGzip(newJsonReponse);
             } else {
+                // not gzipped encoding.
                 buffer = newJsonReponse.getBytes();
             }
-
             length = buffer.length;
-            if (LOG.isDebugEnabled()) LOG.debug("new length: {}", length);
-
+            LOG.info("new buffer length: {}", length);
             // set new content length.
             response.setHeader("Content-Length", String.valueOf(length));
         }
 
+        // finally, write new constructed json to output stream.
         super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
     }
 

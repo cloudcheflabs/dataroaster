@@ -1,15 +1,15 @@
 namespace: trino-gateway
 serviceAccount: trino-gateway
-image: cloudcheflabs/trino-gateway:v2.3.0
+image: cloudcheflabs/trino-gateway:v2.4.0
 imagePullPolicy: Always
 replicas: 1
 resources:
   requests:
-    cpu: 200m
-    memory: 1Gi
+    cpu: 500m
+    memory: 2Gi
   limits:
-    cpu: 300m
-    memory: 1500Mi
+    cpu: 1000m
+    memory: 2500Mi
 priorityClassName: ""
 annotations: null
 affinity: null
