@@ -357,9 +357,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 decompressedBytes = GzipUtils.decompress(buffer);
                 LOG.info("gzip decompression success...");
             } catch (Exception e) {
+                super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
                 LOG.info("portion of gzip data...[{}]", threadId);
                 notCompletedResponseBuffer.getOs().write(buffer, offset, length);
-                tempResponseBufferMap.put(threadId, notCompletedResponseBuffer);
                 try {
                     byte[] accumulatedBytes = notCompletedResponseBuffer.getOs().toByteArray();
                     LOG.info("accumulatedBytes: {}", accumulatedBytes.length);
@@ -388,7 +388,6 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         } else {
             LOG.info("content encoding not gzip...[{}]", threadId);
             notCompletedResponseBuffer.getOs().write(buffer, offset, length);
-            tempResponseBufferMap.put(threadId, notCompletedResponseBuffer);
             try {
                 String jsonResponse = new String(notCompletedResponseBuffer.getOs().toByteArray());
                 LOG.info("ready to convert to map...");
@@ -396,6 +395,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 LOG.info("map conversion done...");
             } catch (Exception ex) {
                 LOG.info("not json format...");
+                super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
                 return;
             }
         }
