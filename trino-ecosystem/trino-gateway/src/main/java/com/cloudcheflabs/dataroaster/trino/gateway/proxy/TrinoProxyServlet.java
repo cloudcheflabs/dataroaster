@@ -353,7 +353,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         int requestId = getRequestId(request);
         LOG.info("request id: {}", requestId);
 
-        if(!tempResponseBufferMap.contains(requestId)) {
+        if(!tempResponseBufferMap.containsKey(requestId)) {
             tempResponseBufferMap.put(requestId, new NotCompletedResponseBuffer(
                     requestId,
                     DateTimeUtils.currentTimeMillis()
