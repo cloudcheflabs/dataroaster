@@ -357,8 +357,9 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 // write zero bytes to output stream.
                 try {
                     response.getOutputStream().write(new byte[0], 0, 0);
+                    callback.failed(new RuntimeException("callback failed..."));
                 } catch (IOException exception) {
-                    throw new RuntimeException(exception);
+                    exception.printStackTrace();
                 }
 
                 // append portion of gzipped data to temp buffer.
@@ -402,9 +403,11 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
                 // write zero bytes to output stream.
                 try {
                     response.getOutputStream().write(new byte[0], 0, 0);
+                    callback.failed(new RuntimeException("callback failed..."));
                 } catch (IOException exception) {
-                    throw new RuntimeException(exception);
+                    exception.printStackTrace();
                 }
+                
                 return;
             }
         }
