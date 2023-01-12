@@ -98,13 +98,14 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         }
 
         public void appendBuffer(byte[] buffer) {
-            if(accumulatedBuffer.length == 0) {
-                accumulatedBuffer = buffer;
-            } else {
-                byte[] result = new byte[accumulatedBuffer.length + buffer.length];
-                System.arraycopy(accumulatedBuffer, 0, result, 0, accumulatedBuffer.length);
-                System.arraycopy(buffer, 0, result, accumulatedBuffer.length, buffer.length);
-                accumulatedBuffer = result;
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            try {
+                os.write(accumulatedBuffer);
+                os.write(buffer);
+                accumulatedBuffer = os.toByteArray();
+                os.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
 
