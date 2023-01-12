@@ -506,7 +506,12 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         }
 
         // finally, write new constructed json to output stream.
-        super.onResponseContent(request, response, proxyResponse, buffer, offset, length, callback);
+        try {
+            response.getOutputStream().write(buffer, offset, length);
+            callback.succeeded();
+        } catch (Throwable t) {
+            callback.failed(t);
+        }
     }
 
 
