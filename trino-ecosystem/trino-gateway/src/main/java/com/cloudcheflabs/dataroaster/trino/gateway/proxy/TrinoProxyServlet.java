@@ -315,7 +315,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     @Override
     public Response.Listener newProxyResponseListener(HttpServletRequest request, HttpServletResponse response)
     {
-        return new BufferedResponseListener(request, response);
+        return new BufferedResponseListener(request, response, this);
     }
 
 
@@ -324,11 +324,14 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         private final HttpServletRequest request;
         private final HttpServletResponse response;
 
-        protected BufferedResponseListener(HttpServletRequest request, HttpServletResponse response)
+        private TrinoProxyServlet trinoProxyServlet;
+
+        protected BufferedResponseListener(HttpServletRequest request, HttpServletResponse response, TrinoProxyServlet trinoProxyServlet)
         {
             super(request, response);
             this.request = request;
             this.response = response;
+            this.trinoProxyServlet = trinoProxyServlet;
         }
 
         @Override
@@ -360,49 +363,43 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
             }
             NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(requestId);
 
+            // append portion of data to temp buffer.
+            notCompletedResponseBuffer.appendBuffer(buffer);
+
+            // get accumulated buffer.
+            byte[] completeBytes = notCompletedResponseBuffer.getAccumulatedBuffer();
+
             Map<String, Object> responseMap = null;
             if (contentEncoding != null && contentEncoding.toLowerCase().equals("gzip")) {
                 // gzip compressed data.
-                byte[] decompressedBytes = null;
                 try {
                     // decompress gzipped data.
-                    decompressedBytes = GzipUtils.decompress(buffer);
+                    GzipUtils.decompress(completeBytes);
                 } catch (Exception e) {
-                    // append portion of gzipped data to temp buffer.
-                    notCompletedResponseBuffer.appendBuffer(buffer);
-                    try {
-                        // get accumulated buffer.
-                        byte[] accumulatedBytes = notCompletedResponseBuffer.getAccumulatedBuffer();
-
-                        // try to decompress with accumulated buffer.
-                        byte[] tempDecompressedBytes = GzipUtils.decompress(accumulatedBytes);
-                    } catch (Exception ex) {
-                        // accumulated buffer is not complete gzipped data yet.
-                        return;
-                    }
+                    // accumulated buffer is not complete gzipped data yet.
+                    return;
                 }
             }
             else {
                 // not gzipped encoded data.
-                notCompletedResponseBuffer.appendBuffer(buffer);
                 try {
-                    // try to convert decompressed json to map.
-                    String jsonResponse = new String(notCompletedResponseBuffer.getAccumulatedBuffer());
+                    // try to convert json to map.
+                    String jsonResponse = new String(completeBytes);
                     responseMap = JsonUtils.toMap(mapper, jsonResponse);
                 } catch (Exception ex) {
                     return;
                 }
             }
 
-            byte[] completeBytes = notCompletedResponseBuffer.getAccumulatedBuffer();
-            int contentLength = completeBytes.length;
-
             // remove temp buffer.
             tempResponseBufferMap.remove(requestId);
             LOG.info("temp accumulated buffer [{}] removed...", requestId);
 
+            int contentLength = completeBytes.length;
+            LOG.info("contentLength: {}", contentLength);
+
             response.setHeader("Content-Length", String.valueOf(contentLength));
-            onResponseContent(request, response, proxyResponse, completeBytes, 0, contentLength, new Callback.Nested(callback)
+            trinoProxyServlet.transformResponseContent(request, response, proxyResponse, completeBytes, 0, contentLength, new Callback.Nested(callback)
             {
                 @Override
                 public void failed(Throwable x)
@@ -415,8 +412,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
     }
 
 
-    @Override
-    protected void onResponseContent(HttpServletRequest request,
+    public void transformResponseContent(HttpServletRequest request,
                                      HttpServletResponse response,
                                      Response proxyResponse,
                                      byte[] buffer,
