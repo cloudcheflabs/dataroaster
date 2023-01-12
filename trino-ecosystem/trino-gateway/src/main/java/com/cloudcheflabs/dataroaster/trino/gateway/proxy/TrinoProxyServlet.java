@@ -89,7 +89,7 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         private int requestId;
         private long startTime;
 
-        private byte[] accumulatedBuffer = null;
+        private byte[] accumulatedBuffer = new byte[0];
 
         public NotCompletedResponseBuffer(int requestId,
                                           long startTime) {
@@ -98,17 +98,13 @@ public class TrinoProxyServlet extends ProxyServlet.Transparent implements Initi
         }
 
         public void appendBuffer(byte[] buffer) {
-            if(accumulatedBuffer == null) {
+            if(accumulatedBuffer.length == 0) {
                 accumulatedBuffer = buffer;
             } else {
-                try {
-                    ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    os.write(accumulatedBuffer);
-                    os.write(buffer);
-                    accumulatedBuffer = os.toByteArray();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                byte[] result = new byte[accumulatedBuffer.length + buffer.length];
+                System.arraycopy(accumulatedBuffer, 0, result, 0, accumulatedBuffer.length);
+                System.arraycopy(buffer, 0, result, accumulatedBuffer.length, buffer.length);
+                accumulatedBuffer = result;
             }
         }
 
