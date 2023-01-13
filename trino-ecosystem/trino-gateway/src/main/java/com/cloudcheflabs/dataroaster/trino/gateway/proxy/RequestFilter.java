@@ -1,12 +1,9 @@
 package com.cloudcheflabs.dataroaster.trino.gateway.proxy;
 
 
-import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.domain.BasicAuthentication;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.slf4j.Logger;
@@ -14,8 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.Enumeration;
 
 import static com.cloudcheflabs.dataroaster.trino.gateway.proxy.TrinoProxyServlet.ATTR_BASIC_AUTHENTICATION;
 import static com.cloudcheflabs.dataroaster.trino.gateway.proxy.TrinoProxyServlet.HEADER_HTTP_AUTHORIZATION;
