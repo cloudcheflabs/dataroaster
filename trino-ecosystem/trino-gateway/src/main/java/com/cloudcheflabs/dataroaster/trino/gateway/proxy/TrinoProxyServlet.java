@@ -322,7 +322,13 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
     @Override
     protected ContentTransformer newServerResponseContentTransformer(HttpServletRequest clientRequest, HttpServletResponse proxyResponse, Response serverResponse)
     {
-        return new TrinoResponseContentTransformer(trinoResponseRedisCache, publicEndpoint);
+        return new TrinoResponseContentTransformer(
+                clientRequest,
+                proxyResponse,
+                serverResponse,
+                trinoResponseRedisCache,
+                publicEndpoint
+        );
     }
 
     private static class TrinoResponseContentTransformer extends AfterContentTransformer
@@ -330,9 +336,20 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
         private ObjectMapper mapper = new ObjectMapper();
         private CacheService<TrinoResponse> trinoResponseRedisCache;
         private String publicEndpoint;
+        private HttpServletRequest clientRequest;
+        private HttpServletResponse proxyResponse;
+        private Response serverResponse;
 
-        public TrinoResponseContentTransformer(CacheService<TrinoResponse> trinoResponseRedisCache, String publicEndpoint) {
+        public TrinoResponseContentTransformer(HttpServletRequest clientRequest,
+                                               HttpServletResponse proxyResponse,
+                                               Response serverResponse,
+                                               CacheService<TrinoResponse> trinoResponseRedisCache,
+                                               String publicEndpoint) {
+            this.clientRequest = clientRequest;
+            this.proxyResponse = proxyResponse;
+            this.serverResponse = serverResponse;
             this.trinoResponseRedisCache = trinoResponseRedisCache;
+            this.publicEndpoint = publicEndpoint;
         }
 
         @Override
@@ -408,6 +425,10 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
                     // not gzipped encoding.
                     buffer = newJsonReponse.getBytes();
                 }
+                int length = buffer.length;
+                LOG.info("new buffer length: {}", length);
+                // set new content length.
+                proxyResponse.setHeader("Content-Length", String.valueOf(length));
             } else {
                 if (isGzip) {
                     // compress new constructed json in gzip.
