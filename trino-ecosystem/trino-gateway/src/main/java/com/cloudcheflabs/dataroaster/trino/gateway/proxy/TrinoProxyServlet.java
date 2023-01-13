@@ -18,6 +18,7 @@ import com.cloudcheflabs.dataroaster.trino.gateway.util.GzipUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.RandomUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.client.ContentDecoder;
@@ -25,6 +26,7 @@ import org.eclipse.jetty.client.GZIPContentDecoder;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
+import org.eclipse.jetty.client.util.AsyncRequestContent;
 import org.eclipse.jetty.io.ByteBufferPool;
 import org.eclipse.jetty.io.RuntimeIOException;
 import org.eclipse.jetty.proxy.AfterContentTransformer;
@@ -40,11 +42,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletInputStream;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
 @Component
@@ -242,6 +247,12 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
                 throw new IllegalStateException("User Authentication Failed...");
             }
         }
+    }
+
+    @Override
+    protected void service(HttpServletRequest clientRequest, HttpServletResponse proxyResponse) throws IOException, ServletException {
+        LOG.info("service called...");
+        super.service(clientRequest, proxyResponse);
     }
 
     @Override
