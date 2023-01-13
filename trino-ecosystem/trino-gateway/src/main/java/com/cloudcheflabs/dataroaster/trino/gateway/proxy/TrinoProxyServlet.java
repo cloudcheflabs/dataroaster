@@ -325,6 +325,8 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
                 LOG.info("expects100Continue false....");
                 ServletInputStream input = clientRequest.getInputStream();
                 input.setReadListener(newProxyReadListener(clientRequest, proxyResponse, proxyRequest, content));
+                sendProxyRequest(clientRequest, proxyResponse, proxyRequest);
+                LOG.info("sendProxyRequest....");
             }
         }
         else
