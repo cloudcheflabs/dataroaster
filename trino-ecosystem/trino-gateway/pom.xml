@@ -66,10 +66,10 @@
 		<joda-time.version>2.10.6</joda-time.version>
 
 		<!-- jetty -->
-		<jetty.version>11.0.9</jetty.version>
+		<jetty.version>11.0.13</jetty.version>
 
 		<!-- trino -->
-		<trino.version>385</trino.version>
+		<trino.version>403</trino.version>
 
 		<!-- favre bcrypt -->
 		<favre-bcrypt.version>0.8.0</favre-bcrypt.version>
