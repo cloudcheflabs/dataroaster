@@ -324,6 +324,47 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
         }
     }
 
+
+    @Override
+    protected void sendProxyRequest(HttpServletRequest clientRequest, HttpServletResponse proxyResponse, Request proxyRequest) {
+        if (LOG.isInfoEnabled()) {
+            StringBuilder builder = new StringBuilder(clientRequest.getMethod());
+            builder.append(" ").append(clientRequest.getRequestURI());
+            String query = clientRequest.getQueryString();
+            if (query != null) {
+                builder.append("?").append(query);
+            }
+
+            builder.append(" ").append(clientRequest.getProtocol()).append(System.lineSeparator());
+            Enumeration<String> headerNames = clientRequest.getHeaderNames();
+
+            while(headerNames.hasMoreElements()) {
+                String headerName = (String)headerNames.nextElement();
+                builder.append(headerName).append(": ");
+                Enumeration<String> headerValues = clientRequest.getHeaders(headerName);
+
+                while(headerValues.hasMoreElements()) {
+                    String headerValue = (String)headerValues.nextElement();
+                    if (headerValue != null) {
+                        builder.append(headerValue);
+                    }
+
+                    if (headerValues.hasMoreElements()) {
+                        builder.append(",");
+                    }
+                }
+
+                builder.append(System.lineSeparator());
+            }
+
+            builder.append(System.lineSeparator());
+            LOG.info("{} proxying to upstream:{}{}{}{}{}", new Object[]{this.getRequestId(clientRequest), System.lineSeparator(), builder, proxyRequest, System.lineSeparator(), proxyRequest.getHeaders().toString().trim()});
+        }
+        LOG.info("sendProxyRequest ...");
+
+        proxyRequest.send(this.newProxyResponseListener(clientRequest, proxyResponse));
+    }
+
     @Override
     protected ContentTransformer newClientRequestContentTransformer(HttpServletRequest clientRequest, Request proxyRequest) {
         return new GZIPContentTransformer(getHttpClient(), ContentTransformer.IDENTITY);
