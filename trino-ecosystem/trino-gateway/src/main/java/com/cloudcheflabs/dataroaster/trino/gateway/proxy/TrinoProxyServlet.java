@@ -329,9 +329,6 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
                     // not gzipped encoding.
                     buffer = newJsonReponse.getBytes();
                 }
-                int length = buffer.length;
-                // set new content length.
-                proxyResponse.setHeader("Content-Length", String.valueOf(length));
             } else {
                 if (isGzip) {
                     // compress new constructed json in gzip.
@@ -341,6 +338,9 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
                     buffer = jsonResponse.getBytes();
                 }
             }
+            int length = buffer.length;
+            // set new content length.
+            proxyResponse.setHeader("Content-Length", String.valueOf(length));
 
             OutputStream output = sink.getOutputStream();
             output.write(buffer);
