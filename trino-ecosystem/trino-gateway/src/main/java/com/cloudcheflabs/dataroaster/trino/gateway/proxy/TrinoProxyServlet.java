@@ -84,87 +84,12 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private ConcurrentHashMap<Integer, NotCompletedResponseBuffer> tempResponseBufferMap = new ConcurrentHashMap<>();
-
-    private static class NotCompletedResponseBuffer {
-        private int requestId;
-        private long startTime;
-
-        private byte[] accumulatedBuffer = new byte[0];
-
-        public NotCompletedResponseBuffer(int requestId,
-                                          long startTime) {
-            this.requestId = requestId;
-            this.startTime = startTime;
-        }
-
-        public void appendBuffer(byte[] buffer) {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            try {
-                os.write(accumulatedBuffer);
-                os.write(buffer);
-                accumulatedBuffer = os.toByteArray();
-                os.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        public byte[] getAccumulatedBuffer() {
-            return accumulatedBuffer;
-        }
-
-        public int getRequestId() {
-            return requestId;
-        }
-
-        public long getStartTime() {
-            return startTime;
-        }
-    }
-
-    private static class NotCompletedResponseBufferExpirationChecker implements Runnable {
-
-        private ConcurrentHashMap<Integer, NotCompletedResponseBuffer> tempResponseBufferMap;
-
-        public NotCompletedResponseBufferExpirationChecker(ConcurrentHashMap<Integer, NotCompletedResponseBuffer> tempResponseBufferMap) {
-            this.tempResponseBufferMap = tempResponseBufferMap;
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    for (Integer requestId : tempResponseBufferMap.keySet()) {
-                        NotCompletedResponseBuffer notCompletedResponseBuffer = tempResponseBufferMap.get(requestId);
-                        long startTime = notCompletedResponseBuffer.getStartTime();
-                        long endTime = DateTimeUtils.currentTimeMillis();
-                        // if 30seconds elapsed, remove buffer.
-                        if ((endTime - startTime) > 30 * 1000) {
-                            tempResponseBufferMap.remove(requestId);
-                            LOG.info("notCompletedResponseBuffer with request id [{}] removed from temp buffer map.", requestId);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                // pause.
-                TrinoActiveQueryCountUpdater.pause(30 * 1000);
-            }
-        }
-    }
-
-
     @Override
     public void afterPropertiesSet() throws Exception {
         authenticationNecessary = Boolean.valueOf(env.getProperty("trino.proxy.authentication"));
         LOG.info("authenticationNecessary: [{}]", authenticationNecessary);
         publicEndpoint = env.getProperty("trino.proxy.publicEndpoint");
         LOG.info("publicEndpoint: [{}]", publicEndpoint);
-
-        // run temp response buffer checker.
-        new Thread(new NotCompletedResponseBufferExpirationChecker(tempResponseBufferMap)).start();
     }
 
     @Override
@@ -319,6 +244,8 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
         }
     }
 
+
+
     @Override
     protected ContentTransformer newServerResponseContentTransformer(HttpServletRequest clientRequest, HttpServletResponse proxyResponse, Response serverResponse)
     {
@@ -446,7 +373,7 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
 
             OutputStream output = sink.getOutputStream();
             output.write(buffer);
-            return false;
+            return true;
         }
 
         private String replaceUri(String uri, String hostName) {
