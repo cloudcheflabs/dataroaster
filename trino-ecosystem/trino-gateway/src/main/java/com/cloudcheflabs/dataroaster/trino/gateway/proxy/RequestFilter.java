@@ -51,23 +51,7 @@ public class RequestFilter implements jakarta.servlet.Filter {
       req.setAttribute(ATTR_BASIC_AUTHENTICATION, new BasicAuthentication(user, password));
     }
 
-//    RequestWrapper requestWrapper = new RequestWrapper(req);
-//    if(LOG.isInfoEnabled()) {
-//      // print all headers without Authorization header.
-//      LOG.info("after removing authorization header...");
-//      Enumeration<String> headers = requestWrapper.getHeaderNames();
-//      while (headers.hasMoreElements()) {
-//        String header = headers.nextElement();
-//        String headerValue = requestWrapper.getHeader(header);
-//        Enumeration<String> headerValues = requestWrapper.getHeaders(header);
-//        LOG.info("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), Collections.list(headerValues)));
-//      }
-//
-//      String body = requestWrapper.getBody();
-//      LOG.info("body: [{}]", body);
-//    }
-
-    HttpServletRequestWrapper requestWrapper = new HttpServletRequestWrapper(req);
+    RequestWrapper requestWrapper = new RequestWrapper(req);
     HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper((HttpServletResponse) response);
     chain.doFilter(requestWrapper, responseWrapper);
   }
