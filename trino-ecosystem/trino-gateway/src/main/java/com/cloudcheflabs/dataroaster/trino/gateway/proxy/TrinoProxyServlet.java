@@ -18,7 +18,9 @@ import com.cloudcheflabs.dataroaster.trino.gateway.util.GzipUtils;
 import com.cloudcheflabs.dataroaster.trino.gateway.util.RandomUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import jakarta.servlet.AsyncContext;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.client.ContentDecoder;
@@ -42,8 +44,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletInputStream;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -88,6 +88,8 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
     private String publicEndpoint;
 
     private ObjectMapper mapper = new ObjectMapper();
+
+    private static final String CONTINUE_ACTION_ATTRIBUTE = AsyncMiddleManServlet.class.getName() + ".continueAction";
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -250,9 +252,76 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
     }
 
     @Override
-    protected void service(HttpServletRequest clientRequest, HttpServletResponse proxyResponse) throws IOException, ServletException {
-        LOG.info("service called...");
-        super.service(clientRequest, proxyResponse);
+    protected void service(HttpServletRequest clientRequest, HttpServletResponse proxyResponse) throws ServletException, IOException
+    {
+        String rewrittenTarget = rewriteTarget(clientRequest);
+        LOG.info("rewrittenTarget: {}", rewrittenTarget);
+        if (_log.isDebugEnabled())
+        {
+            StringBuffer target = clientRequest.getRequestURL();
+            if (clientRequest.getQueryString() != null)
+                target.append("?").append(clientRequest.getQueryString());
+            _log.debug("{} rewriting: {} -> {}", getRequestId(clientRequest), target, rewrittenTarget);
+        }
+        if (rewrittenTarget == null)
+        {
+            onProxyRewriteFailed(clientRequest, proxyResponse);
+            return;
+        }
+
+        Request proxyRequest = newProxyRequest(clientRequest, rewrittenTarget);
+
+        copyRequestHeaders(clientRequest, proxyRequest);
+
+        addProxyHeaders(clientRequest, proxyRequest);
+
+        final AsyncContext asyncContext = clientRequest.startAsync();
+        // We do not timeout the continuation, but the proxy request.
+        asyncContext.setTimeout(0);
+        proxyRequest.timeout(getTimeout(), TimeUnit.MILLISECONDS);
+
+        // If there is content, the send of the proxy request
+        // is delayed and performed when the content arrives,
+        // to allow optimization of the Content-Length header.
+        if (hasContent(clientRequest))
+        {
+            LOG.info("hasContent....");
+
+            AsyncRequestContent content = newProxyRequestContent(clientRequest, proxyResponse, proxyRequest);
+            proxyRequest.body(content);
+
+            if (expects100Continue(clientRequest))
+            {
+                // Must delay the call to request.getInputStream()
+                // that sends the 100 Continue to the client.
+                proxyRequest.attribute(CONTINUE_ACTION_ATTRIBUTE, (Runnable)() ->
+                {
+                    try
+                    {
+                        jakarta.servlet.ServletInputStream input = clientRequest.getInputStream();
+                        input.setReadListener(newProxyReadListener(clientRequest, proxyResponse, proxyRequest, content));
+                    }
+                    catch (Throwable failure)
+                    {
+                        onClientRequestFailure(clientRequest, proxyRequest, proxyResponse, failure);
+                    }
+                });
+                sendProxyRequest(clientRequest, proxyResponse, proxyRequest);
+                LOG.info("sendProxyRequest....");
+            }
+            else
+            {
+                LOG.info("expects100Continue false....");
+                ServletInputStream input = clientRequest.getInputStream();
+                input.setReadListener(newProxyReadListener(clientRequest, proxyResponse, proxyRequest, content));
+            }
+        }
+        else
+        {
+            LOG.info("hasContent. false ...");
+            sendProxyRequest(clientRequest, proxyResponse, proxyRequest);
+            LOG.info("sendProxyRequest....");
+        }
     }
 
     @Override
