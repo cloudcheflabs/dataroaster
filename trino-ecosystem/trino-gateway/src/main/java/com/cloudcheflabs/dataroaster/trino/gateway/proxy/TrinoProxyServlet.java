@@ -244,6 +244,18 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
         }
     }
 
+    @Override
+    protected ContentTransformer newClientRequestContentTransformer(HttpServletRequest clientRequest, Request proxyRequest) {
+        return AsyncMiddleManServlet.ContentTransformer.IDENTITY;
+    }
+
+    @Override
+    protected Response.CompleteListener newProxyResponseListener(HttpServletRequest clientRequest, HttpServletResponse proxyResponse)
+    {
+        LOG.info("newProxyResponseListener called...");
+
+        return super.newProxyResponseListener(clientRequest, proxyResponse);
+    }
 
 
     @Override
