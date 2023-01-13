@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -47,6 +48,11 @@ public class GzipUtils {
 
     public static String decompressGzip(byte[] bytes) {
         return new String(uncompress(bytes));
+    }
+
+    public static byte[] decompress(InputStream is) throws IOException{
+        byte[] compressedData = is.readAllBytes();
+        return decompress(compressedData);
     }
 
 
