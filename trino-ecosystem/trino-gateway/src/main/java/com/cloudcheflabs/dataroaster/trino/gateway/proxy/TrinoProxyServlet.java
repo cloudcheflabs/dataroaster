@@ -322,6 +322,8 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
     @Override
     protected ContentTransformer newServerResponseContentTransformer(HttpServletRequest clientRequest, HttpServletResponse proxyResponse, Response serverResponse)
     {
+        LOG.info("newServerResponseContentTransformer called...");
+
         return new TrinoResponseContentTransformer(
                 clientRequest,
                 proxyResponse,
@@ -354,6 +356,9 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
 
         @Override
         public boolean transform(Source source, Sink sink) throws IOException {
+            long maxOutputBufferSize = this.getMaxOutputBufferSize();
+            LOG.info("maxOutputBufferSize: {}", maxOutputBufferSize);
+
             InputStream input = source.getInputStream();
 
             byte[] inputBytes = input.readAllBytes();
@@ -441,7 +446,7 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
 
             OutputStream output = sink.getOutputStream();
             output.write(buffer);
-            return true;
+            return false;
         }
 
         private String replaceUri(String uri, String hostName) {
