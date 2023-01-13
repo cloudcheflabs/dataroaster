@@ -29,6 +29,7 @@ import org.eclipse.jetty.client.GZIPContentDecoder;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
+import org.eclipse.jetty.client.api.Result;
 import org.eclipse.jetty.client.util.AsyncRequestContent;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpHeaderValue;
@@ -318,7 +319,7 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
                     }
                 });
                 sendProxyRequest(clientRequest, proxyResponse, proxyRequest);
-                LOG.info("sendProxyRequest....");
+                LOG.info("sendProxyRequest 1....");
             }
             else
             {
@@ -326,14 +327,14 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
                 ServletInputStream input = clientRequest.getInputStream();
                 input.setReadListener(newProxyReadListener(clientRequest, proxyResponse, proxyRequest, content));
                 sendProxyRequest(clientRequest, proxyResponse, proxyRequest);
-                LOG.info("sendProxyRequest....");
+                LOG.info("sendProxyRequest. 2...");
             }
         }
         else
         {
             LOG.info("hasContent. false ...");
             sendProxyRequest(clientRequest, proxyResponse, proxyRequest);
-            LOG.info("sendProxyRequest....");
+            LOG.info("sendProxyRequest. 3...");
         }
     }
 
@@ -555,14 +556,158 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
             builder.append(System.lineSeparator());
             LOG.info("{} proxying to upstream:{}{}{}{}{}", new Object[]{this.getRequestId(clientRequest), System.lineSeparator(), builder, proxyRequest, System.lineSeparator(), proxyRequest.getHeaders().toString().trim()});
         }
-        LOG.info("sendProxyRequest ...");
+        LOG.info("sendProxyRequest in sendProxyRequest..");
 
         proxyRequest.send(this.newProxyResponseListener(clientRequest, proxyResponse));
     }
 
+    private class TrinoProxyResponseListener extends Response.Listener.Adapter implements Callback {
+        private final Callback complete = new CountingCallback(this, 2);
+        private final List<ByteBuffer> buffers = new ArrayList();
+        private final HttpServletRequest clientRequest;
+        private final HttpServletResponse proxyResponse;
+        private boolean hasContent;
+        private long contentLength;
+        private long length;
+        private Response response;
+
+        protected TrinoProxyResponseListener(HttpServletRequest clientRequest, HttpServletResponse proxyResponse) {
+            this.clientRequest = clientRequest;
+            this.proxyResponse = proxyResponse;
+        }
+
+        public void onBegin(Response serverResponse) {
+            this.response = serverResponse;
+            this.proxyResponse.setStatus(serverResponse.getStatus());
+        }
+
+        public void onHeaders(Response serverResponse) {
+            this.contentLength = serverResponse.getHeaders().getLongField(HttpHeader.CONTENT_LENGTH);
+            onServerResponseHeaders(this.clientRequest, this.proxyResponse, serverResponse);
+        }
+
+        public void onContent(Response serverResponse, ByteBuffer content, Callback callback) {
+            try {
+                int contentBytes = content.remaining();
+                LOG.info("contentBytes: {}", contentBytes);
+
+                this.hasContent = true;
+                ProxyWriter proxyWriter = (ProxyWriter)this.clientRequest.getAttribute(WRITE_LISTENER_ATTRIBUTE);
+                boolean committed = proxyWriter != null;
+                if (proxyWriter == null) {
+                    proxyWriter = newProxyWriteListener(this.clientRequest, serverResponse);
+                    this.clientRequest.setAttribute(WRITE_LISTENER_ATTRIBUTE, proxyWriter);
+                }
+
+                ContentTransformer transformer = (ContentTransformer)this.clientRequest.getAttribute(SERVER_TRANSFORMER_ATTRIBUTE);
+                if (transformer == null) {
+                    transformer = newServerResponseContentTransformer(this.clientRequest, this.proxyResponse, serverResponse);
+                    this.clientRequest.setAttribute(SERVER_TRANSFORMER_ATTRIBUTE, transformer);
+                }
+
+                this.length += (long)contentBytes;
+                boolean finished = this.contentLength >= 0L && this.length == this.contentLength;
+                transform(transformer, content, finished, this.buffers);
+                int newContentBytes = 0;
+                int size = this.buffers.size();
+                if (size <= 0) {
+                    proxyWriter.offer(BufferUtil.EMPTY_BUFFER, callback);
+                } else {
+                    Callback counter = size == 1 ? callback : new CountingCallback(callback, size);
+                    Iterator var12 = this.buffers.iterator();
+
+                    while(var12.hasNext()) {
+                        ByteBuffer buffer = (ByteBuffer)var12.next();
+                        newContentBytes += buffer.remaining();
+                        proxyWriter.offer(buffer, (Callback)counter);
+                    }
+
+                    this.buffers.clear();
+                }
+
+                if (finished) {
+                    proxyWriter.offer(BufferUtil.EMPTY_BUFFER, this.complete);
+                }
+
+                LOG.info("{} downstream content transformation {} -> {} bytes", new Object[]{getRequestId(this.clientRequest), contentBytes, newContentBytes});
+
+            if (committed) {
+                    proxyWriter.onWritePossible();
+                } else {
+                    if (this.contentLength >= 0L) {
+                        this.proxyResponse.setContentLength(-1);
+                    }
+
+                    this.proxyResponse.getOutputStream().setWriteListener(proxyWriter);
+                }
+            } catch (Throwable var14) {
+                callback.failed(var14);
+            }
+
+        }
+
+        public void onSuccess(Response serverResponse) {
+            LOG.info("onSuccess");
+            try {
+                if (this.hasContent) {
+                    if (this.contentLength < 0L) {
+                        ProxyWriter proxyWriter = (ProxyWriter)this.clientRequest.getAttribute(WRITE_LISTENER_ATTRIBUTE);
+                        ContentTransformer transformer = (ContentTransformer)this.clientRequest.getAttribute(SERVER_TRANSFORMER_ATTRIBUTE);
+                        transform(transformer, BufferUtil.EMPTY_BUFFER, true, this.buffers);
+                        long newContentBytes = 0L;
+                        int size = this.buffers.size();
+                        if (size <= 0) {
+                            proxyWriter.offer(BufferUtil.EMPTY_BUFFER, this.complete);
+                        } else {
+                            Callback callback = size == 1 ? this.complete : new CountingCallback(this.complete, size);
+                            Iterator var8 = this.buffers.iterator();
+
+                            while(var8.hasNext()) {
+                                ByteBuffer buffer = (ByteBuffer)var8.next();
+                                newContentBytes += (long)buffer.remaining();
+                                proxyWriter.offer(buffer, (Callback)callback);
+                            }
+
+                            this.buffers.clear();
+                        }
+
+                        LOG.info("{} downstream content transformation to {} bytes", getRequestId(this.clientRequest), newContentBytes);
+
+
+                        proxyWriter.onWritePossible();
+                    }
+                } else {
+                    this.complete.succeeded();
+                }
+            } catch (Throwable var10) {
+                this.complete.failed(var10);
+            }
+
+        }
+
+        public void onComplete(Result result) {
+            if (result.isSucceeded()) {
+                this.complete.succeeded();
+            } else {
+                this.complete.failed(result.getFailure());
+            }
+
+        }
+
+        public void succeeded() {
+            cleanup(this.clientRequest);
+            onProxyResponseSuccess(this.clientRequest, this.proxyResponse, this.response);
+        }
+
+        public void failed(Throwable failure) {
+            cleanup(this.clientRequest);
+            onProxyResponseFailure(this.clientRequest, this.proxyResponse, this.response, failure);
+        }
+    }
+
     @Override
     protected ContentTransformer newClientRequestContentTransformer(HttpServletRequest clientRequest, Request proxyRequest) {
-        return new GZIPContentTransformer(getHttpClient(), ContentTransformer.IDENTITY);
+        return ContentTransformer.IDENTITY;
     }
 
     @Override
@@ -570,7 +715,7 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
     {
         LOG.info("newProxyResponseListener called...");
 
-        return super.newProxyResponseListener(clientRequest, proxyResponse);
+        return new TrinoProxyResponseListener(clientRequest, proxyResponse);
     }
 
 
