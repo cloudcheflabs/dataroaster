@@ -19,6 +19,7 @@ import com.cloudcheflabs.dataroaster.trino.gateway.util.RandomUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,12 +30,18 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.util.AsyncRequestContent;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.http.HttpHeaderValue;
 import org.eclipse.jetty.io.ByteBufferPool;
 import org.eclipse.jetty.io.RuntimeIOException;
 import org.eclipse.jetty.proxy.AfterContentTransformer;
 import org.eclipse.jetty.proxy.AsyncMiddleManServlet;
 import org.eclipse.jetty.proxy.ProxyServlet;
+import org.eclipse.jetty.util.BufferUtil;
 import org.eclipse.jetty.util.Callback;
+import org.eclipse.jetty.util.CountingCallback;
+import org.eclipse.jetty.util.IteratingCallback;
+import org.eclipse.jetty.util.component.Destroyable;
 import org.joda.time.DateTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +96,11 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    private static final String PROXY_REQUEST_CONTENT_COMMITTED_ATTRIBUTE = AsyncMiddleManServlet.class.getName() + ".proxyRequestContentCommitted";
+    private static final String CLIENT_TRANSFORMER_ATTRIBUTE = AsyncMiddleManServlet.class.getName() + ".clientTransformer";
+    private static final String SERVER_TRANSFORMER_ATTRIBUTE = AsyncMiddleManServlet.class.getName() + ".serverTransformer";
     private static final String CONTINUE_ACTION_ATTRIBUTE = AsyncMiddleManServlet.class.getName() + ".continueAction";
+    private static final String WRITE_LISTENER_ATTRIBUTE = AsyncMiddleManServlet.class.getName() + ".writeListener";
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -321,6 +332,188 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
             LOG.info("hasContent. false ...");
             sendProxyRequest(clientRequest, proxyResponse, proxyRequest);
             LOG.info("sendProxyRequest....");
+        }
+    }
+
+    @Override
+    protected boolean expects100Continue(HttpServletRequest request) {
+        return HttpHeaderValue.CONTINUE.is(request.getHeader(HttpHeader.EXPECT.asString()));
+    }
+
+    @Override
+    protected HttpClient getHttpClient() {
+        return super.getHttpClient();
+    }
+
+    @Override
+    protected ReadListener newProxyReadListener(HttpServletRequest clientRequest, HttpServletResponse proxyResponse, Request proxyRequest, AsyncRequestContent content) {
+        return new TrinoProxyReader(clientRequest, proxyResponse, proxyRequest, content);
+    }
+
+    private void cleanup(HttpServletRequest clientRequest) {
+        ContentTransformer clientTransformer = (ContentTransformer)clientRequest.getAttribute(CLIENT_TRANSFORMER_ATTRIBUTE);
+        if (clientTransformer instanceof Destroyable) {
+            ((Destroyable)clientTransformer).destroy();
+        }
+
+        ContentTransformer serverTransformer = (ContentTransformer)clientRequest.getAttribute(SERVER_TRANSFORMER_ATTRIBUTE);
+        if (serverTransformer instanceof Destroyable) {
+            ((Destroyable)serverTransformer).destroy();
+        }
+
+    }
+
+    @Override
+    protected void onClientRequestFailure(HttpServletRequest clientRequest, Request proxyRequest, HttpServletResponse proxyResponse, Throwable failure) {
+        boolean aborted = proxyRequest.abort(failure);
+        if (!aborted) {
+            int status = this.clientRequestStatus(failure);
+            this.sendProxyResponseError(clientRequest, proxyResponse, status);
+        }
+
+    }
+
+    int readClientRequestContent(ServletInputStream input, byte[] buffer) throws IOException {
+        return input.read(buffer);
+    }
+
+    private void transform(ContentTransformer transformer, ByteBuffer input, boolean finished, List<ByteBuffer> output) throws IOException {
+        try {
+            transformer.transform(input, finished, output);
+        } catch (Throwable var6) {
+            this._log.info("Exception while transforming {} ", transformer, var6);
+            throw var6;
+        }
+    }
+
+
+    private class TrinoProxyReader extends IteratingCallback implements ReadListener {
+        private final byte[] buffer = new byte[getHttpClient().getRequestBufferSize()];
+        private final List<ByteBuffer> buffers = new ArrayList();
+        private final HttpServletRequest clientRequest;
+        private final HttpServletResponse proxyResponse;
+        private final Request proxyRequest;
+        private final AsyncRequestContent content;
+        private final int contentLength;
+        private final boolean expects100Continue;
+        private int length;
+
+        public TrinoProxyReader(HttpServletRequest clientRequest, HttpServletResponse proxyResponse, Request proxyRequest, AsyncRequestContent content) {
+            this.clientRequest = clientRequest;
+            this.proxyResponse = proxyResponse;
+            this.proxyRequest = proxyRequest;
+            this.content = content;
+            this.contentLength = clientRequest.getContentLength();
+            this.expects100Continue = expects100Continue(clientRequest);
+        }
+
+        public void onDataAvailable() {
+            this.iterate();
+        }
+
+        public void onAllDataRead() throws IOException {
+            if (!this.content.isClosed()) {
+                this.process(BufferUtil.EMPTY_BUFFER, new Callback() {
+                    public void failed(Throwable x) {
+                        onError(x);
+                    }
+                }, true);
+            }
+
+        }
+
+        public void onError(Throwable t) {
+            cleanup(this.clientRequest);
+            onClientRequestFailure(this.clientRequest, this.proxyRequest, this.proxyResponse, t);
+        }
+
+        protected IteratingCallback.Action process() throws Exception {
+            ServletInputStream input = this.clientRequest.getInputStream();
+
+            LOG.info("ServletInputStream ...");
+
+            while(input.isReady() && !input.isFinished()) {
+                int read = readClientRequestContent(input, this.buffer);
+
+                if (read < 0) {
+                    return Action.SUCCEEDED;
+                }
+
+                if (this.contentLength > 0 && read > 0) {
+                    this.length += read;
+                }
+
+                ByteBuffer content = read > 0 ? ByteBuffer.wrap(this.buffer, 0, read) : BufferUtil.EMPTY_BUFFER;
+                boolean finished = this.length == this.contentLength;
+                this.process(content, this, finished);
+                if (read > 0) {
+                    return Action.SCHEDULED;
+                }
+            }
+
+            if (input.isFinished()) {
+                return Action.SUCCEEDED;
+            } else {
+
+                return Action.IDLE;
+            }
+        }
+
+        private void process(ByteBuffer content, Callback callback, boolean finished) throws IOException {
+            ContentTransformer transformer = (ContentTransformer)this.clientRequest.getAttribute(CLIENT_TRANSFORMER_ATTRIBUTE);
+            if (transformer == null) {
+                transformer = newClientRequestContentTransformer(this.clientRequest, this.proxyRequest);
+                this.clientRequest.setAttribute(CLIENT_TRANSFORMER_ATTRIBUTE, transformer);
+            }
+
+            LOG.info("ContentTransformer ...");
+
+            int contentBytes = content.remaining();
+            if (contentBytes == 0 && !finished) {
+                callback.succeeded();
+            } else {
+                transform(transformer, content, finished, this.buffers);
+                int newContentBytes = 0;
+                int size = this.buffers.size();
+                if (size > 0) {
+                    CountingCallback counter = new CountingCallback(callback, size);
+                    Iterator var9 = this.buffers.iterator();
+
+                    while(var9.hasNext()) {
+                        ByteBuffer buffer = (ByteBuffer)var9.next();
+                        newContentBytes += buffer.remaining();
+                        this.content.offer(buffer, counter);
+                    }
+
+                    this.buffers.clear();
+                }
+
+                if (finished) {
+                    this.content.close();
+                }
+
+                boolean contentCommitted = this.clientRequest.getAttribute(PROXY_REQUEST_CONTENT_COMMITTED_ATTRIBUTE) != null;
+                LOG.info("contentCommitted: {}", contentCommitted);
+
+                if (!contentCommitted && (size > 0 || finished)) {
+                    this.clientRequest.setAttribute(PROXY_REQUEST_CONTENT_COMMITTED_ATTRIBUTE, true);
+                    if (!this.expects100Continue) {
+                        this.proxyRequest.headers((headers) -> {
+                            headers.remove(HttpHeader.CONTENT_LENGTH);
+                        });
+                        sendProxyRequest(this.clientRequest, this.proxyResponse, this.proxyRequest);
+                    }
+                }
+
+                if (size == 0) {
+                    callback.succeeded();
+                }
+
+            }
+        }
+
+        protected void onCompleteFailure(Throwable x) {
+            this.onError(x);
         }
     }
 
