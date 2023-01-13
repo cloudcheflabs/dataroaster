@@ -301,6 +301,7 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
 
             AsyncRequestContent content = newProxyRequestContent(clientRequest, proxyResponse, proxyRequest);
             proxyRequest.body(content);
+            LOG.info("content type: {}, length: {}", content.getContentType(), content.getLength());
 
             if (expects100Continue(clientRequest))
             {
@@ -310,7 +311,7 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
                 {
                     try
                     {
-                        jakarta.servlet.ServletInputStream input = clientRequest.getInputStream();
+                        ServletInputStream input = clientRequest.getInputStream();
                         input.setReadListener(newProxyReadListener(clientRequest, proxyResponse, proxyRequest, content));
                     }
                     catch (Throwable failure)
@@ -335,6 +336,25 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
             LOG.info("hasContent. false ...");
             sendProxyRequest(clientRequest, proxyResponse, proxyRequest);
             LOG.info("sendProxyRequest. 3...");
+        }
+    }
+
+    @Override
+    protected AsyncRequestContent newProxyRequestContent(HttpServletRequest clientRequest, HttpServletResponse proxyResponse, Request proxyRequest) {
+        return new TrinoProxyAsyncRequestContent(clientRequest);
+    }
+
+    private class TrinoProxyAsyncRequestContent extends AsyncRequestContent {
+        private final HttpServletRequest clientRequest;
+
+        private TrinoProxyAsyncRequestContent(HttpServletRequest clientRequest) {
+            super(new ByteBuffer[0]);
+            this.clientRequest = clientRequest;
+        }
+
+        public boolean offer(ByteBuffer buffer, Callback callback) {
+            LOG.info("{} proxying content to upstream: {} bytes", getRequestId(this.clientRequest), buffer.remaining());
+            return super.offer(buffer, callback);
         }
     }
 
@@ -557,6 +577,8 @@ public class TrinoProxyServlet extends AsyncMiddleManServlet.Transparent impleme
             LOG.info("{} proxying to upstream:{}{}{}{}{}", new Object[]{this.getRequestId(clientRequest), System.lineSeparator(), builder, proxyRequest, System.lineSeparator(), proxyRequest.getHeaders().toString().trim()});
         }
         LOG.info("sendProxyRequest in sendProxyRequest..");
+
+
 
         proxyRequest.send(this.newProxyResponseListener(clientRequest, proxyResponse));
     }
