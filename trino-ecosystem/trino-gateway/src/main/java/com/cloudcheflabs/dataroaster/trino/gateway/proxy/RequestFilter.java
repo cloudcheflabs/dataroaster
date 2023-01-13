@@ -51,19 +51,19 @@ public class RequestFilter implements jakarta.servlet.Filter {
     }
 
     RequestWrapper requestWrapper = new RequestWrapper(req);
-    if(LOG.isDebugEnabled()) {
+    if(LOG.isInfoEnabled()) {
       // print all headers without Authorization header.
-      LOG.debug("after removing authorization header...");
+      LOG.info("after removing authorization header...");
       Enumeration<String> headers = requestWrapper.getHeaderNames();
       while (headers.hasMoreElements()) {
         String header = headers.nextElement();
         String headerValue = requestWrapper.getHeader(header);
         Enumeration<String> headerValues = requestWrapper.getHeaders(header);
-        LOG.debug("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), Collections.list(headerValues)));
+        LOG.info("header: [{}], value: [{}], values: [{}]", header, headerValue, JsonUtils.toJson(new ObjectMapper(), Collections.list(headerValues)));
       }
 
       String body = requestWrapper.getBody();
-      LOG.debug("body: [{}]", body);
+      LOG.info("body: [{}]", body);
     }
 
     HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper((HttpServletResponse) response);
