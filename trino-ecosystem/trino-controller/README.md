@@ -334,6 +334,11 @@ affinity:
               operator: In
               values:
                 - "coordinator"
+tolerations:
+  - key: "cluster-name"
+    operator: "Equal"
+    value: "etl-1"
+    effect: "NoSchedule"
 EOF
 
 cat <<EOF > worker-pod-template.yaml
@@ -366,6 +371,11 @@ affinity:
               operator: In
               values:
                 - "worker"
+tolerations:
+  - key: "cluster-name"
+    operator: "Equal"
+    value: "etl-1"
+    effect: "NoSchedule"
 EOF
 
 
