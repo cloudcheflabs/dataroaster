@@ -800,4 +800,89 @@ public class TrinoController {
             LOG.info("prometheus configmap updated...");
         }
     }
+
+
+
+    @PutMapping("/v1/trino/pod-template/update")
+    public String updatePodTemplate(@RequestParam Map<String, String> params) {
+        return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
+            String name = params.get("name");
+            String coordinatorPodTemplate = params.get("coordinator_pod_template");
+            LOG.info("coordinatorPodTemplate: {}", coordinatorPodTemplate);
+            String workerPodTemplate = params.get("worker_pod_template");
+            LOG.info("workerPodTemplate: {}", workerPodTemplate);
+
+            if(coordinatorPodTemplate == null) {
+                throw new RuntimeException("coordinator pod template is null!");
+            }
+            if(workerPodTemplate == null) {
+                throw new RuntimeException("worker pod template is null!");
+            }
+
+            // convert yaml to map.
+            Map<String, Object> coordinatorPodTemplateMap = YamlUtils.yamlToMap(coordinatorPodTemplate);
+            Map<String, Object> workerPodTemplateMap = YamlUtils.yamlToMap(workerPodTemplate);
+
+
+            List<GenericKubernetesResource> trinoClusters =
+                    k8sResourceService.listCustomResources(DEFAULT_TRINO_OPERATOR_NAMESPACE, "TrinoCluster");
+
+            for (GenericKubernetesResource genericKubernetesResource : trinoClusters) {
+                String clusterName = genericKubernetesResource.getMetadata().getName();
+                if(clusterName.equals(name)) {
+                    Map<String, Object> additionalMap = genericKubernetesResource.getAdditionalProperties();
+                    Map<String, Object> specMap = (Map<String, Object>) additionalMap.get("spec");
+
+                    // add coordinator pod template.
+                    Map<String, Object> coordinatorMap = (Map<String, Object>) specMap.get("coordinator");
+                    if(coordinatorPodTemplateMap.containsKey("resources")) {
+                        coordinatorMap.put("resources", coordinatorPodTemplateMap.get("resources"));
+                    }
+                    if(coordinatorPodTemplateMap.containsKey("nodeSelector")) {
+                        coordinatorMap.put("nodeSelector", coordinatorPodTemplateMap.get("nodeSelector"));
+                    }
+                    if(coordinatorPodTemplateMap.containsKey("affinity")) {
+                        coordinatorMap.put("affinity", coordinatorPodTemplateMap.get("affinity"));
+                    }
+                    if(coordinatorPodTemplateMap.containsKey("tolerations")) {
+                        coordinatorMap.put("tolerations", coordinatorPodTemplateMap.get("tolerations"));
+                    }
+
+                    // add worker pod template.
+                    Map<String, Object> workerMap = (Map<String, Object>) specMap.get("worker");
+                    if(workerPodTemplateMap.containsKey("resources")) {
+                        workerMap.put("resources", workerPodTemplateMap.get("resources"));
+                    }
+                    if(workerPodTemplateMap.containsKey("nodeSelector")) {
+                        workerMap.put("nodeSelector", workerPodTemplateMap.get("nodeSelector"));
+                    }
+                    if(workerPodTemplateMap.containsKey("affinity")) {
+                        workerMap.put("affinity", workerPodTemplateMap.get("affinity"));
+                    }
+                    if(workerPodTemplateMap.containsKey("tolerations")) {
+                        workerMap.put("tolerations", workerPodTemplateMap.get("tolerations"));
+                    }
+
+                    LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
+
+                    k8sResourceService.updateCustomResource(genericKubernetesResource);
+                    LOG.info("cluster [{}] configs updated.", name);
+
+                    String clusterNamespace = (String) specMap.get("namespace");
+                    rolloutDeployment(clusterNamespace);
+
+                    // wait for coordinator and workers restarted.
+                    LOG.info("waiting for coordinator and workers restarted...");
+                    PauseUtils.pause(20000);
+
+                    // update prometheus configmap to update prometheus jobs.
+                    updatePrometheusConfigMap(name, clusterNamespace);
+
+                    break;
+                }
+            }
+
+            return ControllerUtils.successMessage();
+        });
+    }
 }

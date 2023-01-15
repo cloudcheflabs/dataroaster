@@ -1,0 +1,29 @@
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: coordinator
+              operator: In
+              values:
+                - "true"
+            - key: worker
+              operator: NotIn
+              values:
+                - "true"
+            - key: cluster-name
+              operator: In
+              values:
+                - "etl-1"
+            - key: management
+              operator: NotIn
+              values:
+                - "true"
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: component
+              operator: In
+              values:
+                - "coordinator"
