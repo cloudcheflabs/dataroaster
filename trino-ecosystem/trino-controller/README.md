@@ -295,6 +295,89 @@ http://localhost:8093/v1/trino/delete \
 -d  "name=etl-1";
 ```
 
+### Trino Pod Template
+
+#### Update Trino Pod Template
+Parameters:
+* `name` : unique cluster name.
+* `coordinator_pod_template` : coordinator pod template in yaml. base64 encoded.
+* `worker_pod_template` : worker pod template in yaml. base64 encoded.
+
+```
+cat <<EOF > coordinator-pod-template.yaml
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: coordinator
+              operator: In
+              values:
+                - "true"
+            - key: worker
+              operator: NotIn
+              values:
+                - "true"
+            - key: cluster-name
+              operator: In
+              values:
+                - "etl-1"
+            - key: management
+              operator: NotIn
+              values:
+                - "true"
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: component
+              operator: In
+              values:
+                - "coordinator"
+EOF
+
+cat <<EOF > worker-pod-template.yaml
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: coordinator
+              operator: NotIn
+              values:
+                - "true"
+            - key: worker
+              operator: In
+              values:
+                - "true"
+            - key: cluster-name
+              operator: In
+              values:
+                - "etl-1"
+            - key: management
+              operator: NotIn
+              values:
+                - "true"
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: component
+              operator: In
+              values:
+                - "worker"
+EOF
+
+
+
+curl -XPUT \
+http://localhost:8093/v1/trino/pod-template/update \
+-d  "name=etl-1" \
+-d "coordinator_pod_template=$(base64 -w 0 ./coordinator-pod-template.yaml)" \
+-d "worker_pod_template=$(base64 -w 0 ./worker-pod-template.yaml)" \
+;
+```
+
 
 
 ### Trino Configuration

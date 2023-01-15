@@ -1,6 +1,6 @@
 namespace: trino-controller
 serviceAccount: trino-controller
-image: cloudcheflabs/trino-controller:v1.0.5
+image: cloudcheflabs/trino-controller:v1.1.0
 imagePullPolicy: Always
 replicas: 1
 resources:

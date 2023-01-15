@@ -808,9 +808,7 @@ public class TrinoController {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
             String name = params.get("name");
             String coordinatorPodTemplate = params.get("coordinator_pod_template");
-            LOG.info("coordinatorPodTemplate: {}", coordinatorPodTemplate);
             String workerPodTemplate = params.get("worker_pod_template");
-            LOG.info("workerPodTemplate: {}", workerPodTemplate);
 
             if(coordinatorPodTemplate == null) {
                 throw new RuntimeException("coordinator pod template is null!");
@@ -818,6 +816,12 @@ public class TrinoController {
             if(workerPodTemplate == null) {
                 throw new RuntimeException("worker pod template is null!");
             }
+
+            coordinatorPodTemplate = Base64Utils.decodeBase64(coordinatorPodTemplate);
+            LOG.info("coordinatorPodTemplate: {}", coordinatorPodTemplate);
+
+            workerPodTemplate = Base64Utils.decodeBase64(workerPodTemplate);
+            LOG.info("workerPodTemplate: {}", workerPodTemplate);
 
             // convert yaml to map.
             Map<String, Object> coordinatorPodTemplateMap = YamlUtils.yamlToMap(coordinatorPodTemplate);
