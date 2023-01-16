@@ -26,7 +26,7 @@ helm install \
 trino-controller \
 --create-namespace \
 --namespace trino-controller \
---version v1.3.0 \
+--version v1.4.0 \
 --set trino.gateway.publicEndpoint="https://trino-gateway-proxy-test.cloudchef-labs.com" \
 --set trino.gateway.proxyHostName=trino-gateway-proxy-test.cloudchef-labs.com \
 --set trino.gateway.restHostName=trino-gateway-rest-test.cloudchef-labs.com \
@@ -293,6 +293,108 @@ Parameters:
 curl -XDELETE \
 http://localhost:8093/v1/trino/delete \
 -d  "name=etl-1";
+```
+
+### Trino Pod Template
+
+#### Update Trino Pod Template
+Parameters:
+* `name` : unique cluster name.
+* `coordinator_pod_template` : coordinator pod template in yaml. base64 encoded.
+* `worker_pod_template` : worker pod template in yaml. base64 encoded.
+
+```
+
+cat <<EOF > coordinator-pod-template.yaml
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: coordinator
+              operator: In
+              values:
+                - "true"
+            - key: worker
+              operator: In
+              values:
+                - "false"
+            - key: clusterName
+              operator: In
+              values:
+                - "etl-1"
+            - key: management
+              operator: In
+              values:
+                - "false"
+      topologyKey: topology.kubernetes.io/zone
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: component
+                operator: In
+                values:
+                  - coordinator
+          topologyKey: topology.kubernetes.io/zone
+tolerations:
+  - key: "clusterName"
+    operator: "Equal"
+    value: "etl-1"
+    effect: "NoSchedule"
+EOF
+
+cat <<EOF > worker-pod-template.yaml
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: coordinator
+              operator: In
+              values:
+                - "false"
+            - key: worker
+              operator: In
+              values:
+                - "true"
+            - key: clusterName
+              operator: In
+              values:
+                - "etl-1"
+            - key: management
+              operator: In
+              values:
+                - "false"
+      topologyKey: topology.kubernetes.io/zone
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: component
+                operator: In
+                values:
+                  - worker
+          topologyKey: topology.kubernetes.io/zone
+tolerations:
+  - key: "clusterName"
+    operator: "Equal"
+    value: "etl-1"
+    effect: "NoSchedule"
+EOF
+
+
+
+curl -XPUT \
+http://localhost:8093/v1/trino/pod-template/update \
+-d  "name=etl-1" \
+-d "coordinator_pod_template=$(base64 -w 0 ./coordinator-pod-template.yaml)" \
+-d "worker_pod_template=$(base64 -w 0 ./worker-pod-template.yaml)" \
+;
 ```
 
 

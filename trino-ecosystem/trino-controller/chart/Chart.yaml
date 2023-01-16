@@ -1,8 +1,8 @@
 
 apiVersion: v2
 name: dataroaster-trino-controller
-version: v1.3.0
-appVersion: v1.0.5
+version: v1.4.0
+appVersion: v1.1.0
 description: dataroaster trino controller
 
 dependencies:
