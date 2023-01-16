@@ -4,33 +4,35 @@ affinity:
       nodeSelectorTerms:
         - matchExpressions:
             - key: coordinator
-              operator: NotIn
+              operator: In
               values:
-                - "true"
+                - "false"
             - key: worker
               operator: In
               values:
                 - "true"
-            - key: cluster-name
+            - key: clusterName
               operator: In
               values:
                 - "etl-1"
             - key: management
-              operator: NotIn
-              values:
-                - "true"
-      topologyKey: topology.kubernetes.io/zone
-  podAntiAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-            - key: component
               operator: In
               values:
-                - "worker"
-        topologyKey: topology.kubernetes.io/zone
+                - "false"
+      topologyKey: topology.kubernetes.io/zone
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: component
+                operator: In
+                values:
+                  - worker
+          topologyKey: topology.kubernetes.io/zone
 tolerations:
-  - key: "cluster-name"
+  - key: "clusterName"
     operator: "Equal"
     value: "etl-1"
     effect: "NoSchedule"
