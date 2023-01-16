@@ -19,6 +19,7 @@ affinity:
               operator: NotIn
               values:
                 - "true"
+      topologyKey: topology.kubernetes.io/zone
   podAntiAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
@@ -27,6 +28,7 @@ affinity:
               operator: In
               values:
                 - "worker"
+        topologyKey: topology.kubernetes.io/zone
 tolerations:
   - key: "cluster-name"
     operator: "Equal"
