@@ -26,7 +26,7 @@ helm install \
 trino-controller \
 --create-namespace \
 --namespace trino-controller \
---version v1.3.0 \
+--version v1.4.0 \
 --set trino.gateway.publicEndpoint="https://trino-gateway-proxy-test.cloudchef-labs.com" \
 --set trino.gateway.proxyHostName=trino-gateway-proxy-test.cloudchef-labs.com \
 --set trino.gateway.restHostName=trino-gateway-rest-test.cloudchef-labs.com \
@@ -304,6 +304,7 @@ Parameters:
 * `worker_pod_template` : worker pod template in yaml. base64 encoded.
 
 ```
+
 cat <<EOF > coordinator-pod-template.yaml
 affinity:
   nodeAffinity:
@@ -315,27 +316,31 @@ affinity:
               values:
                 - "true"
             - key: worker
-              operator: NotIn
+              operator: In
               values:
-                - "true"
-            - key: cluster-name
+                - "false"
+            - key: clusterName
               operator: In
               values:
                 - "etl-1"
             - key: management
-              operator: NotIn
-              values:
-                - "true"
-  podAntiAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-            - key: component
               operator: In
               values:
-                - "coordinator"
+                - "false"
+      topologyKey: topology.kubernetes.io/zone
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: component
+                operator: In
+                values:
+                  - coordinator
+          topologyKey: topology.kubernetes.io/zone
 tolerations:
-  - key: "cluster-name"
+  - key: "clusterName"
     operator: "Equal"
     value: "etl-1"
     effect: "NoSchedule"
@@ -348,31 +353,35 @@ affinity:
       nodeSelectorTerms:
         - matchExpressions:
             - key: coordinator
-              operator: NotIn
+              operator: In
               values:
-                - "true"
+                - "false"
             - key: worker
               operator: In
               values:
                 - "true"
-            - key: cluster-name
+            - key: clusterName
               operator: In
               values:
                 - "etl-1"
             - key: management
-              operator: NotIn
-              values:
-                - "true"
-  podAntiAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-            - key: component
               operator: In
               values:
-                - "worker"
+                - "false"
+      topologyKey: topology.kubernetes.io/zone
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: component
+                operator: In
+                values:
+                  - worker
+          topologyKey: topology.kubernetes.io/zone
 tolerations:
-  - key: "cluster-name"
+  - key: "clusterName"
     operator: "Equal"
     value: "etl-1"
     effect: "NoSchedule"
