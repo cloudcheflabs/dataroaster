@@ -54,7 +54,6 @@ public class JmxController implements InitializingBean {
     public String listClusters(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_USER, context, () -> {
             String namespace = params.get("namespace");
-            LOG.info("namespace: {}", namespace);
 
             List<Map<String, Object>> mapList = new ArrayList<>();
 
@@ -162,19 +161,12 @@ public class JmxController implements InitializingBean {
     public String getMBeanValue(@RequestParam Map<String, String> params) {
         return ControllerUtils.doProcess(Roles.ROLE_USER, context, () -> {
             String namespace = params.get("namespace");
-            LOG.info("namespace: {}", namespace);
             String clusterName = params.get("cluster_name");
-            LOG.info("clusterName: {}", clusterName);
-
             String objectName = params.get("object_name");
-            LOG.info("objectName: {}", objectName);
-
             String attribute = params.get("attribute");
-            LOG.info("attribute: {}", attribute);
 
             // optional.
             String compositeKey = params.get("composite_key");
-            LOG.info("compositeKey: {}", compositeKey);
 
             List<Map<String, Object>> mapList = new ArrayList<>();
 
