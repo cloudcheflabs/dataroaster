@@ -28,10 +28,7 @@ public class ControllerUtils {
             try {
                 return task.call();
             } catch (Exception e) {
-
-                e.printStackTrace();
-                LOG.info("instanceof " + e.getClass());
-
+                LOG.error(e.getMessage());
                 if(e instanceof ResponseStatusException) {
                     throw (ResponseStatusException) e;
                 } else {
