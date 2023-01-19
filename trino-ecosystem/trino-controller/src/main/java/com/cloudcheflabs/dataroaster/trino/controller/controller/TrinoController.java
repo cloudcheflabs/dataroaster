@@ -809,6 +809,8 @@ public class TrinoController {
             String name = params.get("name");
             String coordinatorPodTemplate = params.get("coordinator_pod_template");
             String workerPodTemplate = params.get("worker_pod_template");
+            String imageCacheRepoPrefix = params.get("image_cache_repo_prefix");
+            String imagePullSecret = params.get("image_pull_secret");
 
             if(coordinatorPodTemplate == null) {
                 throw new RuntimeException("coordinator pod template is null!");
@@ -837,8 +839,37 @@ public class TrinoController {
                     Map<String, Object> additionalMap = genericKubernetesResource.getAdditionalProperties();
                     Map<String, Object> specMap = (Map<String, Object>) additionalMap.get("spec");
 
+                    Map<String, Object> imageMap = (Map<String, Object>) specMap.get("image");
+                    if(imageCacheRepoPrefix != null) {
+                        // add image cache server prefix like harbor server to repository.
+                        String repository = (String) imageMap.get("repository");
+                        if(!repository.startsWith(imageCacheRepoPrefix)) {
+                            LOG.info("original repository: {}", repository);
+                            repository = imageCacheRepoPrefix + "/" + repository;
+                            LOG.info("new repository: {}", repository);
+                            imageMap.put("repository", repository);
+                        }
+                    }
+                    // add image pull secret to pull image from harbor, for instance.
+                    if(imagePullSecret != null) {
+                        imageMap.put("imagePullSecrets", Arrays.asList(imagePullSecret));
+                    }
+
                     // add coordinator pod template.
                     Map<String, Object> coordinatorMap = (Map<String, Object>) specMap.get("coordinator");
+                    if(imageCacheRepoPrefix != null) {
+                        List<Map<String, Object>> initContainers = (List<Map<String, Object>>) coordinatorMap.get("initContainers");
+                        for(Map<String, Object> initContainer : initContainers) {
+                            String image = (String) initContainer.get("image");
+                            if(!image.startsWith(imageCacheRepoPrefix)) {
+                                LOG.info("original init container image for coordinator: {}", image);
+                                image = imageCacheRepoPrefix + "/" + image;
+                                LOG.info("new init container image for coordinator: {}", image);
+                                initContainer.put("image", image);
+                            }
+                        }
+                    }
+
                     if(coordinatorPodTemplateMap.containsKey("resources")) {
                         coordinatorMap.put("resources", coordinatorPodTemplateMap.get("resources"));
                     }
@@ -854,6 +885,18 @@ public class TrinoController {
 
                     // add worker pod template.
                     Map<String, Object> workerMap = (Map<String, Object>) specMap.get("worker");
+                    if(imageCacheRepoPrefix != null) {
+                        List<Map<String, Object>> initContainers = (List<Map<String, Object>>) workerMap.get("initContainers");
+                        for(Map<String, Object> initContainer : initContainers) {
+                            String image = (String) initContainer.get("image");
+                            if(!image.startsWith(imageCacheRepoPrefix)) {
+                                LOG.info("original init container image for worker: {}", image);
+                                image = imageCacheRepoPrefix + "/" + image;
+                                LOG.info("new init container image for worker: {}", image);
+                                initContainer.put("image", image);
+                            }
+                        }
+                    }
                     if(workerPodTemplateMap.containsKey("resources")) {
                         workerMap.put("resources", workerPodTemplateMap.get("resources"));
                     }

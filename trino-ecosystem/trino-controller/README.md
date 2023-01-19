@@ -295,6 +295,7 @@ http://localhost:8093/v1/trino/delete \
 -d  "name=etl-1";
 ```
 
+
 ### Trino Pod Template
 
 #### Update Trino Pod Template
@@ -302,9 +303,10 @@ Parameters:
 * `name` : unique cluster name.
 * `coordinator_pod_template` : coordinator pod template in yaml. base64 encoded.
 * `worker_pod_template` : worker pod template in yaml. base64 encoded.
+* `image_cache_repo_prefix` : image proxy cache repository prefix, for instance, `harbor-core-server-name/proxy-cache-project` prefix of the image repo `harbor-core-server-name/proxy-cache-project/busybox:1.28`. optional.
+* `image_pull_secret` : image pull secret. optional.
 
 ```
-
 cat <<EOF > coordinator-pod-template.yaml
 affinity:
   nodeAffinity:
