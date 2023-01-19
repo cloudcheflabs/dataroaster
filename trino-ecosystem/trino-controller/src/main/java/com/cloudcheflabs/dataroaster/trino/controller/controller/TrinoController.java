@@ -854,8 +854,8 @@ public class TrinoController {
                     }
                     // add image pull secret to pull image from harbor, for instance.
                     if(imagePullSecret != null) {
-                        List<LocalObjectReference> imagePullSecretList = new ArrayList<>();
-                        imagePullSecretList.add(new LocalObjectReferenceBuilder().withName(imagePullSecret).build());
+                        List<String> imagePullSecretList = new ArrayList<>();
+                        imagePullSecretList.add(imagePullSecret);
                         imageMap.put("imagePullSecrets", imagePullSecretList);
                     }
 
