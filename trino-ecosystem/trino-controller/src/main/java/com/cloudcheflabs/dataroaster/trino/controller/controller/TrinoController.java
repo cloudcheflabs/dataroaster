@@ -12,6 +12,8 @@ import com.cloudcheflabs.dataroaster.trino.controller.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
+import io.fabric8.kubernetes.api.model.LocalObjectReference;
+import io.fabric8.kubernetes.api.model.LocalObjectReferenceBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -852,8 +854,8 @@ public class TrinoController {
                     }
                     // add image pull secret to pull image from harbor, for instance.
                     if(imagePullSecret != null) {
-                        List<String> imagePullSecretList = new ArrayList<>();
-                        imagePullSecretList.add(imagePullSecret);
+                        List<LocalObjectReference> imagePullSecretList = new ArrayList<>();
+                        imagePullSecretList.add(new LocalObjectReferenceBuilder().withName(imagePullSecret).build());
                         imageMap.put("imagePullSecrets", imagePullSecretList);
                     }
 
