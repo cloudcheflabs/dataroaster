@@ -3,8 +3,10 @@ package com.cloudcheflabs.dataroaster.operators.trino.config;
 
 import com.cloudcheflabs.dataroaster.common.util.FileUtils;
 import com.cloudcheflabs.dataroaster.operators.trino.TrinoOperator;
+import com.cloudcheflabs.dataroaster.operators.trino.api.dao.K8sResourceDao;
 import com.cloudcheflabs.dataroaster.operators.trino.api.dao.ResourceDao;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
+import com.cloudcheflabs.dataroaster.operators.trino.dao.KubernetesK8sResourceDao;
 import com.cloudcheflabs.dataroaster.operators.trino.dao.KubernetesResourceDao;
 import com.cloudcheflabs.dataroaster.operators.trino.handler.ActionHandler;
 import com.cloudcheflabs.dataroaster.operators.trino.handler.TrinoClusterActionHandler;
@@ -21,6 +23,11 @@ public class SpringBeanConfig {
     public static final String PROPERTY_TRINO_OPERATOR_KUBECONFIG = "trinoOperatorKubeconfig";
     @Bean
     public ResourceDao resourceDao() { return new KubernetesResourceDao(kubernetesClient()); }
+
+    @Bean
+    public K8sResourceDao k8sResourceDao() {
+        return new KubernetesK8sResourceDao(kubernetesClient());
+    }
 
     @Bean
     public TrinoClusterClient trinoClusterClient() { return new TrinoClusterClient(kubernetesClient()); }

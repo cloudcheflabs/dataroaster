@@ -1,13 +1,14 @@
 package com.cloudcheflabs.dataroaster.operators.trino.controller;
 
 import com.cloudcheflabs.dataroaster.common.util.JsonUtils;
+import com.cloudcheflabs.dataroaster.operators.trino.api.dao.K8sResourceDao;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.Autoscaler;
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
-import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoClusterSpec;
 import com.cloudcheflabs.dataroaster.operators.trino.domain.Roles;
+import com.cloudcheflabs.dataroaster.operators.trino.util.YamlUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
-import io.fabric8.kubernetes.api.model.LocalObjectReference;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
@@ -42,6 +43,9 @@ public class ScaleController implements InitializingBean {
 
     @Autowired
     private KubernetesClient client;
+
+    @Autowired
+    private K8sResourceDao k8sResourceDao;
 
     private MixedOperation<TrinoCluster, KubernetesResourceList<TrinoCluster>, Resource<TrinoCluster>> trinoClusterClient;
 
@@ -94,10 +98,26 @@ public class ScaleController implements InitializingBean {
             String replicas = params.get("replicas");
             LOG.info("replicas: {}", replicas);
 
-            TrinoCluster trinoCluster = trinoClusterClient.inNamespace(namespace).withName(clusterName).get();
-            trinoCluster.getSpec().getWorker().setReplicas(Integer.valueOf(replicas));
-            // scale worker count with update trino cluster custom resource.
-            trinoClusterClient.inNamespace(namespace).withName(clusterName).createOrReplace(trinoCluster);
+            List<GenericKubernetesResource> trinoClusters =
+                    k8sResourceDao.listCustomResources(namespace, "TrinoCluster");
+
+            for (GenericKubernetesResource genericKubernetesResource : trinoClusters) {
+                String trinoClusterName = genericKubernetesResource.getMetadata().getName();
+                if(trinoClusterName.equals(clusterName)) {
+                    Map<String, Object> additionalMap = genericKubernetesResource.getAdditionalProperties();
+                    Map<String, Object> specMap = (Map<String, Object>) additionalMap.get("spec");
+
+                    // add worker pod template.
+                    Map<String, Object> workerMap = (Map<String, Object>) specMap.get("worker");
+                    workerMap.put("replicas", Integer.valueOf(replicas));
+
+                    LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
+
+                    k8sResourceDao.updateCustomResource(genericKubernetesResource);
+                    LOG.info("cluster [{}] configs updated.", clusterName);
+                    break;
+                }
+            }
 
             return ControllerUtils.successMessage();
         });

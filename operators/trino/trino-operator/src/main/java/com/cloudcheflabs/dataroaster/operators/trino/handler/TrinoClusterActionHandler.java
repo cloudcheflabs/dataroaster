@@ -1,12 +1,8 @@
 package com.cloudcheflabs.dataroaster.operators.trino.handler;
 
 import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoCluster;
-import com.cloudcheflabs.dataroaster.operators.trino.crd.TrinoClusterSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.cloudcheflabs.dataroaster.operators.trino.config.TrinoConfiguration.DEFAULT_COORDINATOR_DEPLOYMENT;
-import static com.cloudcheflabs.dataroaster.operators.trino.config.TrinoConfiguration.DEFAULT_WORKER_DEPLOYMENT;
 
 public class TrinoClusterActionHandler implements ActionHandler<TrinoCluster> {
 
