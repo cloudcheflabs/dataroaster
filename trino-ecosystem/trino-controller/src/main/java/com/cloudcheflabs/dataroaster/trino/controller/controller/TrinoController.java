@@ -852,7 +852,9 @@ public class TrinoController {
                     }
                     // add image pull secret to pull image from harbor, for instance.
                     if(imagePullSecret != null) {
-                        imageMap.put("imagePullSecrets", Arrays.asList(imagePullSecret));
+                        List<String> imagePullSecretList = new ArrayList<>();
+                        imagePullSecretList.add(imagePullSecret);
+                        imageMap.put("imagePullSecrets", imagePullSecretList);
                     }
 
                     // add coordinator pod template.
