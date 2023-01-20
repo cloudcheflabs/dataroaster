@@ -28,13 +28,14 @@ ENV PATH="$PATH:$SPARK_HOME/bin"
 
 # install maven.
 ENV MAVEN_HOME /opt/maven
+ENV MAVEN_VERSION 3.8.7
 RUN set -eux; \
     mkdir -p ${MAVEN_HOME}; \
     cd ${MAVEN_HOME}; \
-    curl -L -O https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz; \
-    tar zxvf apache-maven-3.8.6-bin.tar.gz; \
-    cp -R apache-maven-3.8.6/* .; \
-    rm -rf apache-maven-3.8.6 apache-maven-3.8.6-bin.tar.gz;
+    curl -L -O https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz; \
+    tar zxvf apache-maven-${MAVEN_VERSION}-bin.tar.gz; \
+    cp -R apache-maven-${MAVEN_VERSION}/* .; \
+    rm -rf apache-maven-${MAVEN_VERSION} apache-maven-${MAVEN_VERSION}-bin.tar.gz;
 
 # export maven home to path.
 ENV PATH="$PATH:$MAVEN_HOME/bin"
