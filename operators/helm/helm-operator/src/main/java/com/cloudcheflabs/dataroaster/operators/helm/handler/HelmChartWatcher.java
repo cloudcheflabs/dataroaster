@@ -7,18 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 
 public class HelmChartWatcher implements Watcher<HelmChart>{
     private static Logger LOG = LoggerFactory.getLogger(HelmChartWatcher.class);
 
-    private final CountDownLatch countDownLatch;
     private BlockingQueue<HelmChartActionEvent> queue;
 
-    public HelmChartWatcher(BlockingQueue<HelmChartActionEvent> queue,
-                            CountDownLatch countDownLatch) {
+    public HelmChartWatcher(BlockingQueue<HelmChartActionEvent> queue) {
         this.queue = queue;
-        this.countDownLatch = countDownLatch;
     }
 
     @Override
@@ -33,10 +29,8 @@ public class HelmChartWatcher implements Watcher<HelmChart>{
 
     @Override
     public void onClose(WatcherException e) {
-        LOG.error(e.getMessage());
+        LOG.error("watcher exception: " + e.getMessage());
         e.printStackTrace();
-        this.countDownLatch.countDown();
-        LOG.error("close watcher... system exited...");
-        System.exit(-1);
+        throw new RuntimeException(e);
     }
 }

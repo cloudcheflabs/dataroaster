@@ -7,18 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 
 public class SparkApplicationWatcher implements Watcher<SparkApplication> {
 
     private static Logger LOG = LoggerFactory.getLogger(SparkApplicationWatcher.class);
 
-    private final CountDownLatch countDownLatch;
     private BlockingQueue<SparkApplicationActionEvent> queue;
 
-    public SparkApplicationWatcher(BlockingQueue<SparkApplicationActionEvent> queue, CountDownLatch countDownLatch) {
+    public SparkApplicationWatcher(BlockingQueue<SparkApplicationActionEvent> queue) {
         this.queue = queue;
-        this.countDownLatch = countDownLatch;
     }
 
     @Override
@@ -33,10 +30,8 @@ public class SparkApplicationWatcher implements Watcher<SparkApplication> {
 
     @Override
     public void onClose(WatcherException e) {
-        LOG.error(e.getMessage());
+        LOG.error("watcher exception: " + e.getMessage());
         e.printStackTrace();
-        this.countDownLatch.countDown();
-        LOG.error("close watcher... system exited...");
-        System.exit(-1);
+        throw new RuntimeException(e);
     }
 }

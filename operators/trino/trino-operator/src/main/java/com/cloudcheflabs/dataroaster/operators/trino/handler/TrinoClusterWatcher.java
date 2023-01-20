@@ -7,17 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 
 public class TrinoClusterWatcher implements Watcher<TrinoCluster>{
     private static Logger LOG = LoggerFactory.getLogger(TrinoClusterWatcher.class);
 
-    private final CountDownLatch countDownLatch;
     private BlockingQueue<TrinoClusterActionEvent> queue;
 
-    public TrinoClusterWatcher(BlockingQueue<TrinoClusterActionEvent> queue, CountDownLatch countDownLatch) {
+    public TrinoClusterWatcher(BlockingQueue<TrinoClusterActionEvent> queue) {
         this.queue = queue;
-        this.countDownLatch = countDownLatch;
     }
 
     @Override
@@ -32,10 +29,8 @@ public class TrinoClusterWatcher implements Watcher<TrinoCluster>{
 
     @Override
     public void onClose(WatcherException e) {
-        LOG.error(e.getMessage());
+        LOG.error("watcher exception: " + e.getMessage());
         e.printStackTrace();
-        this.countDownLatch.countDown();
-        LOG.error("close watcher... system exited...");
-        System.exit(-1);
+        throw new RuntimeException(e);
     }
 }
