@@ -33,7 +33,10 @@ public class SparkApplicationWatcher implements Watcher<SparkApplication> {
 
     @Override
     public void onClose(WatcherException e) {
+        LOG.error(e.getMessage());
+        e.printStackTrace();
         this.countDownLatch.countDown();
-        LOG.info("Closing watch");
+        LOG.error("close watcher... system exited...");
+        System.exit(-1);
     }
 }

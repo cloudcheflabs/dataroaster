@@ -32,7 +32,10 @@ public class TrinoClusterWatcher implements Watcher<TrinoCluster>{
 
     @Override
     public void onClose(WatcherException e) {
+        LOG.error(e.getMessage());
+        e.printStackTrace();
         this.countDownLatch.countDown();
-        LOG.info("close watcher");
+        LOG.error("close watcher... system exited...");
+        System.exit(-1);
     }
 }
