@@ -38,7 +38,12 @@ public class HelmChartWatchRunnable implements Runnable{
                 e.printStackTrace();
                 countDownLatch.countDown();
                 LOG.error("watch close count: {}", ++watchCloseCount);
-                LOG.info("trying to watch custom resource again...");
+                try {
+                    Thread.sleep(5000);
+                    LOG.info("trying to watch custom resource again...");
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
             }
         }
     }
