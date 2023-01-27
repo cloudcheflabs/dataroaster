@@ -54,7 +54,7 @@ public class TrinoActiveQueryCountUpdater implements Runnable {
                 List<Cluster> clusterList = new ArrayList<>();
                 List<ClusterGroup> clusterGroupList = clusterGroupService.findAll();
                 if (clusterGroupList == null) {
-                    pause(1000);
+                    pause(10000);
                     continue;
                 }
                 for (ClusterGroup clusterGroup : clusterGroupList) {
@@ -66,7 +66,7 @@ public class TrinoActiveQueryCountUpdater implements Runnable {
                 }
 
                 if (clusterList.size() == 0) {
-                    pause(1000);
+                    pause(10000);
                     continue;
                 }
                 for (Cluster cluster : clusterList) {
@@ -79,10 +79,10 @@ public class TrinoActiveQueryCountUpdater implements Runnable {
                     // update active query count to redis.
                     trinoActiveQueryCountUpdaterCacheService.set(clusterName, trinoActiveQueryCount);
                 }
-                pause(1000);
+                pause(10000);
             } catch (Exception e) {
                 e.printStackTrace();
-                pause(5000);
+                pause(10000);
                 continue;
             }
         }
