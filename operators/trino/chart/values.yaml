@@ -2,6 +2,7 @@ namespace: trino-operator
 serviceAccount: trino-operator
 image: cloudcheflabs/trino-operator:v3.1.1
 imagePullPolicy: Always
+replicas: 3
 resources:
   requests:
     cpu: 200m
