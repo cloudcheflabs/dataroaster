@@ -6,10 +6,10 @@ replicas: 3
 resources:
   requests:
     cpu: 200m
-    memory: 1Gi
-  limits:
-    cpu: 300m
     memory: 1500Mi
+  limits:
+    cpu: 500m
+    memory: 2500Mi
 priorityClassName: ""
 annotations: null
 affinity: null
