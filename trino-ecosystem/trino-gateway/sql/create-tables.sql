@@ -40,8 +40,7 @@ create table if not exists trino_proxy.users
     `user`  varchar(100) NOT NULL,
     `password`  varchar(1000) NOT NULL,
     `group_name`   varchar(100) NOT NULL,
-    PRIMARY KEY (`user`),
-    UNIQUE KEY `users_unique` (`group_name`)
+    PRIMARY KEY (`user`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 ALTER TABLE `trino_proxy`.`users`
