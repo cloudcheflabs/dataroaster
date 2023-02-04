@@ -31,6 +31,7 @@ public class TrinoClusterWatcher implements Watcher<TrinoCluster>{
     public void onClose(WatcherException e) {
         LOG.error("watcher exception: " + e.getMessage());
         e.printStackTrace();
-        throw new RuntimeException(e);
+        //throw new RuntimeException(e);
+        System.exit(1);
     }
 }
