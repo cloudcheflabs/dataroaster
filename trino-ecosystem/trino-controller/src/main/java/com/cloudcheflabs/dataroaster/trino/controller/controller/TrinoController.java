@@ -10,6 +10,7 @@ import com.cloudcheflabs.dataroaster.trino.controller.domain.RestResponse;
 import com.cloudcheflabs.dataroaster.trino.controller.domain.Roles;
 import com.cloudcheflabs.dataroaster.trino.controller.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.LocalObjectReference;
@@ -23,6 +24,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -714,6 +718,97 @@ public class TrinoController {
 
             return JsonUtils.toJson(mapList);
         });
+    }
+
+    @PutMapping("/v1/trino/config/memory-properties/update")
+    public String updateMemoryConfig(@RequestParam Map<String, String> params) {
+        return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
+            String name = params.get("name");
+            String memoryProperties = params.get("memory_properties");
+            if(memoryProperties == null) {
+                throw new IllegalArgumentException("memory properties param NULL not allowed.");
+            }
+            memoryProperties = Base64Utils.decodeBase64(memoryProperties);
+            LOG.info("decoded memory properties: \n{}", memoryProperties);
+            Properties memoryPropObj = new Properties();
+            memoryPropObj.load(new ByteArrayInputStream(memoryProperties.getBytes()));
+
+
+            List<GenericKubernetesResource> trinoClusters =
+                    k8sResourceService.listCustomResources(DEFAULT_TRINO_OPERATOR_NAMESPACE, "TrinoCluster");
+
+            for (GenericKubernetesResource genericKubernetesResource : trinoClusters) {
+                String clusterName = genericKubernetesResource.getMetadata().getName();
+                if(clusterName.equals(name)) {
+                    Map<String, Object> additionalMap = genericKubernetesResource.getAdditionalProperties();
+                    Map<String, Object> specMap = (Map<String, Object>) additionalMap.get("spec");
+                    Map<String, Object> coordinatorMap = (Map<String, Object>) specMap.get("coordinator");
+                    List<Map<String, Object>> coordinatorConfigs = (List<Map<String, Object>>) coordinatorMap.get("configs");
+                    Map<String, Object> workerMap = (Map<String, Object>) specMap.get("worker");
+                    List<Map<String, Object>> workerConfigs = (List<Map<String, Object>>) workerMap.get("configs");
+
+                    for(Map<String, Object> coordinatorConfig : coordinatorConfigs) {
+                        if(coordinatorConfig.get("name").equals("config.properties") &&
+                                coordinatorConfig.get("path").equals("/etc/trino")) {
+
+                            String configProperties = (String) coordinatorConfig.get("value");
+                            String changedConfigProperties = updateConfigProperties(memoryPropObj, configProperties);
+                            LOG.info("changed config properties: \n{}", changedConfigProperties);
+
+                            // update config properties.
+                            coordinatorConfig.put("value", changedConfigProperties);
+                            break;
+                        }
+                    }
+
+                    for(Map<String, Object> workerConfig : workerConfigs) {
+                        if(workerConfig.get("name").equals("config.properties") &&
+                                workerConfig.get("path").equals("/etc/trino")) {
+                            String configProperties = (String) workerConfig.get("value");
+                            String changedConfigProperties = updateConfigProperties(memoryPropObj, configProperties);
+                            LOG.info("changed config properties: \n{}", changedConfigProperties);
+
+                            // update config properties.
+                            workerConfig.put("value", changedConfigProperties);
+                            break;
+                        }
+                    }
+                    LOG.info("updated generic custom resource: \n{}", YamlUtils.objectToYaml(genericKubernetesResource));
+
+                    k8sResourceService.updateCustomResource(genericKubernetesResource);
+                    LOG.info("cluster [{}] configs updated.", name);
+
+                    String clusterNamespace = (String) specMap.get("namespace");
+                    rolloutDeployment(clusterNamespace);
+
+                    // wait for coordinator and workers restarted.
+                    LOG.info("waiting for coordinator and workers restarted...");
+                    PauseUtils.pause(20000);
+
+                    // update prometheus configmap to update prometheus jobs.
+                    updatePrometheusConfigMap(name, clusterNamespace);
+
+                    break;
+                }
+            }
+
+            return ControllerUtils.successMessage();
+        });
+    }
+
+    private String updateConfigProperties(Properties memoryPropObj, String configProperties) throws IOException {
+        Properties configPropObj = new Properties();
+        configPropObj.load(new ByteArrayInputStream(configProperties.getBytes()));
+
+        for(Object keyObj : memoryPropObj.keySet()) {
+            if(configPropObj.containsKey(keyObj)) {
+                configPropObj.put(keyObj, memoryPropObj.get(keyObj));
+            }
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        configPropObj.store(out, null);
+        return new String(out.toByteArray());
     }
 
     private void updatePrometheusConfigMap(String name, String trinoClusterNamespace) {
