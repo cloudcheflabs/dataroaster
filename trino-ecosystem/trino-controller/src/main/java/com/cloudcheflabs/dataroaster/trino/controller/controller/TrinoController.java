@@ -496,12 +496,15 @@ public class TrinoController {
                     k8sResourceService.updateCustomResource(genericKubernetesResource);
                     LOG.info("cluster [{}] configs updated.", name);
 
+                    LOG.info("waiting for update trinocluster custom resource...");
+                    PauseUtils.pause(30000);
+
                     String clusterNamespace = (String) specMap.get("namespace");
                     rolloutDeployment(clusterNamespace);
 
                     // wait for coordinator and workers restarted.
                     LOG.info("waiting for coordinator and workers restarted...");
-                    PauseUtils.pause(20000);
+                    PauseUtils.pause(30000);
 
                     // update prometheus configmap to update prometheus jobs.
                     updatePrometheusConfigMap(name, clusterNamespace);
@@ -729,7 +732,7 @@ public class TrinoController {
             if(name == null) {
                 throw new IllegalArgumentException("cluster name param NULL not allowed.");
             }
-            
+
             if(memoryProperties == null) {
                 throw new IllegalArgumentException("memory properties param NULL not allowed.");
             }
