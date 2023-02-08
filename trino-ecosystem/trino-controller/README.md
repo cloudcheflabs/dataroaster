@@ -495,6 +495,28 @@ http://localhost:8093/v1/trino/config/update \
 ```
 
 
+#### Update memory properties in config.properties
+Parameters:
+* `name` : cluster name.
+* `memory_properties` : trino memory properties.
+
+```
+cat <<EOF > memory.properties
+query.max-memory=16GB
+query.max-total-memory=19GB
+query.max-memory-per-node=5GB
+memory.heap-headroom-per-node=3GB
+EOF
+
+
+curl -XPUT \
+http://localhost:8093/v1/trino/config/memory-properties/update \
+-d "name=etl-1" \
+-d "memory_properties=$(base64 -w 0 ./memory.properties)" \
+;
+```
+
+
 
 
 #### Delete trino cluster config
