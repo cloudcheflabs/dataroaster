@@ -725,6 +725,11 @@ public class TrinoController {
         return ControllerUtils.doProcess(Roles.ROLE_PLATFORM_ADMIN, context, () -> {
             String name = params.get("name");
             String memoryProperties = params.get("memory_properties");
+
+            if(name == null) {
+                throw new IllegalArgumentException("cluster name param NULL not allowed.");
+            }
+            
             if(memoryProperties == null) {
                 throw new IllegalArgumentException("memory properties param NULL not allowed.");
             }
