@@ -6,8 +6,8 @@ metadata:
   namespace: {{ .Values.namespace }}
 type: Opaque
 data:
-  access-key: {{ .Values.s3.accessKey }}
-  secret-key: {{ .Values.s3.secretKey }}
+  access-key: {{ .Values.s3.accessKey | b64enc }}
+  secret-key: {{ .Values.s3.secretKey | b64enc }}
 ---
 apiVersion: v1
 kind: ConfigMap
