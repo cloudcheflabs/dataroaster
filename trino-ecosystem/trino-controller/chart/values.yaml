@@ -16,6 +16,8 @@ affinity: null
 tolerations: null
 nodeSelector: null
 hostNetwork: false
+dnsPolicy: Default
+
 # spring boot server
 server:
   port: 8093
