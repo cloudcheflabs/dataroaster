@@ -1,5 +1,6 @@
 namespace: hive-metastore
 image: cloudcheflabs/hivemetastore:v3.0.0
+dnsPolicy: Default
 s3:
   bucket: any-bucket
   accessKey: any-access-key

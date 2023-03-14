@@ -39,6 +39,7 @@ spec:
       labels:
         app: mysql
     spec:
+      dnsPolicy: {{ .Values.dnsPolicy }}
       containers:
         - name: mysql
           image: mysql:5.7

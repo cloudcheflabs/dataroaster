@@ -115,6 +115,7 @@ spec:
       labels:
         app: metastore
     spec:
+      dnsPolicy: {{ .Values.dnsPolicy }}
       initContainers:
         - name: init-create-schema
           image: {{ .Values.image }}

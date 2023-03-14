@@ -46,6 +46,7 @@ spec:
       - name: postgres-for-redash
         persistentVolumeClaim:
           claimName: pgredash-pv-claim
+      dnsPolicy: {{ .Values.dnsPolicy }}
       containers:
       - name: redis
         image: redis:5.0-alpine

@@ -37,6 +37,7 @@ spec:
       {{- end }}
       hostNetwork: {{ .Values.hostNetwork }}
       serviceAccountName: {{ .Values.serviceAccount }}
+      dnsPolicy: {{ .Values.dnsPolicy }}
       containers:
         - name: metabase
           image: {{ .Values.image }}

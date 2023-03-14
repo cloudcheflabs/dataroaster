@@ -16,6 +16,7 @@ affinity: {}
 tolerations: {}
 nodeSelector: {}
 hostNetwork: false
+dnsPolicy: Default
 
 server:
   port: 3000

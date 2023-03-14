@@ -1,5 +1,6 @@
 namespace: redash
 image: redash/redash:10.0.0-beta.b49597
+dnsPolicy: Default
 storage:
   storageClass: oci
   size: 10
