@@ -18,6 +18,15 @@ nodeSelector: null
 hostNetwork: false
 dnsPolicy: Default
 
+# helm operator.
+dataroasterhelmoperator:
+  dnsPolicy: Default
+
+# trino operator.
+dataroastertrinooperator:
+  dnsPolicy: Default
+
+
 # spring boot server
 server:
   port: 8093
