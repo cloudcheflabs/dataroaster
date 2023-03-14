@@ -28,6 +28,7 @@ spec:
       {{- end }}
       hostNetwork: {{ .Values.hostNetwork }}
       serviceAccountName: {{ .Values.serviceAccount }}
+      dnsPolicy: {{ .Values.dnsPolicy }}
       initContainers:
         - name: init-create-schema
           image: {{ .Values.image }}

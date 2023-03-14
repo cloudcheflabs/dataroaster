@@ -16,6 +16,7 @@ affinity: null
 tolerations: null
 nodeSelector: null
 hostNetwork: false
+dnsPolicy: Default
 
 # ingress.
 ingress:

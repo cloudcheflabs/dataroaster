@@ -27,6 +27,7 @@ spec:
       {{- end }}
       hostNetwork: {{ .Values.hostNetwork }}
       serviceAccountName: {{ .Values.serviceAccount }}
+      dnsPolicy: {{ .Values.dnsPolicy }}
       containers:
         - name: helm-operator
           image: {{ .Values.image }}

@@ -16,5 +16,6 @@ affinity: null
 tolerations: null
 nodeSelector: null
 hostNetwork: false
+dnsPolicy: Default
 server:
     port: 8092
