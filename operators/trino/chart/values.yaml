@@ -16,6 +16,6 @@ affinity: null
 tolerations: null
 nodeSelector: null
 hostNetwork: false
-dnsPolicy: Default
+dnsPolicy: ClusterFirst
 server:
     port: 8092

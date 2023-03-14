@@ -2,4 +2,4 @@ storage:
   storageClass: standard
   size: 5Gi
 rootPassword: mysqlpass123
-dnsPolicy: Default
+dnsPolicy: ClusterFirst

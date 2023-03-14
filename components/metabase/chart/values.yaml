@@ -16,7 +16,7 @@ affinity: {}
 tolerations: {}
 nodeSelector: {}
 hostNetwork: false
-dnsPolicy: Default
+dnsPolicy: ClusterFirst
 
 server:
   port: 3000

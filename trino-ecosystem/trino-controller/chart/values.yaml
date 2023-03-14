@@ -16,15 +16,15 @@ affinity: null
 tolerations: null
 nodeSelector: null
 hostNetwork: false
-dnsPolicy: Default
+dnsPolicy: ClusterFirst
 
 # helm operator.
 dataroasterhelmoperator:
-  dnsPolicy: Default
+  dnsPolicy: ClusterFirst
 
 # trino operator.
 dataroastertrinooperator:
-  dnsPolicy: Default
+  dnsPolicy: ClusterFirst
 
 
 # spring boot server
