@@ -105,6 +105,7 @@ metadata:
   name: metastore
   namespace: {{ .Values.namespace }}
 spec:
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: metastore
