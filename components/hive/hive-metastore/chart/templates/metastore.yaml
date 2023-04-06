@@ -120,9 +120,21 @@ spec:
       initContainers:
         - name: init-create-schema
           image: {{ .Values.image }}
-          command: [ "/opt/hive-metastore/bin/schematool" ]
-          args: [ "--verbose" ,"-initSchema" , "-dbType", "mysql" , "-userName", "{{ .Values.jdbc.user }}",
-                    "-passWord", "{{ .Values.jdbc.password }}" , "-url", "jdbc:mysql://mysql-service.{{ .Values.namespace }}.svc:3306/metastore_db?createDatabaseIfNotExist=true&useSSL=false" ]
+          command:
+            - sh
+            - "-c"
+            - |
+              /bin/bash <<'EOF'
+              set +e;
+              /opt/hive-metastore/bin/schematool \
+              --verbose \
+              -initSchema \
+              -dbType mysql \
+              -userName {{ .Values.jdbc.user }} \
+              -passWord {{ .Values.jdbc.password }} \
+              -url jdbc:mysql://mysql-service.{{ .Values.namespace }}.svc:3306/metastore_db?createDatabaseIfNotExist=true&useSSL=false;
+              exit 0;
+              EOF
       containers:
         - name: metastore
           image: {{ .Values.image }}
