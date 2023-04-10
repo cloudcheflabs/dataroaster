@@ -76,9 +76,9 @@ public class SparkOperatorTestRunner {
     public void downloadObjectFromS3() throws Exception {
         String applicationFileUrl = "s3a://mykidong/spark-app/pi.py";
 
-        S3Utils.downloadObject("48d4ec0c682cec9f1bc97ffc563c27827651b07b",
-                "akOGv1TgyV/p0RZEQFFCkzhHGsxpbcI9AQfPmeXeR8U=",
-                "https://cnobgk2u8blu.compat.objectstorage.ap-seoul-1.oraclecloud.com",
+        S3Utils.downloadObject("any-access-key",
+                "any-secret-key",
+                "https://any-endpoint",
                 applicationFileUrl,
                 System.getProperty("user.home") + "/pi-downloaded.py");
     }
