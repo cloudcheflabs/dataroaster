@@ -1,5 +1,5 @@
 namespace: hive-metastore
-image: cloudcheflabs/hivemetastore:v3.0.0
+image: cloudcheflabs/hivemetastore:v3.3.5
 dnsPolicy: ClusterFirst
 replicas: 1
 s3:
@@ -7,6 +7,7 @@ s3:
   accessKey: any-access-key
   secretKey: any-secret
   endpoint: any-endpoint
+  region: any-region
 jdbc:
   user: root
   password: mysqlpass123

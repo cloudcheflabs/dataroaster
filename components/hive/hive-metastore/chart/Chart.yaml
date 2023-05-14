@@ -1,7 +1,7 @@
 apiVersion: v2
 name: dataroaster-hivemetastore
-version: v2.1.0
-appVersion: 3.0.0
+version: v2.2.0
+appVersion: v3.3.5
 description: dataroaster hivemetastore.
 
 

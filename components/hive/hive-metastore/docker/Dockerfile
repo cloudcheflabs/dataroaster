@@ -1,6 +1,6 @@
 FROM openjdk:8-slim
 
-ARG HADOOP_VERSION=3.2.0
+ARG HADOOP_VERSION=3.3.5
 
 RUN apt-get update && apt-get install -y curl --no-install-recommends \
 	&& rm -rf /var/lib/apt/lists/*
@@ -10,8 +10,8 @@ RUN curl https://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VERSION/hado
 	&& ln -s /opt/hadoop-$HADOOP_VERSION /opt/hadoop \
 	&& rm -r /opt/hadoop/share/doc 
 
-RUN ln -s /opt/hadoop/share/hadoop/tools/lib/hadoop-aws-3.2.0.jar /opt/hadoop/share/hadoop/common/lib/ && \
-    ln -s /opt/hadoop/share/hadoop/tools/lib/aws-java-sdk-bundle-1.11.375.jar /opt/hadoop/share/hadoop/common/lib/
+RUN ln -s /opt/hadoop/share/hadoop/tools/lib/hadoop-aws-$HADOOP_VERSION.jar /opt/hadoop/share/hadoop/common/lib/ && \
+    ln -s /opt/hadoop/share/hadoop/tools/lib/aws-java-sdk-bundle-1.12.316.jar /opt/hadoop/share/hadoop/common/lib/
 
 ENV HADOOP_HOME="/opt/hadoop"
 ENV PATH="/opt/spark/bin:/opt/hadoop/bin:${PATH}"

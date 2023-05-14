@@ -48,6 +48,10 @@ data:
             <value>{{ .Values.s3.endpoint }}</value>
         </property>
         <property>
+            <name>fs.s3a.endpoint.region</name>
+            <value>{{ .Values.s3.region }}</value>
+        </property>
+        <property>
             <name>fs.s3a.fast.upload</name>
             <value>true</value>
         </property>
@@ -147,6 +151,8 @@ spec:
               secretKeyRef:
                 name: my-s3-keys
                 key: secret-key
+          - name: AWS_REGION
+            value: "{{ .Values.s3.region }}"
           ports:
             - containerPort: 9083
           volumeMounts:
