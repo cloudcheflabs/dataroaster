@@ -915,6 +915,10 @@ spec:
                         properties:
                           claimName:
                             type: string
+                          storageClass:
+                            type: string
+                          sizeLimit:
+                            type: string
                           readOnly:
                             type: boolean
                         required:

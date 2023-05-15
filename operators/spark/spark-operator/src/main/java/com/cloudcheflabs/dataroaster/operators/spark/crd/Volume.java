@@ -52,6 +52,26 @@ public class Volume {
 
     public static class PersistentVolumeClaim {
         private String claimName;
+
+        private String storageClass;
+        private String sizeLimit;
+
+        public String getStorageClass() {
+            return storageClass;
+        }
+
+        public void setStorageClass(String storageClass) {
+            this.storageClass = storageClass;
+        }
+
+        public String getSizeLimit() {
+            return sizeLimit;
+        }
+
+        public void setSizeLimit(String sizeLimit) {
+            this.sizeLimit = sizeLimit;
+        }
+
         private boolean readOnly = false;
 
         public String getClaimName() {

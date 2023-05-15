@@ -125,11 +125,15 @@ spec:
     - name: driver-local-dir
       type: SparkLocalDir
       persistentVolumeClaim:
-        claimName: nfs-pvc-driver
+        claimName: OnDemand
+        storageClass: oci
+        sizeLimit: 50Gi
     - name: executor-local-dir
       type: SparkLocalDir
       persistentVolumeClaim:
-        claimName: nfs-pvc-executor
+        claimName: OnDemand
+        storageClass: oci
+        sizeLimit: 50Gi
 ```
 
 

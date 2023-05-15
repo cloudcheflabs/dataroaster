@@ -234,20 +234,14 @@ public class SparkConfiguration {
         } else if(volume.getPersistentVolumeClaim() != null) {
             Volume.PersistentVolumeClaim persistentVolumeClaim = volume.getPersistentVolumeClaim();
             String claimName = persistentVolumeClaim.getClaimName();
+            String storageClass = persistentVolumeClaim.getStorageClass();
+            String sizeLimit = persistentVolumeClaim.getSizeLimit();
             boolean pvcReadOnly = persistentVolumeClaim.isReadOnly();
 
-            // TODO: support dynamic persistent volume allocation.
-
-            /**
-             * Example:
-             * spark.kubernetes.executor.volumes.persistentVolumeClaim.data.options.claimName=OnDemand
-             * spark.kubernetes.executor.volumes.persistentVolumeClaim.data.options.storageClass=gp
-             * spark.kubernetes.executor.volumes.persistentVolumeClaim.data.options.sizeLimit=500Gi
-             * spark.kubernetes.executor.volumes.persistentVolumeClaim.data.mount.path=/data
-             * spark.kubernetes.executor.volumes.persistentVolumeClaim.data.mount.readOnly=false
-             */
-
-            //confMap.put("spark.kubernetes." + driverOrExecutor + ".volumes." + volumeType + "." + volumeName + ".options.claimName", claimName);
+            confMap.put("spark.kubernetes." + driverOrExecutor + ".volumes." + volumeType + "." + volumeName + ".options.claimName", claimName);
+            confMap.put("spark.kubernetes." + driverOrExecutor + ".volumes." + volumeType + "." + volumeName + ".options.storageClass", storageClass);
+            confMap.put("spark.kubernetes." + driverOrExecutor + ".volumes." + volumeType + "." + volumeName + ".options.sizeLimit", sizeLimit);
+            confMap.put("spark.kubernetes." + driverOrExecutor + ".volumes." + volumeType + "." + volumeName + ".options.readOnly", String.valueOf(pvcReadOnly));
         }
         return confMap;
     }
