@@ -75,10 +75,12 @@ public class SparkOperatorTestRunner {
     @Test
     public void downloadObjectFromS3() throws Exception {
         String applicationFileUrl = "s3a://mykidong/spark-app/pi.py";
+        String region = "us-east-1";
 
         S3Utils.downloadObject("any-access-key",
                 "any-secret-key",
                 "https://any-endpoint",
+                region,
                 applicationFileUrl,
                 System.getProperty("user.home") + "/pi-downloaded.py");
     }

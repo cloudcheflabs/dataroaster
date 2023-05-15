@@ -15,8 +15,8 @@ helm install \
 spark-operator \
 --create-namespace \
 --namespace spark-operator \
---version v1.0.2 \
---set image=cloudcheflabs/spark-operator:latest \
+--version v1.2.0 \
+--set image=cloudcheflabs/spark-operator:v3.4.0 \
 dataroaster-spark-operator/dataroastersparkoperator;
 ```
 
@@ -77,7 +77,7 @@ spec:
     applicationType: EndlessRun
     deployMode: Cluster
     container:
-      image: "cloudcheflabs/spark:v3.2.2"
+      image: "cloudcheflabs/spark:v3.4.0"
       imagePullPolicy: Always
     class: com.cloudcheflabs.dataroaster.hive.SparkThriftServerRunner
     applicationFileUrl: "s3a://mykidong/spark-app/spark-thrift-server-4.8.0-SNAPSHOT-spark-job.jar"
@@ -95,6 +95,7 @@ spec:
             name: s3-secret
             key: secretKey
       endpoint: "https://any-s3-endpoint"
+      region: "us-east-1"
     hive:
       metastoreUris:
         - "thrift://metastore.dataroaster-hivemetastore.svc:9083"

@@ -97,6 +97,8 @@ spec:
                                     - key
                         endpoint:
                           type: string
+                        region:
+                          type: string
                     hive:
                       type: object
                       properties:

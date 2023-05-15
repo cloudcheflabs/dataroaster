@@ -20,7 +20,7 @@ public class S3Utils {
 
     private static Logger LOG = LoggerFactory.getLogger(S3Utils.class);
 
-    public static void downloadObject(String accessKey, String secretKey, String endpoint, String s3Path, String toFilePath) {
+    public static void downloadObject(String accessKey, String secretKey, String endpoint, String region, String s3Path, String toFilePath) {
         s3Path = s3Path.replaceAll("s3a://", "");
         int index = s3Path.indexOf("/");
         String s3Bucket = s3Path.substring(0, index);
@@ -33,6 +33,7 @@ public class S3Utils {
 
         AmazonS3 s3Client = AmazonS3ClientBuilder
                 .standard()
+                .withRegion(region)
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, null))
                 .withPathStyleAccessEnabled(true)
                 .withClientConfiguration(clientConfiguration)

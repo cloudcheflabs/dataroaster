@@ -25,7 +25,7 @@
 		<!-- junit -->
 		<junit.version>4.12</junit.version>
 
-		<aws.java.sdk.version>1.11.163</aws.java.sdk.version>
+		<aws.java.sdk.version>1.12.316</aws.java.sdk.version>
 	</properties>
 
 	<dependencies>

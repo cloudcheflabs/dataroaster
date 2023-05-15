@@ -74,9 +74,10 @@ public class SparkSubmitHandler {
             String accessKey = accessKeyDecoded;
             String secretKey = secretKeyDecoded;
             String endpoint = s3.getEndpoint();
+            String region = s3.getRegion();
 
             // set s3 credentials.
-            confMap = SparkConfiguration.setS3Credentials(confMap, bucket, accessKey, secretKey, endpoint);
+            confMap = SparkConfiguration.setS3Credentials(confMap, bucket, accessKey, secretKey, endpoint, region);
 
             Core.Hive hive = core.getHive();
             if (hive != null) {
@@ -218,6 +219,7 @@ public class SparkSubmitHandler {
                 S3Utils.downloadObject(accessKey,
                         secretKey,
                         endpoint,
+                        region,
                         applicationFileUrl,
                         toFilePath);
             }
@@ -242,6 +244,7 @@ public class SparkSubmitHandler {
                     S3Utils.downloadObject(accessKey,
                             secretKey,
                             endpoint,
+                            region,
                             pyFilesUrl,
                             pyFilesFilePath);
                 }

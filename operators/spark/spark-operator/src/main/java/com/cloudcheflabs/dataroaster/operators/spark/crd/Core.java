@@ -119,6 +119,15 @@ public class Core {
         private AccessKey accessKey;
         private SecretKey secretKey;
         private String endpoint;
+        private String region;
+
+        public String getRegion() {
+            return region;
+        }
+
+        public void setRegion(String region) {
+            this.region = region;
+        }
 
         public String getBucket() {
             return bucket;

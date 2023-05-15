@@ -15,7 +15,7 @@ import java.util.Map;
 public class SparkConfiguration {
 
     public static final String DEFAULT_MASTER = System.getProperty("masterUrlForLocalTest", "k8s://https://kubernetes.default.svc");
-    public static final String DEFAULT_PACKAGES = "com.amazonaws:aws-java-sdk-s3:1.11.375,org.apache.hadoop:hadoop-aws:3.2.0";
+    public static final String DEFAULT_PACKAGES = "com.amazonaws:aws-java-sdk-s3:1.12.316,org.apache.hadoop:hadoop-aws:3.3.5";
     public static final String DEFAULT_SPARK_OPERATOR_NAMESPACE = "spark-operator";
 
     public static Map<String, String> defaultConf() {
@@ -54,11 +54,12 @@ public class SparkConfiguration {
         return confMap;
     }
 
-    public static Map<String, String> setS3Credentials(Map<String, String> confMap, String bucket, String accessKey, String secretKey, String endpoint) {
+    public static Map<String, String> setS3Credentials(Map<String, String> confMap, String bucket, String accessKey, String secretKey, String endpoint, String region) {
         confMap.put("spark.hadoop.fs.defaultFS", "s3a://" + bucket);
         confMap.put("spark.hadoop.fs.s3a.access.key", accessKey);
         confMap.put("spark.hadoop.fs.s3a.secret.key", secretKey);
         confMap.put("spark.hadoop.fs.s3a.endpoint", endpoint);
+        confMap.put("spark.hadoop.fs.s3a.endpoint.region", region);
         return confMap;
     }
 
