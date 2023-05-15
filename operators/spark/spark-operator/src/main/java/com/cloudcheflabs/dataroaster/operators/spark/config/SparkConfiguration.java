@@ -234,9 +234,12 @@ public class SparkConfiguration {
         } else if(volume.getPersistentVolumeClaim() != null) {
             Volume.PersistentVolumeClaim persistentVolumeClaim = volume.getPersistentVolumeClaim();
             String claimName = persistentVolumeClaim.getClaimName();
+            if(driverOrExecutor.equals("executor")) {
+                claimName = "OnDemand";
+            }
             boolean pvcReadOnly = persistentVolumeClaim.isReadOnly();
             confMap.put("spark.kubernetes." + driverOrExecutor + ".volumes." + volumeType + "." + volumeName + ".options.claimName", claimName);
-            confMap.put("spark.kubernetes." + driverOrExecutor + ".volumes." + volumeType + "." + volumeName + ".options.readOnly", String.valueOf(pvcReadOnly));
+            confMap.put("spark.kubernetes." + driverOrExecutor + ".volumes." + volumeType + "." + volumeName + ".mount.readOnly", String.valueOf(pvcReadOnly));
         }
         return confMap;
     }
