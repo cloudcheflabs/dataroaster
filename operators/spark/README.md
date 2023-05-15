@@ -126,13 +126,13 @@ spec:
       type: SparkLocalDir
       persistentVolumeClaim:
         claimName: OnDemand
-        storageClass: oci
+        storageClass: nfs
         sizeLimit: 50Gi
     - name: executor-local-dir
       type: SparkLocalDir
       persistentVolumeClaim:
         claimName: OnDemand
-        storageClass: oci
+        storageClass: nfs
         sizeLimit: 50Gi
 ```
 
