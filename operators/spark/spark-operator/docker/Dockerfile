@@ -28,7 +28,7 @@ ENV PATH="$PATH:$SPARK_HOME/bin"
 
 # install maven.
 ENV MAVEN_HOME /opt/maven
-ENV MAVEN_VERSION 3.8.7
+ENV MAVEN_VERSION 3.9.2
 RUN set -eux; \
     mkdir -p ${MAVEN_HOME}; \
     cd ${MAVEN_HOME}; \

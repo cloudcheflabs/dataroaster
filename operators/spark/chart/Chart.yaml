@@ -1,7 +1,7 @@
 apiVersion: v2
 name: dataroastersparkoperator
-version: v1.1.0
-appVersion: v3.0.4
+version: v1.2.0
+appVersion: v3.4.0
 description: dataroaster spark operator
 
 
