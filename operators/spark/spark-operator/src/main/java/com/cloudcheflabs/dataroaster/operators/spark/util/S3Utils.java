@@ -33,8 +33,7 @@ public class S3Utils {
 
         AmazonS3 s3Client = AmazonS3ClientBuilder
                 .standard()
-                .withRegion(region)
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, null))
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, region))
                 .withPathStyleAccessEnabled(true)
                 .withClientConfiguration(clientConfiguration)
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
