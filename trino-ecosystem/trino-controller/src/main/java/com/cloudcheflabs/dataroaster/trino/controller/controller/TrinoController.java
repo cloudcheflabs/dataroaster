@@ -123,7 +123,8 @@ public class TrinoController {
             LOG.info("trino cluster in namespace [{}] is running: {}", trinoClusterNamespace, trinoClusterRunning);
 
             if(trinoClusterRunning) {
-                throw new IllegalStateException("trino cluster in namespace [" + trinoClusterNamespace + "] already running.");
+                LOG.info("trino cluster in namespace [" + trinoClusterNamespace + "] already running.");
+                return ControllerUtils.successMessage();
             }
 
             // build custom resource of trino cluster.
